@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Creator</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  </head>
+  <body>
+    <div id="app">
+      <button @click="callMyFunction">get</button>
+    </div>
+    <!-- <script src="../function/browser/testget.js" type="module"></script>
+    <script src="../function/browser/get-db-creator.js" type="module"></script> -->
+    <script>
+      window.ipcRenderer.receive("data-to-fe", (event, data) => {
+        console.log("from app.js", { event }); // You can now use the received data in your HTML
+      });
+    </script>
+    <script>
+      new Vue({
+        el: "#app",
+        data: {
+          newData: "hello",
+        },
+        methods: {
+          callMyFunction() {
+            window.electron.ipcRenderer.send("data-to-html", this.newData);
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
+<!-- <template>
+  <div>
+    <header class="bg-[#FBFBFD] rounded-t-[15px] p-5">
+      <h1 class="text-xl font-semibold mb-6">Database Kreator</h1>
+      <section class="flex items-center justify-between">
+        <div class="max-w-[150px] md:max-w-[206px]">
+          <SelectDropdown
+            :option="categoryOptions"
+            place-holder="Pilih Kategori"
+            @changeSelectedOption="changeCategoryValue($event)"
+            @click="getShopeeastCreators"
+          />
+        </div>
+
+        <div class="relative w-full lg:max-w-[504px]">
+          <img
+            src="/icons/dashboard/database-creator/search.svg"
+            alt="seach"
+            class="absolute right-[16px] top-1/2 transform -translate-y-1/2 cursor-pointer"
+            @click="onSearchCreator"
+          />
+          <input
+            type="text"
+            name=""
+            id=""
+            v-model="paramGetShopeeCreators.search"
+            placeholder="Search here.."
+            class="border-[1px] border-[#4338C926]/[0.15] p-2 rounded-md text-sm text-[#A0A3BD] w-full outline-none"
+            @keyup.enter="onSearchCreator"
+          />
+        </div>
+      </section>
+    </header>
+    <template v-if="subscriptionId">
+      <div class="bg-white p-[20px] rounded-b-[15px]">
+        <table class="w-full table-auto">
+          <thead
+            class="text-left text-[#2D2D2D] font-medium leading-[165%] text-sm"
+          >
+            <tr>
+              <th class="text-center">No</th>
+              <th>Display Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Nomor HP</th>
+              <th>Kategori Kreator</th>
+              <th>Sosial Media</th>
+              <th>Pesanan</th>
+              <th class="text-left">Jumlah Follower</th>
+            </tr>
+          </thead>
+          <tbody class="text-[#66738F] text-sm" v-if="!isLoadingShopeeCreator">
+            <tr v-for="(creator, id) in dataCreator.list">
+              <td v-if="dataCreator.pagination" class="py-3 text-center">
+                {{ id + 1 + dataCreator.pagination.currentPage *
+                dataCreator.pagination.perPage - dataCreator.pagination.perPage
+                }}
+              </td>
+              <td>
+                <a
+                  :href="linkToDetailAffiliate(creator.affiliateId)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="cursor-pointer hover:opacity-50"
+                >
+                  {{ creator.displayName }}</a
+                >
+              </td>
+              <td>
+                <a
+                  :href="linkToDetailAffiliate(creator.affiliateId)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="cursor-pointer hover:opacity-50"
+                >
+                  {{ creator.username }}</a
+                >
+              </td>
+              <td>{{ creator.email }}</td>
+              <td>{{ creator.phoneNumber }}</td>
+              <td class="truncate max-w-[200px] pr-2">
+                <span
+                  v-for="(category, id) in creator.relatedCategoris"
+                  :key="id"
+                >
+                  {{ category }}
+                  <span v-if="id + 1 < creator.relatedCategoris.length">,</span>
+                </span>
+              </td>
+              <td>
+                <div
+                  class="flex items-center gap-1"
+                  v-html="extractPlatformName(creator.socialMedias)"
+                ></div>
+              </td>
+              <td>
+                <div v-if="creator.orderRange" class="flex gap-1">
+                  <p v-for="(total, id) in creator.orderRange" :key="id">
+                    <span> {{ abbreviateNumber(total) }} </span>
+                    <span v-show="id == 0">-</span>
+                  </p>
+                </div>
+              </td>
+              <td class="text-left">
+                {{ creator.totalFollower ?
+                abbreviateNumber(creator.totalFollower) : '-' }}
+              </td>
+            </tr>
+            <tr
+              v-if="dataCreator.list && dataCreator.list.length == 0"
+              class="bg-blue-50"
+            >
+              <td colspan="12" class="py-10 text-center">
+                Data tidak ditemukan
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr v-for="n in 5" :key="n">
+              <td v-for="i in 8" :key="i" class="p-2 animate-pulse">
+                <div class="bg-slate-200 w-full h-3 rounded-full"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="bg-[#FBFBFD] rounded-b-[15px] p-5">
+        <div class="w-max mx-auto">
+          <Pagination
+            :is-loading="isLoadingShopeeCreator"
+            :pagination="dataCreator.pagination"
+            :max-displayed-pages="5"
+            @onClickPagination="onClickPagination"
+          />
+        </div>
+      </footer>
+    </template>
+    <template v-else>
+      <div class="w-full lg:w-1/2 rounded-lg p-4 flex justify-center border">
+        Kamu belum berlangganan Shopee Blast
+      </div>
+    </template>
+  </div>
+</template>
+
+<script>
+  import { abbreviateNumber } from "~/helpers/common";
+  import SelectDropdown from "~/components/atoms/select-dropdown.vue";
+  import Pagination from "~/components/dashboard-page/pagination.vue";
+
+  export default {
+    layout: "dashboard-shopee",
+    middleware: ["checkSubscription"],
+    components: {
+      SelectDropdown,
+      Pagination,
+    },
+    data() {
+      return {
+        categoryOptions: [
+          { id: 1, name: "Semua", value: "" },
+          { id: 2, name: "Kesehatan", value: "Kesehatan" },
+          { id: 3, name: "Aksesoris Fashion", value: "Aksesoris Fashion" },
+          { id: 4, name: "Elektronik", value: "Elektronik" },
+          { id: 5, name: "Pakaian Pria", value: "Pakaian Pria" },
+          { id: 6, name: "Sepatu Pria", value: "Sepatu Pria" },
+          {
+            id: 7,
+            name: "Handphone & Aksesoris",
+            value: "Handphone & Aksesoris",
+          },
+          {
+            id: 8,
+            name: "Fashion Muslim",
+            value: "Fashion Muslim",
+          },
+          {
+            id: 8,
+            name: "Koper & Tas Travel",
+            value: "Koper & Tas Travel",
+          },
+          {
+            id: 9,
+            name: "Tas Wanita",
+            value: "Tas Wanita",
+          },
+          {
+            id: 10,
+            name: "Pakaian Wanita",
+            value: "Pakaian Wanita",
+          },
+          {
+            id: 11,
+            name: "Food Delivery",
+            value: "Food Delivery",
+          },
+          {
+            id: 12,
+            name: "Sepatu Wanita",
+            value: "Sepatu Wanita",
+          },
+          {
+            id: 13,
+            name: "Tas Pria",
+            value: "Tas Pria",
+          },
+          {
+            id: 14,
+            name: "Jam Tangan",
+            value: "Jam Tangan",
+          },
+          {
+            id: 15,
+            name: "Audio",
+            value: "Audio",
+          },
+          {
+            id: 16,
+            name: "Makanan & Minuman",
+            value: "Makanan & Minuman",
+          },
+          {
+            id: 17,
+            name: "Perawatan & Kecantikan",
+            value: "Perawatan & Kecantikan",
+          },
+          {
+            id: 18,
+            name: "Hewan Peliharaan",
+            value: "Hewan Peliharaan",
+          },
+          {
+            id: 19,
+            name: "Ibu & Bayi",
+            value: "Ibu & Bayi",
+          },
+          {
+            id: 20,
+            name: "Fashion Bayi & Anak",
+            value: "Fashion Bayi & Anak",
+          },
+          {
+            id: 21,
+            name: "Gaming & Konsol",
+            value: "Gaming & Konsol",
+          },
+          {
+            id: 22,
+            name: "Kamera & Drone",
+            value: "Kamera & Drone",
+          },
+          {
+            id: 23,
+            name: "Perlengkapan Rumah",
+            value: "Perlengkapan Rumah",
+          },
+          {
+            id: 24,
+            name: "Olahraga & Outdoor",
+            value: "Olahraga & Outdoor",
+          },
+          {
+            id: 25,
+            name: "Buku & Alat Tulis",
+            value: "Buku & Alat Tulis",
+          },
+          {
+            id: 26,
+            name: "Hobi & Koleksi",
+            value: "Hobi & Koleksi",
+          },
+          {
+            id: 27,
+            name: "Mobil",
+            value: "Mobil",
+          },
+          {
+            id: 28,
+            name: "Sepeda Motor",
+            value: "Sepeda Motor",
+          },
+          {
+            id: 29,
+            name: "Tiket, Voucher, & Layanan",
+            value: "Tiket, Voucher, & Layanan",
+          },
+          {
+            id: 30,
+            name: "Buku & Majalah",
+            value: "Buku & Majalah",
+          },
+          {
+            id: 31,
+            name: "Komputer & Aksesoris",
+            value: "Komputer & Aksesoris",
+          },
+          {
+            id: 32,
+            name: "Deals Sekitarmu",
+            value: "Deals Sekitarmu",
+          },
+        ],
+        urlSocialMedias: [],
+        paramGetShopeeCreators: {
+          page: 1,
+          limit: 10,
+          category: "",
+          followerCount: "",
+          search: "",
+        },
+        isLoadingShopeeCreator: true,
+        dataCreator: {
+          list: [],
+          pagination: {},
+        },
+        subscriptionId: null,
+        userId: this.$getUserInfo("id"),
+      };
+    },
+    mounted() {
+      const getSubscriptionId = this.$getUserInfo("subscriptionId");
+      if (!getSubscriptionId) {
+        this.$toast.error("Sesi berakhir");
+        this.$router.push("/login");
+      }
+      this.subscriptionId = getSubscriptionId;
+      this.getShopeeastCreators();
+    },
+    methods: {
+      changeCategory(val) {
+        this.paramGetShopeeCreators.category = val.name;
+      },
+      onSearchCreator() {
+        alert(this.paramGetShopeeCreators.search);
+      },
+      async getShopeeastCreators() {
+        this.isLoadingShopeeCreator = true;
+        try {
+          const res = await this.$axios.get("/shopee/shopee-creators", {
+            params: this.paramGetShopeeCreators,
+          });
+          const { data, pagination } = res.data;
+          this.dataCreator = {
+            list: data,
+            pagination,
+          };
+        } catch (error) {
+          // only handles error out of axios
+          // because error from API/axios are handled on plugins/axios.js
+        }
+        this.isLoadingShopeeCreator = false;
+      },
+      linkToDetailAffiliate(affId) {
+        if (affId) {
+          return `https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace/detail?affiliate_id=${affId}&show_back=1`;
+        }
+      },
+      extractPlatformName(url) {
+        try {
+          const urlSosmed = JSON.parse(url);
+          const sanitizedUrls = urlSosmed.map((val) =>
+            val.website_url.replace(/^\"|\"$/g, "")
+          );
+          const link = sanitizedUrls.map(
+            (url) =>
+              `<a href="${url}" target="_blank">
+                <img src="/icons/social-medias/${this.getWebsiteName(
+                  url
+                )}.svg" alt="${this.getWebsiteName(
+                url
+              )}" class="w-6 h-6 cursor-pointer rounded"/>
+              </a>`
+          );
+          return link.join("<br>");
+        } catch (error) {
+          return "-";
+        }
+      },
+      getWebsiteName(url) {
+        const match = url.match(/^https:\/\/www\.(.*?)\./);
+        return match ? match[1] : url;
+      },
+      onSearchCreator() {
+        this.paramGetShopeeCreators = {
+          ...this.paramGetShopeeCreators,
+          page: 1,
+        };
+        this.getShopeeastCreators();
+      },
+      changeCategoryValue(val) {
+        this.paramGetShopeeCreators.category = val.value;
+      },
+      onClickPagination(page) {
+        this.paramGetShopeeCreators = {
+          ...this.paramGetShopeeCreators,
+          page,
+        };
+        this.getShopeeastCreators();
+      },
+      abbreviateNumber,
+    },
+  };
+</script> -->

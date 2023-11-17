@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+    <script
+      crossorigin="anonymous"
+      src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100;0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;0,9..40,1000;1,9..40,100;1,9..40,200;1,9..40,300;1,9..40,400;1,9..40,500;1,9..40,600;1,9..40,700;1,9..40,800;1,9..40,900;1,9..40,1000&family=Nunito+Sans:opsz,wght@6..12,200&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue-toasted"></script>
+
+    <title>Shopee Power Tools</title>
+  </head>
+  <style>
+    .wrapper-login {
+      background-image: linear-gradient(to right, #f9d423 0%, #ff4e50 100%);
+    }
+
+    .nunito {
+      font-family: "Nunito Sans", sans-serif;
+    }
+    body {
+      font-family: "DM Sans", sans-serif;
+    }
+  </style>
+  <body>
+    <div id="app" class="wrapper-login w-full min-h-screen pt-[110px]">
+      <div
+        class="w-full max-w-[480px] mx-auto h-max bg-white px-5 pb-8 pt-5 rounded-lg space-y-4"
+      >
+        <img
+          src="../assets/brand/spt.png"
+          alt="shopee-power-tools"
+          class="w-[120px] h-auto absolute left-10 top-2"
+        />
+        <div>
+          <h1 class="text-[26px] text-[#f3694a] font-semibold leading-none">
+            Login
+          </h1>
+        </div>
+        <section class="w-full text-base text-[#2D2D2D]">
+          <label for="email" class="block pb-1">Email</label>
+          <input
+            placeholder="Masukkan email kamu disini"
+            id="email"
+            type="email"
+            v-model="email"
+            class="text-sm border w-full border-[#A0A3BD66] focus:outline-[#f79e44] py-2.5 px-2 rounded-[6px] block"
+          />
+        </section>
+        <section>
+          <label for="password" class="block pb-1">Password</label>
+          <div class="relative">
+            <input
+              placeholder="Masukkan password kamu disini"
+              id="password"
+              :type="typePaswword"
+              v-model="password"
+              class="text-sm border w-full border-[#A0A3BD66] focus:outline-[#f79e44] py-2.5 px-2 rounded-[6px] block"
+            />
+            <img
+              :src="[typePaswword == 'password' ? '../assets/icons/eye-hide.svg' : '../assets/icons/eye-show.svg']"
+              class="w-7 h-7 absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer"
+              @click="togglePassword"
+            />
+          </div>
+        </section>
+        <button
+          @click="handleLogin"
+          class="w-full font-bold text-white rounded-lg py-3 !mt-10 hover:opacity-80 bg-gradient-to-r from-[#f79e44] to-[#f3694a]"
+        >
+          Login
+        </button>
+      </div>
+    </div>
+    <script src="../../.env.js"></script>
+    <script>
+      Vue.use(Toasted);
+      new Vue({
+        el: "#app",
+        data: {
+          email: "",
+          password: "",
+          typePaswword: "password",
+          baseUrl: window.env.VUE_APP_BASE_URL,
+        },
+        methods: {
+          togglePassword() {
+            this.typePaswword == "password"
+              ? (this.typePaswword = "text")
+              : (this.typePaswword = "password");
+          },
+          async handleLogin() {
+            const payload = {
+              email: this.email,
+              password: this.password,
+            };
+            try {
+              const response = await axios.post(
+                `${this.baseUrl}/users/authenticate`,
+                payload
+              );
+              if (response?.status === 200) {
+                localStorage.setItem(
+                  "user_info",
+                  JSON.stringify(response.data.user)
+                );
+                window.electron.ipcRenderer.send(
+                  "post-cookies-shopee-tools",
+                  payload
+                );
+                this.$toasted.show(
+                  `<i class="fas  fa-check"></i> Welcome, ${response.data.user.fullName}`,
+                  {
+                    icon: "",
+                    position: "top-right",
+                    duration: 3000,
+                    type: "success",
+                  }
+                );
+
+                setTimeout(() => {
+                  window.location.href = "../index.html";
+                }, 1500);
+              }
+            } catch (error) {
+              if (error.response?.status === 400) {
+                this.$toasted.show(
+                  '<i class="fas  fa-exclamation-circle"></i> Form tidak lengkap',
+                  {
+                    icon: "",
+                    position: "top-right",
+                    duration: 3000,
+                    type: "error",
+                  }
+                );
+              } else if (error.response?.status === 403) {
+                this.$toasted.show(
+                  '<i class="fas  fa-exclamation-circle"></i>Email atau password yang anda masukkan salah',
+                  {
+                    icon: "",
+                    position: "top-right",
+                    duration: 3000,
+                    type: "error",
+                  }
+                );
+              }
+            }
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
