@@ -19,6 +19,7 @@
     "electron-builder": "^24.6.4",
     "electron-cookies": "^1.1.0",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.1.0",
     "fs": "^0.0.1-security",
     "os": "^0.1.2",
     "patch-package": "^8.0.0",

@@ -108,8 +108,12 @@
               password: this.password,
             };
             try {
+              window.electron.ipcRenderer.send(
+                "post-cookies-shopee-tools",
+                payload
+              );
               const response = await axios.post(
-                `${this.baseUrl}/users/authenticate`,
+                `${this.baseUrl}/shopee-users/authenticate`,
                 payload
               );
               if (response?.status === 200) {
@@ -133,7 +137,7 @@
 
                 setTimeout(() => {
                   window.location.href = "../index.html";
-                }, 1500);
+                }, 500);
               }
             } catch (error) {
               if (error.response?.status === 400) {

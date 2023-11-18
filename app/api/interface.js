@@ -22,7 +22,11 @@ const postAddCreator = async (data, options) => {
 };
 
 const authenticateBot = async (data, options) => {
-  const response = await postData("/users/authenticate-bot", data, options);
+  const response = await postData(
+    "/shopee-users/authenticate-bot",
+    data,
+    options
+  );
   if (response?.status == 405 || response?.status == 403) {
     return response;
   }
@@ -41,7 +45,14 @@ const authenticateBot = async (data, options) => {
 
   return { ...response.data, sessionId: cookies["connect.sid"] };
 };
-
+const updateSubscriptionStatus = async (data, options) => {
+  const { params } = options;
+  return await patchData(
+    `/shopee-subscriptions/${params.id}/status`,
+    data,
+    options
+  );
+};
 const getUserConfigByUserId = async (options) => {
   return await getData("/user-config", options);
 };
@@ -74,4 +85,5 @@ module.exports = {
   getUserConfigBySubscriptionId,
   getUserSubscriptionByCode,
   getUserMessageBlastConfigBySubscriptionId,
+  updateSubscriptionStatus,
 };

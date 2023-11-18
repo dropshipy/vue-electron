@@ -85,7 +85,7 @@ async function messageBlast({
               }
             });
             const buttonChat =
-              "#root > div.affiliate-layout > div.affiliate-layout-content.affiliate-layout-content-full > div > div > div > div.marketplace-detail_U9pYf > div.affiliate-content-1264.affiliate-content-detail.userinfo-card_OvP4e > div.user_dl3on > div > span.chat-button_7HREW";
+              "#root > div.affiliate-layout > div.affiliate-layout-content.affiliate-layout-content-full > div > div > div > div.marketplace-detail_U9pYf > div.affiliate-content-1264.affiliate-content-detail.userinfo-card_OvP4e > div.right-wrap_EpKO4 > div > span.chat-button_7HREW";
             await page.click(buttonChat);
 
             const textArea =

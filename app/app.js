@@ -14,6 +14,7 @@ const {
 } = require("./function/browser/authenticate-shopee-tools");
 const { saveCookies, loadCookies } = require("./helpers/utils");
 require("dotenv").config();
+const ElectronStore = require("electron-store");
 
 const COOKIES_PATH = path.join(__dirname, "./store/cookies.json");
 const USER_CONFIG_PATH = path.join(__dirname, "./store/user-config.json");
@@ -38,6 +39,7 @@ const replyReviewsConfigPath = path.join(
 let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
+const store = new ElectronStore();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -243,6 +245,7 @@ async function handleAutoUnfolow(iteration) {
 }
 
 ipcMain.on("crawl-creator", (event, data) => {
+  console.log(data);
   handleCrawlCreator(data);
 });
 async function handleCrawlCreator(config) {
@@ -300,6 +303,15 @@ ipcMain.on("get-database-creator", async (event, data) => {
 //end
 ipcMain.on("account-subscription", (event, data) => {
   fs.writeFileSync(ACCOUNT_SUBSCRIPTION_PATH, JSON.stringify(data));
+});
+
+ipcMain.on("get-subscription-info", async () => {
+  const res = await axios.get(`${process.env.BASE_URL}/shopee-subscriptions`, {
+    headers: {
+      Cookie: store.get("cookies-spt"),
+    },
+  });
+  store.set("data-subscription", res.data);
 });
 
 app.on("window-all-closed", () => {

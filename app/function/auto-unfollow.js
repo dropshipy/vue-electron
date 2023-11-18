@@ -58,10 +58,42 @@ async function autoUnfollow({ page, iteration }) {
       ),
     ]);
     try {
-      await scrollAndHandleModal(page);
-      await page.evaluate(() => {
-        window.scrollTo(0, 0);
-      });
+      try {
+        await scrollAndHandleModal(page);
+        await page.evaluate(() => {
+          window.scrollTo(0, 0);
+        });
+        if (iteration == "Semua") {
+          const buttons = await page.$$("button");
+
+          for (const button of buttons) {
+            await page.waitForTimeout(1000);
+            await button.click();
+          }
+        } else {
+          await clickAllButtons(page, iteration);
+        }
+        await page.waitForTimeout(2000);
+        await page.evaluate(() => {
+          window.alert("Program Unffollow Otomatis Telah Selesai");
+        });
+      } catch (error) {
+        if (iteration == "Semua") {
+          const buttons = await page.$$("button");
+
+          for (const button of buttons) {
+            await page.waitForTimeout(1000);
+            await button.click();
+          }
+        } else {
+          await clickAllButtons(page, iteration);
+        }
+        await page.waitForTimeout(2000);
+        await page.evaluate(() => {
+          window.alert("Program Unffollow Otomatis Telah Selesai");
+        });
+      }
+
       if (iteration == "Semua") {
         const buttons = await page.$$("button");
 

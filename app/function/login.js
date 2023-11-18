@@ -1,28 +1,22 @@
 const puppeteer = require("puppeteer");
-const fs = require("fs");
 const os = require("os");
-const path = require("node:path");
 const { authenticateBot } = require("../api/interface");
-const { loadCookies } = require("../helpers/utils");
-const COOKIES_PATH = path.join(__dirname, "../store/cookies.json");
-const accountSubscriptionPath = path.join(
-  __dirname,
-  "../store/account-subscription.json"
-);
-
+const ElectronStore = require("electron-store");
+const store = new ElectronStore();
+const { updateSubscriptionStatus } = require("../api/interface");
 async function saveCookies(page, browser) {
   const cookies = await page.cookies();
-  fs.writeFileSync(COOKIES_PATH, JSON.stringify(cookies));
+  store.set("cookies-shopee-account", cookies);
 }
 async function loadCookiesShopee(page) {
-  if (fs.existsSync(COOKIES_PATH)) {
-    const cookies = JSON.parse(fs.readFileSync(COOKIES_PATH, "utf-8"));
-    await page.setCookie(...cookies);
+  const cookieShopee = store.get("cookies-shopee-account");
+  if (cookieShopee) {
+    await page.setCookie(...cookieShopee);
   }
 }
 
 async function authenticateBotStatus(page, browser) {
-  const accountSubscription = await loadCookies(accountSubscriptionPath);
+  const accountSubscription = store.get("account-subscription");
 
   // fetch fingerprint
   const osVersion = os.version();
@@ -38,75 +32,121 @@ async function authenticateBotStatus(page, browser) {
   const osTotalMem = os.totalmem();
   const osUserInfo = JSON.stringify(os.userInfo());
   const osEndianess = os.endianness();
+  if (accountSubscription) {
+    const payloadAuthBot = {
+      email: accountSubscription.email,
+      password: accountSubscription.password,
+      subscriptionCode: accountSubscription.subscription,
+      device_info: osVersion,
+      fingerprint: {
+        architecture: osArch,
+        platform: osPlatform,
+        release: osRelease,
+        hostName: osHostName,
+        homeDir: osHomeDir,
+      },
+      fingerprintV2: {
+        osArch: osArch,
+        osPlatform: osPlatform,
+        osType: osType,
+        osCpus: osCpus,
+        osTotalMem: osTotalMem,
+        osEndianess: osEndianess,
+        osUserInfo: osUserInfo,
+      },
+    };
+    try {
+      if (accountSubscription) {
+        const authenticateBotCookie = "";
+        const authenticateBotRes = await authenticateBot(payloadAuthBot, {
+          headers: {
+            Cookie: authenticateBotCookie,
+          },
+        });
 
-  const payloadAuthBot = {
-    email: accountSubscription.email,
-    password: accountSubscription.password,
-    subscriptionCode: accountSubscription.subscription,
-    device_info: osVersion,
-    fingerprint: {
-      architecture: osArch,
-      platform: osPlatform,
-      release: osRelease,
-      hostName: osHostName,
-      homeDir: osHomeDir,
-    },
-    fingerprintV2: {
-      osArch: osArch,
-      osPlatform: osPlatform,
-      osType: osType,
-      osCpus: osCpus,
-      osTotalMem: osTotalMem,
-      osEndianess: osEndianess,
-      osUserInfo: osUserInfo,
-    },
-  };
-  try {
-    if (accountSubscription) {
-      const authenticateBotCookie = "";
-      const authenticateBotRes = await authenticateBot(payloadAuthBot, {
-        headers: {
-          Cookie: authenticateBotCookie,
-        },
-      });
-      if (authenticateBotRes?.status == 405) {
-        await page.evaluate(() => {
-          window.alert(
-            "Akun sudah terhubung ke perangkat lain. Cek perangkat terhubung di halaman dashboard."
-          );
-        });
-        await browser.close();
-      } else if (authenticateBotRes?.status == 403) {
-        await page.evaluate(() => {
-          window.alert(
-            "Email / password salah. Periksa kembali data user info pada halaman akun shopee power tools."
-          );
-        });
-        await browser.close();
+        if (authenticateBotRes?.status == 405) {
+          await page.evaluate(() => {
+            window.alert(
+              "Akun sudah terhubung ke perangkat lain. Cek perangkat terhubung di halaman dashboard."
+            );
+          });
+          await browser.close();
+        } else if (authenticateBotRes?.status == 403) {
+          await page.evaluate(() => {
+            window.alert(
+              "Email / password salah. Periksa kembali data user info pada halaman akun shopee power tools."
+            );
+          });
+          await browser.close();
+        } else {
+          const subscriptionData = authenticateBotRes.user.subscription;
+          const authenticateBotResponse = {
+            sessionId: authenticateBotRes?.sessionId,
+            subscriptionData: authenticateBotRes.user,
+          };
+
+          if (subscriptionData.status !== "active") {
+            await page.evaluate((subscriptionData) => {
+              window.alert(
+                `Status langganan ${subscriptionData.code} tidak aktif. Cek status langganan di menu dashboard atau hubungi admin.`
+              );
+            }, subscriptionData);
+            await browser.close();
+          } else if (subscriptionData.expiredAt) {
+            const today = new Date();
+            const expiryDate = new Date(subscriptionData.expiredAt);
+            const data = {
+              status: "inactive",
+            };
+            if (subscriptionData.status === "active" && today > expiryDate) {
+              await updateSubscriptionStatus(data, {
+                headers: {
+                  Cookie: "connect.sid=" + authenticateBotResponse.sessionId,
+                },
+                params: {
+                  id: subscriptionData.id,
+                },
+              });
+              await page.evaluate((subscriptionData) => {
+                window.alert(
+                  `ID langganan ${subscriptionData.code} sudah melewati batas masa berlangganan (expired). Hubungi admin jika ingin melanjutkan berlangganan.`
+                );
+              }, subscriptionData);
+              await browser.close();
+            }
+          }
+          return authenticateBotResponse;
+        }
       } else {
-        const authenticateBotResponse = {
-          sessionId: authenticateBotRes?.sessionId,
-          subscriptionData: authenticateBotRes.user.subscription,
-        };
-        return authenticateBotResponse;
+        await page.evaluate(() => {
+          window.alert(
+            "Harap isi terlebih dahulu account subcription shopee tools power kamu"
+          );
+        });
+        await browser.close();
       }
-    } else {
+    } catch (error) {
       await page.evaluate(() => {
-        window.alert(
-          "Harap isi terlebih dahulu account subcription shopee tools power kamu"
-        );
+        window.alert("Gagal menghubungkan shopee power tools");
       });
       await browser.close();
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error);
+  } else {
+    await page.evaluate(() => {
+      window.alert(
+        "Harap isi terlebih dahulu account subcription shopee tools power kamu"
+      );
+    });
+    await browser.close();
   }
 }
 
 async function loginShopee(page, browser) {
   const resBotStatus = await authenticateBotStatus(page, browser);
   try {
-    if (fs.existsSync(COOKIES_PATH)) {
+    const cookieShopee = store.get("cookies-shopee-account");
+    if (cookieShopee) {
       try {
         console.log("Cookies found. Logging in...");
         await loadCookiesShopee(page);

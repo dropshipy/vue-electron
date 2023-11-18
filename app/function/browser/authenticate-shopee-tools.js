@@ -1,21 +1,13 @@
-const path = require("node:path");
-const fs = require("fs");
 const axios = require("axios");
+const ElectronStore = require("electron-store");
+const store = new ElectronStore();
 
-const COOKIES_PATH = path.join(
-  __dirname,
-  "../../store/cookies-shopee-tools.json"
-);
-
-function saveCookies(config) {
-  fs.writeFileSync(COOKIES_PATH, JSON.stringify(config));
-}
 function handleCookies(payload) {
   // Simulate an authentication request and return the obtained cookie
   return new Promise((resolve, reject) => {
     // Your authentication logic here, for example using axios
     axios
-      .post(`${process.env.BASE_URL}/users/authenticate`, payload)
+      .post(`${process.env.BASE_URL}/shopee-users/authenticate`, payload)
       .then((response) => {
         // Assuming the authentication endpoint returns a 'Set-Cookie' header
         const setCookieHeader = response.headers["set-cookie"];
@@ -45,7 +37,7 @@ async function authenticateUserShopeeTools(payload) {
     handleCookies(payload)
       .then((cookie) => {
         // Store the obtained authentication cookie
-        saveCookies(cookie);
+        store.set("cookies-spt", cookie);
       })
 
       .catch((error) => {

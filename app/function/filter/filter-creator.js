@@ -3,11 +3,14 @@ const { waitForTimeout } = require("../../helpers/utils");
 // selector in affialter market place page
 const categoryDropdown =
   "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(1) > div.filter-group-content_Xfj27 > div:nth-child(1) > div > div > div > div";
+const chevronCategory =
+  "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(1) > div.filter-group-content_Xfj27 > div:nth-child(1) > div > div > div > div > div.trigger.trigger--normal.multiple.shopee-react-popover-open > div.shopee-react-select__suffix > i.shopee-react-select__expend-btn.expend-btn.expand.shopee-react-icon.seller-icon-arrow-down-bold.shopee-seller-iconfont";
+
 const mediaSocialDropdown =
   "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(1) > div.filter-group-content_Xfj27 > div:nth-child(2) > div > div > div > div > div.trigger.trigger--normal";
 
 const followerCountDropdown =
-  "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(2) > div.filter-group-content_Xfj27 > div:nth-child(1) > div > div > div > div";
+  "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(2) > div.filter-group-content_Xfj27 > div:nth-child(1) > div > div > div > div > div.trigger.trigger--normal > div.shopee-react-select__suffix > i.shopee-react-select__expend-btn.expend-btn.shopee-react-icon.seller-icon-arrow-down-bold.shopee-seller-iconfont";
 const followerAgeDropdown =
   "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(2) > div.filter-group-content_Xfj27 > div:nth-child(2) > div > div > div > div";
 const followerGenderDropdown =
@@ -16,14 +19,8 @@ const searchButtonFilter =
   "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.filter-actions_dHTx2 > button.shopee-react-button.shopee-react-button--primary.shopee-react-button--normal";
 
 async function filterCreator({ page, config }) {
-  const {
-    replyMessage,
-    category,
-    socialMedias,
-    followerCount,
-    followerAge,
-    followerGender,
-  } = config.configMessageBlast;
+  const { category, socialMedias, followerCount, followerAge, followerGender } =
+    config.configMessageBlast;
   try {
     if (category !== "Semua") {
       try {
@@ -45,39 +42,69 @@ async function filterCreator({ page, config }) {
             }
           });
         }, category);
+        await page.click(chevronCategory);
       } catch (error) {
         console.log(error);
       }
     }
-    if (socialMedias) {
+    if (socialMedias !== "Semua") {
       try {
         await page.click(mediaSocialDropdown);
         await page.waitForTimeout(2000);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    if (followerCount) {
-      try {
-        await page.click(followerCountDropdown);
-        await page.waitForTimeout(2000);
-        await page.evaluate((text) => {
+        await page.evaluate((socialMedias) => {
           const divs = document.querySelectorAll(".shopee-react-select-option");
           const targetDiv = Array.from(divs).find((div) =>
-            div.innerText.includes(text)
+            div.innerText.includes(socialMedias)
           );
 
           if (targetDiv) {
             targetDiv.click();
           } else {
-            console.error("Div not found with text:", text);
+            console.error("Div not found with text:", socialMedias);
+          }
+        }, socialMedias);
+        // await page.click(mediaSocialDropdown);
+        // await page.waitForTimeout(2000);
+        // await page.evaluate((texts) => {
+        //   const divs = document.querySelectorAll(".shopee-react-select-option");
+
+        //   texts.forEach((text) => {
+        //     const targetDiv = Array.from(divs).find((div) =>
+        //       div.innerText.includes(text)
+        //     );
+
+        //     if (targetDiv) {
+        //       targetDiv.click();
+        //     } else {
+        //       console.error("Div not found with text:", text);
+        //     }
+        //   });
+        // }, socialMedias);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (followerCount !== "Semua") {
+      try {
+        await page.click(followerCountDropdown);
+        await page.waitForTimeout(2000);
+        await page.evaluate((followerCount) => {
+          const divs = document.querySelectorAll(".shopee-react-select-option");
+          const targetDiv = Array.from(divs).find((div) =>
+            div.innerText.includes(followerCount)
+          );
+
+          if (targetDiv) {
+            targetDiv.click();
+          } else {
+            console.error("Div not found with text:", followerCount);
           }
         }, followerCount);
       } catch (error) {
         console.log(error);
       }
     }
-    if (followerAge) {
+    if (followerAge !== "Semua") {
       try {
         await page.click(followerAgeDropdown);
         await page.waitForTimeout(2000);
