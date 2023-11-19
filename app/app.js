@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, session } = require("electron");
 const puppeteer = require("puppeteer");
 const path = require("node:path");
 const fs = require("fs");
+const os = require("os");
 const { loginShopee } = require("./function/login");
 const { autoUnfollow } = require("./function/auto-unfollow");
 const { crawlCreator } = require("./function/invite-creator/crawl-creator");
@@ -36,6 +37,8 @@ const replyReviewsConfigPath = path.join(
   "./store/reply-reviews-config.json"
 );
 
+// determine chrome location
+const chromePath = os.platform() == "win32" ? "chrome-win/chrome.exe" : "chrome-mac/Chromium.app/Contents/MacOS/Chromium"
 let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
@@ -223,6 +226,7 @@ async function handleAutoUnfolow(iteration) {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
+      executablePath: chromePath
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -250,6 +254,7 @@ async function handleCrawlCreator(config) {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
+      executablePath: chromePath
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -276,6 +281,7 @@ async function runReplyReviews(config) {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
+      executablePath: chromePath
     });
     const page = await browser.newPage();
     await page.setViewport({
