@@ -39,10 +39,22 @@ const replyReviewsConfigPath = path.join(
 );
 
 // determine chrome location
-const chromePath =
-  os.platform() == "win32"
-    ? "chrome-win/chrome.exe"
-    : "chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing";
+let chromePath = "invalid_os";
+let isDev = process.resourcesPath.includes("node_modules")
+let chromePathBasePath = process.resourcesPath
+
+if (isDev) {
+  chromePathBasePath = "resources"
+}
+
+if (process.platform == "darwin") {
+  chromePath = path.join(chromePathBasePath, `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`)
+} else if (process.platform == "win32") {
+  chromePath = path.join(chromePathBasePath, `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`)
+}
+
+console.log('Chromium executable path:', chromePath);
+
 let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
@@ -275,6 +287,7 @@ async function handleCrawlCreator(config) {
     await crawlCreator(context);
   } catch (error) {
     console.error("Error in the main process:", error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] }); 
   }
 }
 ipcMain.on("process-reply-reviews", (event, data) => {

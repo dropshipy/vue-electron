@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron-forge start",
     "package-desktop-app": "electron-forge package",
-    "make-desktop-app": "electron-forge make"
+    "make-desktop-app": "electron-forge make",
+    "download-chrome": "node node_modules/puppeteer/install.mjs"
   },
   "author": "",
   "license": "ISC",
