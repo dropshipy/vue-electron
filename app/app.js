@@ -253,7 +253,19 @@ async function handleCrawlCreator(config) {
     // resources\chrome\win64-119.0.6045.105\chrome-win64\chrome.exe
     // const executablePath = await puppeteer.executablePath();
     // const appPath = app.getAppPath();
-    const executablePath = path.join(`resources/chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`);
+    let executablePath = "invalid_os";
+    let isDev = process.resourcesPath.includes("node_modules")
+    let executablePathBasePath = process.resourcesPath
+
+    if (isDev) {
+      executablePathBasePath = "resources"
+    }
+
+    if (process.platform == "darwin") {
+      executablePath = path.join(executablePathBasePath, `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`)
+    } else if (process.platform == "win32") {
+      executablePath = path.join(executablePathBasePath, `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`)
+    }
     console.log('Chromium executable path:', executablePath);
     dialog.showMessageBox({ message: executablePath, buttons: ["OK"] }); 
     // Launch Puppeteer with the dynamically obtained executable path
