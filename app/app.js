@@ -40,7 +40,7 @@ let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
 const store = new ElectronStore();
-
+const baseUrlProd = "http://supportseller.com/api";
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -80,7 +80,7 @@ app.on("ready", () => {
   ipcMain.on("get-crawl-creator-config", async (event, subscriptionId) => {
     const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
     const res = await axios.get(
-      `${process.env.BASE_URL}/shopee/message-blast/${subscriptionId}`,
+      `${baseUrlProd}/shopee/message-blast/${subscriptionId}`,
       {
         headers: {
           Cookie: cookies,
@@ -92,21 +92,18 @@ app.on("ready", () => {
   });
   ipcMain.on("data-to-html", async (event, data) => {
     const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    const res = await axios.get(
-      `${process.env.BASE_URL}/shopee/shopee-creators`,
-      {
-        headers: {
-          Cookie: cookies,
-        },
-      }
-    );
+    const res = await axios.get(`${baseUrlProd}/shopee/shopee-creators`, {
+      headers: {
+        Cookie: cookies,
+      },
+    });
     mainWindow.webContents.send("data-to-fe", res.data);
   });
   ipcMain.on("update-crawl-creator-config", async (event, payload) => {
     const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
     try {
       const res = await axios.patch(
-        `${process.env.BASE_URL}/shopee/message-blast/${payload.userId}`,
+        `${baseUrlProd}/shopee/message-blast/${payload.userId}`,
         payload,
         {
           headers: {
@@ -121,7 +118,7 @@ app.on("ready", () => {
   ipcMain.on("post-crawl-creator-config", async (event, payload) => {
     const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
     const res = await axios.post(
-      `${process.env.BASE_URL}/shopee/message-blast`,
+      `${baseUrlProd}/shopee/message-blast`,
       payload,
       {
         headers: {
@@ -138,7 +135,7 @@ app.on("ready", () => {
   ipcMain.on("get-reply-reviews-config", async (event, subscriptionId) => {
     const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
     const res = await axios.get(
-      `${process.env.BASE_URL}/shopee/reply-reviews/${subscriptionId}`,
+      `${baseUrlProd}/shopee/reply-reviews/${subscriptionId}`,
       {
         headers: {
           Cookie: cookies,
@@ -151,7 +148,7 @@ app.on("ready", () => {
   ipcMain.on("post-reply-reviews-config", async (event, payload) => {
     const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
     const res = await axios.post(
-      `${process.env.BASE_URL}/shopee/reply-reviews`,
+      `${baseUrlProd}/shopee/reply-reviews`,
       payload,
       {
         headers: {
@@ -165,7 +162,7 @@ app.on("ready", () => {
     const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
     try {
       const res = await axios.patch(
-        `${process.env.BASE_URL}/shopee/reply-reviews/${payload.userId}`,
+        `${baseUrlProd}/shopee/reply-reviews/${payload.userId}`,
         payload,
         {
           headers: {
@@ -306,11 +303,14 @@ ipcMain.on("account-subscription", (event, data) => {
 });
 
 ipcMain.on("get-subscription-info", async () => {
-  const res = await axios.get(`${process.env.BASE_URL}/shopee-subscriptions`, {
-    headers: {
-      Cookie: store.get("cookies-spt"),
-    },
-  });
+  const res = await axios.get(
+    `http://supportseller.com/api/shopee-subscriptions`,
+    {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+    }
+  );
   store.set("data-subscription", res.data);
 });
 

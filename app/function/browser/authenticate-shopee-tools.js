@@ -7,7 +7,7 @@ function handleCookies(payload) {
   return new Promise((resolve, reject) => {
     // Your authentication logic here, for example using axios
     axios
-      .post(`${process.env.BASE_URL}/shopee-users/authenticate`, payload)
+      .post(`http://supportseller.com/api/shopee-users/authenticate`, payload)
       .then((response) => {
         // Assuming the authentication endpoint returns a 'Set-Cookie' header
         const setCookieHeader = response.headers["set-cookie"];
@@ -41,6 +41,7 @@ async function authenticateUserShopeeTools(payload) {
       })
 
       .catch((error) => {
+        store.set("console-auth", error.message);
         console.error("Authentication Error:", error.message);
       });
   } catch (error) {

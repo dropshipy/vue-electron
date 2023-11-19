@@ -121,10 +121,7 @@
                   "user_info",
                   JSON.stringify(response.data.user)
                 );
-                window.electron.ipcRenderer.send(
-                  "post-cookies-shopee-tools",
-                  payload
-                );
+
                 this.$toasted.show(
                   `<i class="fas  fa-check"></i> Welcome, ${response.data.user.fullName}`,
                   {

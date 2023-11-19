@@ -1,9 +1,10 @@
 const axios = require("axios");
 const { devLog } = require("../helpers/utils");
 
+const baseUrlPro = "http://supportseller.com/api";
 async function postData(endpoint = "", data = {}, options = {}) {
   try {
-    const url = process.env.BASE_URL + endpoint;
+    const url = baseUrlPro + endpoint;
     const response = await axios.post(url, data, options);
     return response;
   } catch (error) {
@@ -15,7 +16,7 @@ async function postData(endpoint = "", data = {}, options = {}) {
 
 async function getData(endpoint = "", options = {}, Honeybadger) {
   try {
-    const url = process.env.BASE_URL + endpoint;
+    const url = baseUrlPro + endpoint;
     const response = await axios.get(url, options);
     return response;
   } catch (error) {
@@ -25,7 +26,7 @@ async function getData(endpoint = "", options = {}, Honeybadger) {
 
 async function patchData(endpoint = "", data = {}, options = {}, Honeybadger) {
   try {
-    const url = process.env.BASE_URL + endpoint;
+    const url = baseUrlPro + endpoint;
     const response = await axios.patch(url, data, options);
 
     return response;

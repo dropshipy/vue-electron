@@ -1212,6 +1212,7 @@
           },
           logout() {
             localStorage.removeItem("user_info");
+            electronStore.delete("data-subscription");
             window.location.href = "./html/login-page.html";
           },
           saveAccountSubscription() {
