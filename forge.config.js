@@ -1,16 +1,17 @@
+const {join} = require('path');
+
 module.exports = {
   packagerConfig: {
     asar: true,
+    "extraResource": [
+      join(__dirname, 'resources', 'chrome')
+    ]
   },
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {},
-    },
-    {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      platforms: ['win32', 'darwin'],
     },
     {
       name: '@electron-forge/maker-deb',

@@ -15,6 +15,7 @@ const {
 const { saveCookies, loadCookies } = require("./helpers/utils");
 require("dotenv").config();
 const ElectronStore = require("electron-store");
+const { dialog } = require('electron')
 
 const COOKIES_PATH = path.join(__dirname, "./store/cookies.json");
 const USER_CONFIG_PATH = path.join(__dirname, "./store/user-config.json");
@@ -35,6 +36,7 @@ const replyReviewsConfigPath = path.join(
   __dirname,
   "./store/reply-reviews-config.json"
 );
+
 
 let mainWindow;
 // Store the authentication cookie globally
@@ -247,7 +249,16 @@ ipcMain.on("crawl-creator", (event, data) => {
 });
 async function handleCrawlCreator(config) {
   try {
+    // Outputs the path to the Chromium executable
+    // resources\chrome\win64-119.0.6045.105\chrome-win64\chrome.exe
+    // const executablePath = await puppeteer.executablePath();
+    // const appPath = app.getAppPath();
+    const executablePath = path.join(`resources/chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`);
+    console.log('Chromium executable path:', executablePath);
+    dialog.showMessageBox({ message: executablePath, buttons: ["OK"] }); 
+    // Launch Puppeteer with the dynamically obtained executable path
     const browser = await puppeteer.launch({
+      executablePath,
       headless: false,
       defaultViewport: null,
     });
@@ -266,6 +277,7 @@ async function handleCrawlCreator(config) {
     await crawlCreator(context);
   } catch (error) {
     console.error("Error in the main process:", error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] }); 
   }
 }
 ipcMain.on("process-reply-reviews", (event, data) => {
