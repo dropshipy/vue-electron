@@ -2,10 +2,12 @@ const { app, BrowserWindow, ipcMain, session } = require("electron");
 const puppeteer = require("puppeteer");
 const path = require("node:path");
 const fs = require("fs");
+const os = require("os");
 const { loginShopee } = require("./function/login");
 const { autoUnfollow } = require("./function/auto-unfollow");
 const { crawlCreator } = require("./function/invite-creator/crawl-creator");
 const { replyReviews } = require("./function/reply-reviews");
+const { dialog } = require("electron");
 const axios = require("axios");
 const { log } = require("node:console");
 const { authenticateUser } = require("./function/authenticate-user");
@@ -37,6 +39,11 @@ const replyReviewsConfigPath = path.join(
   "./store/reply-reviews-config.json"
 );
 
+// determine chrome location
+const chromePath =
+  os.platform() == "win32"
+    ? "chrome-win/chrome.exe"
+    : "chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing";
 
 let mainWindow;
 // Store the authentication cookie globally
@@ -225,6 +232,7 @@ async function handleAutoUnfolow(iteration) {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
+      executablePath: chromePath,
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -273,6 +281,7 @@ async function handleCrawlCreator(config) {
       executablePath,
       headless: false,
       defaultViewport: null,
+      executablePath: chromePath,
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -297,9 +306,12 @@ ipcMain.on("process-reply-reviews", (event, data) => {
 });
 async function runReplyReviews(config) {
   try {
+    const executablePath = puppeteer.executablePath();
+    console.log({ executablePath });
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
+      executablePath: chromePath,
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -315,6 +327,7 @@ async function runReplyReviews(config) {
     };
     await replyReviews(context);
   } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
   }
 }
