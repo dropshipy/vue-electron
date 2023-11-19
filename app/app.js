@@ -267,7 +267,7 @@ async function handleCrawlCreator(config) {
       executablePath = path.join(executablePathBasePath, `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`)
     }
     console.log('Chromium executable path:', executablePath);
-    dialog.showMessageBox({ message: executablePath, buttons: ["OK"] }); 
+    // dialog.showMessageBox({ message: executablePath, buttons: ["OK"] }); 
     // Launch Puppeteer with the dynamically obtained executable path
     const browser = await puppeteer.launch({
       executablePath,
