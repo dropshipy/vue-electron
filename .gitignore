@@ -1,3 +1,6 @@
 node_modules
 out
 store
+chrome-mac-arm64
+chrome-win
+.DS_Store

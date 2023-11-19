@@ -7,6 +7,7 @@ const { loginShopee } = require("./function/login");
 const { autoUnfollow } = require("./function/auto-unfollow");
 const { crawlCreator } = require("./function/invite-creator/crawl-creator");
 const { replyReviews } = require("./function/reply-reviews");
+const { dialog } = require("electron");
 const axios = require("axios");
 const { log } = require("node:console");
 const { authenticateUser } = require("./function/authenticate-user");
@@ -38,7 +39,10 @@ const replyReviewsConfigPath = path.join(
 );
 
 // determine chrome location
-const chromePath = os.platform() == "win32" ? "chrome-win/chrome.exe" : "chrome-mac/Chromium.app/Contents/MacOS/Chromium"
+const chromePath =
+  os.platform() == "win32"
+    ? "chrome-win/chrome.exe"
+    : "chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing";
 let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
@@ -226,7 +230,7 @@ async function handleAutoUnfolow(iteration) {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
-      executablePath: chromePath
+      executablePath: chromePath,
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -254,7 +258,7 @@ async function handleCrawlCreator(config) {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
-      executablePath: chromePath
+      executablePath: chromePath,
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -278,10 +282,12 @@ ipcMain.on("process-reply-reviews", (event, data) => {
 });
 async function runReplyReviews(config) {
   try {
+    const executablePath = puppeteer.executablePath();
+    console.log({ executablePath });
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
-      executablePath: chromePath
+      executablePath: chromePath,
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -297,6 +303,7 @@ async function runReplyReviews(config) {
     };
     await replyReviews(context);
   } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
   }
 }
