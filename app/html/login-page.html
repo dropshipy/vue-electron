@@ -96,6 +96,9 @@
           typePaswword: "password",
           baseUrl: window.env.VUE_APP_BASE_URL,
         },
+        mounted() {
+          electronStore.set("activeTab", "home");
+        },
         methods: {
           togglePassword() {
             this.typePaswword == "password"

@@ -101,7 +101,8 @@
             <div
               v-for="(menu,id) in sidebarMenu"
               :key="id"
-              class="cursor-pointer px-2"
+              class="cursor-pointer pl-5"
+              :class="[activeTab == menu.slug ? 'text-[#f3694a]':'text-[#66738F]']"
               @click="handleSidebar(menu.slug)"
             >
               <h1>{{menu.name}}</h1>
@@ -112,16 +113,16 @@
             class="bg-white w-full rounded-l-2xl mt-10 p-5"
           >
             <div>
-              <h1>Data Profil</h1>
+              <h1 class="text-2xl font-semibold">Data Profil</h1>
               <div class="p-4 border rounded-lg min-w-[500px] w-max mt-4">
                 <p>Nama: {{ userInfo.fullName }}</p>
                 <p>Email: {{ userInfo.email }}</p>
                 <p>No HP: {{ userInfo.phoneNumber }}</p>
               </div>
             </div>
-            <div class="min-w-[500px] w-max">
-              <h1>Data Berlangganan</h1>
-              <div v-if="dataSubscription">
+            <div class="min-w-[500px] w-max mt-10">
+              <h1 class="text-2xl font-semibold">Data Berlangganan</h1>
+              <div v-if="dataSubscription" class="mt-4">
                 <div
                   class="w-full rounded-lg border overflow-hidden mb-4"
                   :class="[ dataSubscription.status == 'active' ? 'border-teal-400': 'border-yellow-500']"
@@ -185,10 +186,19 @@
                     </div>
                   </div>
                 </div>
-                <div v-else>
-                  <div class="w-full rounded-lg p-4 flex justify-center border">
-                    Kamu belum berlangganan
-                  </div>
+              </div>
+              <div
+                v-else
+                class="w-full rounded-lg border overflow-hidden min-h-[100px] flex justify-center items-center mt-4"
+              >
+                <div class="flex items-center gap-2">
+                  <h1>Kamu belum berlangganan</h1>
+                  <img
+                    @click="location.reload()"
+                    src="./assets/icons/refresh.svg"
+                    alt="reload"
+                    class="w-6 h-6 cursor-pointer"
+                  />
                 </div>
               </div>
             </div>
@@ -715,6 +725,14 @@
               </div>
             </div>
           </section>
+          <!-- <section v-if="activeTab == 'database-creator'" class="w-full">
+            <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
+              <div v-for="(creator,id) in dataCreator.list" :key="id">
+                <p>{{ creator.displayName }}</p>
+              </div>
+              <button @click="nextPageCreator">Next</button>
+            </div>
+          </section> -->
         </main>
       </template>
       <template v-else> Kamu Belum Login </template>
@@ -831,7 +849,7 @@
           iterationUnfollow: null,
           sidebarMenu: [
             {
-              name: "Home",
+              name: "Beranda",
               slug: "home",
             },
             {
@@ -846,6 +864,10 @@
               name: "Balas Ulasan Otomatis",
               slug: "auto-reply-reviews",
             },
+            // {
+            //   name: "Database Creator",
+            //   slug: "database-creator",
+            // },
           ],
           baseUrl: window.env.VUE_APP_BASE_URL,
           userInfo: null,
@@ -858,7 +880,7 @@
           passwordSubscription: null,
           subscriptionCode: null,
           isShowCategory: false,
-          activeTab: "home",
+          activeTab: electronStore.get("activeTab"),
           dataSubscription: null,
           // crawl creator
           optionsCrawlCreator: {
@@ -1140,6 +1162,17 @@
             ratingComment: "semua",
             productName: "",
           },
+          paramGetShopeeCreators: {
+            page: 1,
+            limit: 10,
+            category: "",
+            followerCount: "",
+            search: "",
+          },
+          dataCreator: {
+            list: [],
+            pagination: {},
+          },
           error: {
             replyMessage: "",
           },
@@ -1147,6 +1180,10 @@
         mounted() {
           // clear electron store before make dekstop app
           // electronStore.clearAll();
+          // localStorage.clear();
+          // electronStore.set("activeTab", "home");
+          console.log(electronStore.get("activeTab"));
+          // this.getDataCreator();
           const getdataSubscription = electronStore.get("data-subscription");
           if (getdataSubscription) {
             this.dataSubscription = getdataSubscription.data;
@@ -1179,7 +1216,8 @@
             this.categoryValue = [];
           },
           handleSidebar(val) {
-            this.activeTab = val;
+            electronStore.set("activeTab", val);
+            location.reload();
           },
           toastSuccsess(val) {
             this.$toasted.show(`${val}`, {
@@ -1304,10 +1342,14 @@
 
           //start scrapper
           processUnfollow() {
-            window.electron.ipcRenderer.send(
-              "process-auto-unfollow",
-              this.iterationUnfollow
-            );
+            if (!this.iterationUnfollow) {
+              alert("Form masih kosong");
+            } else {
+              window.electron.ipcRenderer.send(
+                "process-auto-unfollow",
+                this.iterationUnfollow
+              );
+            }
           },
           processCrawlCreator() {
             const context = electronStore.get("selected-crawl-creator");
@@ -1329,7 +1371,22 @@
               this.toastError("Belum ada konfigurasi");
             }
           },
-
+          getDataCreator() {
+            window.electron.ipcRenderer.send(
+              "get-database-creator",
+              this.paramGetShopeeCreators
+            );
+            const dataCreatorFromStore = electronStore.get("database-creator");
+            this.dataCreator.list = dataCreatorFromStore.data;
+            console.log("this", this.dataCreator.list);
+          },
+          nextPageCreator() {
+            this.paramGetShopeeCreators.page = 2;
+            const currentPage =
+              electronStore.get("database-creator").pagination.currentPage;
+            this.getDataCreator();
+            location.reload();
+          },
           // helpers
           toRupiah(num) {
             if (num) {

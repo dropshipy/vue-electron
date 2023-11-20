@@ -1,4 +1,6 @@
 const puppeteer = require("puppeteer");
+const { dialog } = require("electron");
+
 async function clickAllButtons(page, count) {
   try {
     await page.waitForSelector("button", { timeout: 5000 });
@@ -32,19 +34,6 @@ async function autoUnfollow({ page, iteration }) {
       waitUntil: "networkidle2",
     }),
   ]);
-  async function scrollAndHandleModal(page) {
-    await page.evaluate(() => {
-      window.scrollBy(0, 100);
-    });
-
-    await page.waitForSelector("#modal > aside > div.c7huf3.undefined > div", {
-      timeout: 5000,
-    });
-
-    await page.click(
-      "#modal > aside > div.c7huf3.undefined > div > button.Y47Tdy.bOZVyD"
-    );
-  }
 
   if (shopeeProfile.length > 0) {
     await page.emulate(puppeteer.devices["iPhone 11"]);
@@ -58,47 +47,23 @@ async function autoUnfollow({ page, iteration }) {
       ),
     ]);
     try {
-      try {
-        await scrollAndHandleModal(page);
-        await page.evaluate(() => {
-          window.scrollTo(0, 0);
-        });
-        if (iteration == "Semua") {
-          const buttons = await page.$$("button");
-
-          for (const button of buttons) {
-            await page.waitForTimeout(1000);
-            await button.click();
-          }
-        } else {
-          await clickAllButtons(page, iteration);
-        }
-        await page.waitForTimeout(2000);
-        await page.evaluate(() => {
-          window.alert("Program Unffollow Otomatis Telah Selesai");
-        });
-      } catch (error) {
-        if (iteration == "Semua") {
-          const buttons = await page.$$("button");
-
-          for (const button of buttons) {
-            await page.waitForTimeout(1000);
-            await button.click();
-          }
-        } else {
-          await clickAllButtons(page, iteration);
-        }
-        await page.waitForTimeout(2000);
-        await page.evaluate(() => {
-          window.alert("Program Unffollow Otomatis Telah Selesai");
-        });
-      }
-
+      console.log("run", { iteration });
+      await scrollAndHandleModal(page);
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
       if (iteration == "Semua") {
         const buttons = await page.$$("button");
 
         for (const button of buttons) {
           await page.waitForTimeout(1000);
+          await button.evaluate((element) => {
+            element.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+              inline: "center",
+            });
+          });
           await button.click();
         }
       } else {
@@ -109,9 +74,23 @@ async function autoUnfollow({ page, iteration }) {
         window.alert("Program Unffollow Otomatis Telah Selesai");
       });
     } catch (error) {
+      dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
       console.log("error", error);
     }
   }
+}
+async function scrollAndHandleModal(page) {
+  await page.evaluate(() => {
+    window.scrollBy(0, 100);
+  });
+
+  await page.waitForSelector("#modal > aside > div.c7huf3.undefined > div", {
+    timeout: 5000,
+  });
+
+  await page.click(
+    "#modal > aside > div.c7huf3.undefined > div > button.Y47Tdy.bOZVyD"
+  );
 }
 
 module.exports = { autoUnfollow };

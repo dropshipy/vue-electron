@@ -18,42 +18,28 @@ const { saveCookies, loadCookies } = require("./helpers/utils");
 require("dotenv").config();
 const ElectronStore = require("electron-store");
 
-const COOKIES_PATH = path.join(__dirname, "./store/cookies.json");
-const USER_CONFIG_PATH = path.join(__dirname, "./store/user-config.json");
-const COOKIES_SHOPEE_TOOLS_PATH = path.join(
-  __dirname,
-  "./store/cookies-shopee-tools.json"
-);
-const ACCOUNT_SUBSCRIPTION_PATH = path.join(
-  __dirname,
-  "./store/account-subscription.json"
-);
-
-const crawlCreatorConfigPath = path.join(
-  __dirname,
-  "./store/user-crawl-creator-config.json"
-);
-const replyReviewsConfigPath = path.join(
-  __dirname,
-  "./store/reply-reviews-config.json"
-);
-
 // determine chrome location
 let chromePath = "invalid_os";
-let isDev = process.resourcesPath.includes("node_modules")
-let chromePathBasePath = process.resourcesPath
+let isDev = process.resourcesPath.includes("node_modules");
+let chromePathBasePath = process.resourcesPath;
 
 if (isDev) {
-  chromePathBasePath = "resources"
+  chromePathBasePath = "resources";
 }
 
 if (process.platform == "darwin") {
-  chromePath = path.join(chromePathBasePath, `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`)
+  chromePath = path.join(
+    chromePathBasePath,
+    `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+  );
 } else if (process.platform == "win32") {
-  chromePath = path.join(chromePathBasePath, `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`)
+  chromePath = path.join(
+    chromePathBasePath,
+    `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`
+  );
 }
 
-console.log('Chromium executable path:', chromePath);
+console.log("Chromium executable path:", chromePath);
 
 let mainWindow;
 // Store the authentication cookie globally
@@ -95,140 +81,9 @@ app.on("ready", () => {
     await authenticateUserShopeeTools(payload);
   });
 
-  // handle api crawl creator config
-  ipcMain.on("get-crawl-creator-config", async (event, subscriptionId) => {
-    const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    const res = await axios.get(
-      `${baseUrlProd}/shopee/message-blast/${subscriptionId}`,
-      {
-        headers: {
-          Cookie: cookies,
-        },
-      }
-    );
-
-    saveCookies(crawlCreatorConfigPath, res.data);
-  });
-  ipcMain.on("data-to-html", async (event, data) => {
-    const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    const res = await axios.get(`${baseUrlProd}/shopee/shopee-creators`, {
-      headers: {
-        Cookie: cookies,
-      },
-    });
-    mainWindow.webContents.send("data-to-fe", res.data);
-  });
-  ipcMain.on("update-crawl-creator-config", async (event, payload) => {
-    const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    try {
-      const res = await axios.patch(
-        `${baseUrlProd}/shopee/message-blast/${payload.userId}`,
-        payload,
-        {
-          headers: {
-            Cookie: cookies,
-          },
-        }
-      );
-    } catch (error) {
-      console.log("Error patch api user crawl creator config", error);
-    }
-  });
-  ipcMain.on("post-crawl-creator-config", async (event, payload) => {
-    const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    const res = await axios.post(
-      `${baseUrlProd}/shopee/message-blast`,
-      payload,
-      {
-        headers: {
-          Cookie: cookies,
-        },
-      }
-    );
-    saveCookies(crawlCreatorConfigPath, res.data);
-    console.log("status", res.status, res.data);
-  });
-  // end
-
-  // handle api reply reviews config
-  ipcMain.on("get-reply-reviews-config", async (event, subscriptionId) => {
-    const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    const res = await axios.get(
-      `${baseUrlProd}/shopee/reply-reviews/${subscriptionId}`,
-      {
-        headers: {
-          Cookie: cookies,
-        },
-      }
-    );
-
-    saveCookies(replyReviewsConfigPath, res.data);
-  });
-  ipcMain.on("post-reply-reviews-config", async (event, payload) => {
-    const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    const res = await axios.post(
-      `${baseUrlProd}/shopee/reply-reviews`,
-      payload,
-      {
-        headers: {
-          Cookie: cookies,
-        },
-      }
-    );
-    console.log("status", res.status, res.data);
-  });
-  ipcMain.on("update-reply-reviews-config", async (event, payload) => {
-    const cookies = await loadCookies(COOKIES_SHOPEE_TOOLS_PATH);
-    try {
-      const res = await axios.patch(
-        `${baseUrlProd}/shopee/reply-reviews/${payload.userId}`,
-        payload,
-        {
-          headers: {
-            Cookie: cookies,
-          },
-        }
-      );
-    } catch (error) {
-      console.log("Error patch api user crawl creator config", error);
-    }
-  });
-  // end
-  ipcMain.on("delete-cookies-shopee-tools", () => {
-    const cookiesShopeeTools = path.join(
-      __dirname,
-      "./store/cookies-shopee-tools.json"
-    );
-    try {
-      if (fs.existsSync(cookiesShopeeTools)) {
-        fs.unlinkSync(cookiesShopeeTools);
-        console.log("Cookies deleted successfully");
-      } else {
-        console.log("Cookies file not found");
-      }
-    } catch (error) {
-      console.error("Error deleting cookies:", error);
-    }
-  });
-
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
       app.quit();
-    }
-  });
-
-  ipcMain.on("delete-cookies-bot", () => {
-    const cookiesPath = path.join(__dirname, "./store/cookies.json");
-
-    try {
-      if (fs.existsSync(cookiesPath)) {
-        fs.unlinkSync(cookiesPath);
-        console.log("Cookies deleted successfully");
-      } else {
-        console.log("Cookies file not found");
-      }
-    } catch (error) {
-      console.error("Error deleting cookies:", error);
     }
   });
 });
@@ -287,7 +142,7 @@ async function handleCrawlCreator(config) {
     await crawlCreator(context);
   } catch (error) {
     console.error("Error in the main process:", error);
-    dialog.showMessageBox({ message: error.message, buttons: ["OK"] }); 
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }
 }
 ipcMain.on("process-reply-reviews", (event, data) => {
@@ -295,8 +150,6 @@ ipcMain.on("process-reply-reviews", (event, data) => {
 });
 async function runReplyReviews(config) {
   try {
-    const executablePath = puppeteer.executablePath();
-    console.log({ executablePath });
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
@@ -320,13 +173,6 @@ async function runReplyReviews(config) {
     console.error("Error in the main process:", error);
   }
 }
-ipcMain.on("get-database-creator", async (event, data) => {
-  forwardCreator(res);
-});
-//end
-ipcMain.on("account-subscription", (event, data) => {
-  fs.writeFileSync(ACCOUNT_SUBSCRIPTION_PATH, JSON.stringify(data));
-});
 
 ipcMain.on("get-subscription-info", async () => {
   const res = await axios.get(
@@ -338,6 +184,24 @@ ipcMain.on("get-subscription-info", async () => {
     }
   );
   store.set("data-subscription", res.data);
+});
+ipcMain.on("get-database-creator", async (event, data) => {
+  try {
+    const res = await axios.get(
+      `http://supportseller.com/api/shopee/shopee-creators`,
+      {
+        headers: {
+          Cookie: store.get("cookies-spt"),
+        },
+        params: data,
+      }
+    );
+    console.log("res pagination", res.data.pagination);
+    store.set("database-creator", res.data);
+  } catch (error) {
+    console.log(error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
 });
 
 app.on("window-all-closed", () => {
