@@ -86,11 +86,14 @@ async function replyReviews({ page, config }) {
       if (lastReview) {
         await page.waitForTimeout(2000);
         await page.evaluate(() => {
-          window.alert("Program Shopee Power Tools Telah Selesai");
+          window.alert("Program Telah Selesai");
         });
       }
     }
   } catch (error) {
+    await page.evaluate(() => {
+      window.alert("Program Telah Selesai");
+    });
     console.log(error.message);
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }

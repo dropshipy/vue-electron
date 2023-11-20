@@ -132,7 +132,7 @@ async function messageBlast({
       }
     }
     await page.evaluate(() => {
-      window.alert("Program Shopee Power Tools Telah Selesai");
+      window.alert("Program Telah Selesai");
     });
     await Browser.close();
   } catch (error) {}
