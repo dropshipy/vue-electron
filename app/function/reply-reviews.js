@@ -67,7 +67,7 @@ async function replyReviews({ page, config }) {
           } else {
             i = cardReviews.length;
             await page.evaluate(() => {
-              window.alert("Program Shopee Blast Selesai");
+              window.alert("Program Power Tools Selesai");
             });
           }
         }
@@ -86,7 +86,7 @@ async function replyReviews({ page, config }) {
       if (lastReview) {
         await page.waitForTimeout(2000);
         await page.evaluate(() => {
-          window.alert("Program Shopee Blast Telah Selesai");
+          window.alert("Program Shopee Power Tools Telah Selesai");
         });
       }
     }

@@ -725,14 +725,35 @@
               </div>
             </div>
           </section>
-          <!-- <section v-if="activeTab == 'database-creator'" class="w-full">
+          <section v-if="activeTab == 'database-creator'" class="w-full">
             <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
-              <div v-for="(creator,id) in dataCreator.list" :key="id">
-                <p>{{ creator.displayName }}</p>
-              </div>
-              <button @click="nextPageCreator">Next</button>
+              <table class="w-full">
+                <tr>
+                  <thead>
+                    <th>No</th>
+                    <th>Display name</th>
+                    <th>Username</th>
+                    <th>Kategori Kreator</th>
+                    <th>Sosial Media</th>
+                    <th>Pesanan</th>
+                    <th>Jumlah Follower</th>
+                  </thead>
+                </tr>
+                <tbody>
+                  <tr v-for="(creator,id) in dataCreator.list" :key="id">
+                    <td>{{id + 1}}</td>
+                    <td>{{creator.displayName}}</td>
+                    <td>{{creator.username}}</td>
+                    <td>{{creator.relatedCategoris}}</td>
+                    <td>--</td>
+                    <td>{{creator.orderRange}}</td>
+                    <td>{{creator.totalFollower}}</td>
+                  </tr>
+                  <button @click="nextPageCreator">Next</button>
+                </tbody>
+              </table>
             </div>
-          </section> -->
+          </section>
         </main>
       </template>
       <template v-else> Kamu Belum Login </template>
@@ -1184,6 +1205,7 @@
           // electronStore.set("activeTab", "home");
           console.log(electronStore.get("activeTab"));
           // this.getDataCreator();
+          // electronStore.delete("database-creator");
           const getdataSubscription = electronStore.get("data-subscription");
           if (getdataSubscription) {
             this.dataSubscription = getdataSubscription.data;
@@ -1377,8 +1399,10 @@
               this.paramGetShopeeCreators
             );
             const dataCreatorFromStore = electronStore.get("database-creator");
-            this.dataCreator.list = dataCreatorFromStore.data;
-            console.log("this", this.dataCreator.list);
+            if (dataCreatorFromStore) {
+              this.dataCreator.list = dataCreatorFromStore.data;
+              console.log("this", this.dataCreator.list);
+            }
           },
           nextPageCreator() {
             this.paramGetShopeeCreators.page = 2;

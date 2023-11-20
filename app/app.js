@@ -196,7 +196,6 @@ ipcMain.on("get-database-creator", async (event, data) => {
         params: data,
       }
     );
-    console.log("res pagination", res.data.pagination);
     store.set("database-creator", res.data);
   } catch (error) {
     console.log(error);
