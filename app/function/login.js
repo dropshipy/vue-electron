@@ -4,6 +4,7 @@ const { authenticateBot } = require("../api/interface");
 const ElectronStore = require("electron-store");
 const store = new ElectronStore();
 const { updateSubscriptionStatus } = require("../api/interface");
+const { dialog } = require("electron");
 async function saveCookies(page, browser) {
   const cookies = await page.cookies();
   store.set("cookies-shopee-account", cookies);
@@ -66,9 +67,7 @@ async function authenticateBotStatus(page, browser) {
 
         if (authenticateBotRes?.status == 405) {
           await page.evaluate(() => {
-            window.alert(
-              "Akun sudah terhubung ke perangkat lain. Cek perangkat terhubung di halaman dashboard."
-            );
+            window.alert("Akun sudah terhubung ke perangkat lain.");
           });
           await browser.close();
         } else if (authenticateBotRes?.status == 403) {
@@ -126,6 +125,7 @@ async function authenticateBotStatus(page, browser) {
         await browser.close();
       }
     } catch (error) {
+      dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
       await page.evaluate(() => {
         window.alert("Gagal menghubungkan shopee power tools");
       });
@@ -157,6 +157,7 @@ async function loginShopee(page, browser) {
           }),
         ]);
       } catch (error) {
+        dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
         console.log(error);
       }
     } else {
@@ -175,6 +176,7 @@ async function loginShopee(page, browser) {
     }
     return resBotStatus;
   } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
   }
 }

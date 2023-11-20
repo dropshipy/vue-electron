@@ -1,5 +1,6 @@
 const { postGetCreatorList } = require("../../api/interface");
 const { postAddCreator } = require("../../api/interface");
+const { dialog } = require("electron");
 
 async function messageBlast({
   page,
@@ -135,6 +136,8 @@ async function messageBlast({
       window.alert("Program Telah Selesai");
     });
     await Browser.close();
-  } catch (error) {}
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
 }
 module.exports = { messageBlast };

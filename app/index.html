@@ -101,15 +101,23 @@
             <div
               v-for="(menu,id) in sidebarMenu"
               :key="id"
-              class="cursor-pointer pl-5"
+              class="cursor-pointer pl-5 hover:text-[#f3694a]"
               :class="[activeTab == menu.slug ? 'text-[#f3694a]':'text-[#66738F]']"
               @click="handleSidebar(menu.slug)"
             >
               <h1>{{menu.name}}</h1>
             </div>
+            <div class="mt-4 ml-5">
+              <a
+                href="http://supportseller.com/login-spt"
+                target="_blank"
+                class="text-[#66738F] hover:text-[#f3694a]"
+                >Database Creator</a
+              >
+            </div>
           </aside>
           <section
-            v-if="activeTab == 'home'"
+            v-if="activeTab == 'home' || activeTab == 'database-creator'"
             class="bg-white w-full rounded-l-2xl mt-10 p-5"
           >
             <div>
@@ -725,10 +733,13 @@
               </div>
             </div>
           </section>
-          <section v-if="activeTab == 'database-creator'" class="w-full">
+          <!-- <section v-if="activeTab == 'database-creator'" class="w-full">
             <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
               <table class="w-full">
                 <tr>
+                  <a href="http://supportseller.com" target="_blank"
+                    >Go to supp seller</a
+                  >
                   <thead>
                     <th>No</th>
                     <th>Display name</th>
@@ -749,11 +760,12 @@
                     <td>{{creator.orderRange}}</td>
                     <td>{{creator.totalFollower}}</td>
                   </tr>
+                  <button @click="prevPageCreator" class="mr-4">Prev</button>
                   <button @click="nextPageCreator">Next</button>
                 </tbody>
               </table>
             </div>
-          </section>
+          </section> -->
         </main>
       </template>
       <template v-else> Kamu Belum Login </template>
@@ -1205,6 +1217,13 @@
           // electronStore.set("activeTab", "home");
           console.log(electronStore.get("activeTab"));
           // this.getDataCreator();
+          const listDatabaseCreator = electronStore.get("database-creator");
+          if (listDatabaseCreator) {
+            this.dataCreator.list = listDatabaseCreator.data;
+            this.paramGetShopeeCreators.page =
+              listDatabaseCreator.pagination.currentPage;
+          }
+
           // electronStore.delete("database-creator");
           const getdataSubscription = electronStore.get("data-subscription");
           if (getdataSubscription) {
@@ -1239,6 +1258,9 @@
           },
           handleSidebar(val) {
             electronStore.set("activeTab", val);
+            // if (val == "database-creator") {
+            //   location.href = "http://supportseller.com";
+            // }
             location.reload();
           },
           toastSuccsess(val) {
@@ -1404,10 +1426,26 @@
               console.log("this", this.dataCreator.list);
             }
           },
+          prevPageCreator() {
+            const currentPage = this.paramGetShopeeCreators.page;
+            const totalPage =
+              electronStore.get("database-creator").pagination.totalPages;
+            if (currentPage > 1) {
+              this.paramGetShopeeCreators.page--;
+            }
+            this.getDataCreator();
+            location.reload();
+          },
           nextPageCreator() {
-            this.paramGetShopeeCreators.page = 2;
-            const currentPage =
-              electronStore.get("database-creator").pagination.currentPage;
+            const currentPage = this.paramGetShopeeCreators.page;
+            const totalPage =
+              electronStore.get("database-creator").pagination.totalPages;
+
+            if (currentPage < totalPage) {
+              this.paramGetShopeeCreators.page++;
+            }
+            console.log(this.paramGetShopeeCreators.page);
+
             this.getDataCreator();
             location.reload();
           },

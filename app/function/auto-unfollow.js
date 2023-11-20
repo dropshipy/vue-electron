@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 const { dialog } = require("electron");
 
-async function clickAllButtons(page, count) {
+async function clickButtonByIteration(page, count) {
   try {
     await page.waitForSelector("button", { timeout: 5000 });
 
@@ -9,7 +9,11 @@ async function clickAllButtons(page, count) {
     if (buttons.length > 0) {
       for (let i = 0; i < Math.min(count, buttons.length); i++) {
         await page.waitForTimeout(1000);
-        await buttons[i].click();
+        // await buttons.click();
+
+        await page.evaluate((element) => {
+          element.click();
+        }, buttons[i]);
       }
     }
   } catch (error) {
@@ -67,7 +71,7 @@ async function autoUnfollow({ page, iteration }) {
           await button.click();
         }
       } else {
-        await clickAllButtons(page, iteration);
+        await clickButtonByIteration(page, iteration);
       }
       await page.waitForTimeout(2000);
       await page.evaluate(() => {

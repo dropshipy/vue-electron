@@ -112,6 +112,7 @@ async function handleAutoUnfolow(iteration) {
     await loginShopee(page, browser);
     await autoUnfollow(context);
   } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
   }
 }
