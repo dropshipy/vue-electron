@@ -29,7 +29,7 @@
           style="box-shadow: 0px 2px 20px 0px rgba(8, 0, 27, 0.1)"
         >
           <img
-            src="./assets/brand/spt.png"
+            :src="`./assets/brand/${flags.logo}`"
             alt="shopee power tools"
             class="w-[125px] h-auto"
           />
@@ -109,7 +109,7 @@
             </div>
             <div class="mt-4 ml-5">
               <a
-                href="http://supportseller.com/login-spt"
+                :href="`http://supportseller.com/${flags.linkCreator}`"
                 target="_blank"
                 class="text-[#66738F] hover:text-[#f3694a]"
                 >Database Creator</a
@@ -873,6 +873,7 @@
         </div>
       </div>
     </div>
+    <script src="./function/browser/flags.js"></script>
     <script>
       Vue.use(Toasted);
       new Vue({
@@ -1209,8 +1210,10 @@
           error: {
             replyMessage: "",
           },
+          flags: null,
         },
         mounted() {
+          this.flags = flags();
           // clear electron store before make dekstop app
           // electronStore.clearAll();
           // localStorage.clear();
@@ -1253,6 +1256,7 @@
           this.getAccountSubscription();
         },
         methods: {
+          flags,
           deleteCategoryVal() {
             this.categoryValue = [];
           },
