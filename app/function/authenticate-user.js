@@ -15,7 +15,7 @@ function authenticateUser(payload) {
   return new Promise((resolve, reject) => {
     // Your authentication logic here, for example using axios
     axios
-      .post(`http://supportseller.com/api/users/authenticate`, payload)
+      .post(`https://supportseller.com/api/users/authenticate`, payload)
       .then((response) => {
         console.log(response);
         // Assuming the authentication endpoint returns a 'Set-Cookie' header

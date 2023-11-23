@@ -45,7 +45,7 @@ let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
 const store = new ElectronStore();
-const baseUrlProd = "http://supportseller.com/api";
+const baseUrlProd = "https://supportseller.com/api";
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -177,7 +177,7 @@ async function runReplyReviews(config) {
 
 ipcMain.on("get-subscription-info", async () => {
   const res = await axios.get(
-    `http://supportseller.com/api/shopee-subscriptions`,
+    `https://supportseller.com/api/shopee-subscriptions`,
     {
       headers: {
         Cookie: store.get("cookies-spt"),
@@ -189,7 +189,7 @@ ipcMain.on("get-subscription-info", async () => {
 ipcMain.on("get-database-creator", async (event, data) => {
   try {
     const res = await axios.get(
-      `http://supportseller.com/api/shopee/shopee-creators`,
+      `https://supportseller.com/api/shopee/shopee-creators`,
       {
         headers: {
           Cookie: store.get("cookies-spt"),

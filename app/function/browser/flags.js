@@ -1,6 +1,6 @@
 function flags() {
   // shopee-power-tools || support-seller
-  const flags = "support-seller";
+  const flags = "shopee-power-tools";
   const result = {};
   // logo
   if (flags == "shopee-power-tools") {

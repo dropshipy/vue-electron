@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { devLog } = require("../helpers/utils");
 
-const baseUrlPro = "http://supportseller.com/api";
+const baseUrlPro = "https://supportseller.com/api";
 async function postData(endpoint = "", data = {}, options = {}) {
   try {
     const url = baseUrlPro + endpoint;
