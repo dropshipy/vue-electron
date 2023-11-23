@@ -126,7 +126,7 @@ async function handleCrawlCreator(config) {
     const browser = await puppeteer.launch({
       headless: false,
       defaultViewport: null,
-      executablePath: chromePath,
+      // executablePath: chromePath,
     });
     const page = await browser.newPage();
     await page.setViewport({

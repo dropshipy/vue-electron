@@ -110,9 +110,18 @@ async function messageBlast({
                 isAlreadySent = result;
               });
             if (!isAlreadySent) {
-              await page.type(textArea, replyMessage, {
-                delay: 100,
-              });
+              const messageLines = replyMessage.split("\n");
+              // Type each line without pressing Enter
+              for (const line of messageLines) {
+                await page.type(textArea, line);
+
+                // Simulate "Shift + Enter" for the line break
+                await page.keyboard.down("Shift");
+                await page.keyboard.press("Enter");
+                await page.keyboard.up("Shift");
+              }
+
+              // await page.type(textArea, messageLines);
               console.log(
                 iteration,
                 creator[creatorCounter].username,
