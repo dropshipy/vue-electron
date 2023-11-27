@@ -20,6 +20,68 @@
     body {
       font-family: "DM Sans", sans-serif;
     }
+    /* The switch - the box around the slider */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 70px;
+      height: 27px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 22px;
+      left: 0;
+      bottom: 1px;
+      background-color: white;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+    }
+
+    input:checked + .slider {
+      background-color: #f3694a;
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 1px #f3694a;
+    }
+
+    input:checked + .slider:before {
+      -webkit-transform: translateX(48px);
+      -ms-transform: translateX(48px);
+      transform: translateX(48px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
   </style>
   <body class="bg-[#EEEDFA]">
     <div id="app" class="w-full" @click="handleCloseSetting">
@@ -497,6 +559,7 @@
                           >
                           <textarea
                             v-model="selectedCrawlCreator.replyMessage"
+                            
                             placeholder="masukkan pesan undangan"
                             name="pesanUndangan"
                             class="block w-full border border-gray-400 rounded-md py-2 px-3"
@@ -520,7 +583,7 @@
                           @click="processCrawlCreator"
                           class="bg-black text-white px-4 py-3 rounded-md w-full hover:opacity-80 mt-4"
                         >
-                          Proses Chat Otomatis
+                         Start
                         </button>
                       </div>
                     </div>
@@ -547,7 +610,7 @@
           <!-- reply reviews  -->
           <section v-if="activeTab == 'auto-reply-reviews'" class="w-full">
             <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
-              <h1>Balas Ulasan Otomatis</h1>
+              <h1 class="text-xl font-semibold mb-6">Balas Ulasan Otomatis</h1>
               <div
                 class="md:grid md:grid-cols-1 lg:grid-cols-2 xl:gap-6 w-full mt-3"
               >
@@ -677,10 +740,42 @@
             </div>
           </section>
           <!-- auto unfollow -->
-          <section v-if="activeTab == 'auto-unfollow'" class="w-full">
-            <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
-              <h1>Auto Unfollow</h1>
-              <section>
+          <section v-if="activeTab == 'auto-unfollow'" class="w-max mx-auto">
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px]">
+              <h1 class="text-xl font-semibold mb-8 text-center">Auto Unfollow</h1>
+              <!-- Rounded switch -->
+              <div class="flex items-center gap-4 mx-auto w-max">
+                <label class="switch">
+                  <input type="checkbox" v-model="autoUnffolowCount" />
+                  <span class="slider round"></span>
+                </label>
+                <p class="font-semibold text-lg" :class="[autoUnffolowCount? 'text-[#f3694a]':'text-gray-500']">Semua</p>
+              </div>
+              <div
+                class="overflow-hidden transition-all ease-in-out duration-200 mx-auto w-max"
+                :class="[!autoUnffolowCount ? 'h-max py-2' :' h-0']"
+              >
+                  <section class="py-2">
+                    <input
+                      type="number"
+                      id="iteration-unfollow"
+                      v-model="iterationUnfollow"
+                      class="border border-gray-200 rounded focus:outline-none block"
+                    />
+                    <label for="iteration-unfollow " class="text-xs italic text-[#f3694a]">Jumlah yang ingin di unfollow</label>
+                  </section>
+
+                </div>
+                <div class="text-center mt-6">
+                  <button
+                    class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                    @click="processUnfollow"
+                  >
+                    Start
+                  </button>
+                </div>
+              </div>
+              <!-- <section>
                 <label for="" class="block text-xs"
                   >Jumlah yang ingin di unfollow</label
                 >
@@ -730,7 +825,7 @@
                 >
                   Auto Unfollow
                 </button>
-              </div>
+              </div> -->
             </div>
           </section>
           <!-- <section v-if="activeTab == 'database-creator'" class="w-full">
@@ -1120,6 +1215,7 @@
             ],
           },
           categoryValue: [],
+          
           selectedCrawlCreator: {
             iteration: 1,
             socialMedias: "",
@@ -1211,6 +1307,7 @@
             replyMessage: "",
           },
           flags: null,
+          autoUnffolowCount: true,
         },
         mounted() {
           this.flags = flags();
@@ -1359,7 +1456,9 @@
               }
             }
           },
+      
           handleSubmitCrawlCreator() {
+            this.selectedCrawlCreator.replyMessage = this.selectedCrawlCreator.replyMessage.trim()
             const { selectedCrawlCreator } = this;
             const category = this.categoryValue;
             const payload = {
@@ -1390,13 +1489,23 @@
 
           //start scrapper
           processUnfollow() {
-            if (!this.iterationUnfollow) {
-              alert("Form masih kosong");
-            } else {
+            console.log(this.autoUnffolowCount);
+            if (this.autoUnffolowCount) {
+              this.iterationUnfollow = "Semua"
               window.electron.ipcRenderer.send(
-                "process-auto-unfollow",
-                this.iterationUnfollow
-              );
+                  "process-auto-unfollow",
+                  this.iterationUnfollow
+                );
+            } else {
+              if (!this.iterationUnfollow) {
+                this.toastError("Masukkan jumlah yang ingin di unffollow jika tidak ingin semuanya");
+              }else{
+
+                window.electron.ipcRenderer.send(
+                  "process-auto-unfollow",
+                  this.iterationUnfollow
+                );
+              }
             }
           },
           processCrawlCreator() {

@@ -95,11 +95,13 @@ async function messageBlast({
             let isAlreadySent = false;
             await page
               .evaluate(async (text) => {
-                const divs = document.querySelectorAll(
-                  "div.QwyBL5p0DA.o_JQY9VDe5"
-                );
-                const targetDiv = Array.from(divs).find((div) =>
-                  div.innerText.includes(text)
+                const divs = document.querySelectorAll("div.QwyBL5p0DA");
+
+                // const targetDiv = Array.from(divs).find((div) =>
+                //   div.innerText.includes(messageContent)
+                // );
+                const targetDiv = Array.from(divs).some((div) =>
+                  div.textContent.includes(text)
                 );
                 if (targetDiv) {
                   return true;
@@ -120,7 +122,6 @@ async function messageBlast({
                 await page.keyboard.press("Enter");
                 await page.keyboard.up("Shift");
               }
-
               // await page.type(textArea, messageLines);
               console.log(
                 iteration,

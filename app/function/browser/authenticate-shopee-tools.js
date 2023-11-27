@@ -46,6 +46,7 @@ async function authenticateUserShopeeTools(payload) {
       });
   } catch (error) {
     console.log(error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }
 }
 module.exports = { authenticateUserShopeeTools };

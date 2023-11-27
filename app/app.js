@@ -130,8 +130,8 @@ async function handleCrawlCreator(config) {
     });
     const page = await browser.newPage();
     await page.setViewport({
-      width: 1300,
-      height: 800,
+      width: 1350,
+      height: 700,
       deviceScaleFactor: 1,
     });
     const loginShopeeBotRes = await loginShopee(page, browser);

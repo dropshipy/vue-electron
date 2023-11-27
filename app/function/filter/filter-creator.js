@@ -138,6 +138,7 @@ async function filterCreator({ page, config }) {
     }
     await page.click(searchButtonFilter);
   } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.log(error);
   }
 }

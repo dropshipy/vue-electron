@@ -43,7 +43,7 @@ async function crawlCreator({ page, loginShopeeBotRes, config }) {
     page.goto(
       "https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace",
       {
-        waitUntil: "networkidle2",
+        waitUntil: "networkidle0",
       }
     ),
     page.waitForNavigation({ waitUntil: "domcontentloaded" }),
@@ -71,12 +71,11 @@ async function crawlCreator({ page, loginShopeeBotRes, config }) {
   if (context.config) {
     while (loadingCategories) {
       if (counter <= 5) {
-        await waitForTimeout(1000);
+        await waitForTimeout(500);
         counter++;
-      } else
-        await page.reload({
-          waitUntil: ["networkidle0", "domcontentloaded"],
-        });
+      } else {
+        await page.reload({ waitUntil: "networkidle0" });
+      }
     }
     await filterCreator(context);
     if (reqListData.length > 0) {
