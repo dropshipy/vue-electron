@@ -27,11 +27,19 @@ if (isDev) {
   chromePathBasePath = "resources";
 }
 
+let arch = process.arch;
 if (process.platform == "darwin") {
-  chromePath = path.join(
-    chromePathBasePath,
-    `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
-  );
+  if (arch == "arm64") {
+    chromePath = path.join(
+      chromePathBasePath,
+      `chrome/mac_arm-119.0.6045.105/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+    );
+  } else {
+    chromePath = path.join(
+      chromePathBasePath,
+      `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+    );
+  }
 } else if (process.platform == "win32") {
   chromePath = path.join(
     chromePathBasePath,

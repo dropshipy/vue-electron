@@ -21,6 +21,7 @@ const searchButtonFilter =
 async function filterCreator({ page, config }) {
   const { category, socialMedias, followerCount, followerAge, followerGender } =
     config.configMessageBlast;
+  console.log({ config });
   try {
     if (category !== "Semua") {
       try {
