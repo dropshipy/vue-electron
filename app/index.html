@@ -828,6 +828,43 @@
               </div> -->
             </div>
           </section>
+          <section v-if="activeTab == 'auto-follow'" class="w-max mx-auto">
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px]">
+              <h1 class="text-xl font-semibold mb-8 text-center">Auto Follow</h1>
+              <!-- Rounded switch -->
+              <div class="flex items-center gap-4 mx-auto w-max">
+                <label class="switch">
+                  <input type="checkbox" v-model="autoFollowCount" />
+                  <span class="slider round"></span>
+                </label>
+                <p class="font-semibold text-lg" :class="[autoFollowCount? 'text-[#f3694a]':'text-gray-500']">Semua</p>
+              </div>
+              <div
+                class="overflow-hidden transition-all ease-in-out duration-200 mx-auto w-max"
+                :class="[!autoFollowCount ? 'h-max py-2' :' h-0']"
+              >
+                  <section class="py-2">
+                    <input
+                      type="number"
+                      id="iteration-follow"
+                      v-model="iterationFollow"
+                      class="border border-gray-200 rounded focus:outline-none block"
+                    />
+                    <label for="iteration-follow " class="text-xs italic text-[#f3694a]">Jumlah yang ingin di follow</label>
+                  </section>
+
+                </div>
+                <div class="text-center mt-6">
+                  <button
+                    class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                    @click="processFollow"
+                  >
+                    Start
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
           <!-- <section v-if="activeTab == 'database-creator'" class="w-full">
             <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
               <table class="w-full">
@@ -976,6 +1013,7 @@
         data: {
           isShow: false,
           iterationUnfollow: null,
+          iterationFollow: null,
           sidebarMenu: [
             {
               name: "Beranda",
@@ -986,6 +1024,10 @@
               slug: "auto-unfollow",
             },
             {
+              name: "Auto Follow",
+              slug: "auto-follow",
+            },
+            {
               name: "Auto Chat Kreator",
               slug: "auto-chat-creator",
             },
@@ -993,6 +1035,7 @@
               name: "Balas Ulasan Otomatis",
               slug: "auto-reply-reviews",
             },
+           
             // {
             //   name: "Database Creator",
             //   slug: "database-creator",
@@ -1308,6 +1351,7 @@
           },
           flags: null,
           autoUnffolowCount: true,
+          autoFollowCount: true,
         },
         mounted() {
           this.flags = flags();
@@ -1489,7 +1533,7 @@
 
           //start scrapper
           processUnfollow() {
-            console.log(this.autoUnffolowCount);
+          
             if (this.autoUnffolowCount) {
               this.iterationUnfollow = "Semua"
               window.electron.ipcRenderer.send(
@@ -1505,6 +1549,27 @@
                   "process-auto-unfollow",
                   this.iterationUnfollow
                 );
+              }
+            }
+          },
+          processFollow(){
+            console.log(this.autoFollowCount);
+            if (this.autoFollowCount) {
+              this.iterationFollow = "Semua"
+              console.log('iteration follow',this.iterationFollow);
+              // window.electron.ipcRenderer.send(
+              //     "process-auto-unfollow",
+              //     this.iterationFollow
+              //   );
+            } else {
+              if (!this.iterationFollow) {
+                this.toastError("Masukkan jumlah yang ingin di follow jika tidak ingin semuanya");
+              }else{
+                console.log('this', this.iterationFollow);
+                // window.electron.ipcRenderer.send(
+                //   "process-auto-unfollow",
+                //   this.iterationFollow
+                // );
               }
             }
           },
