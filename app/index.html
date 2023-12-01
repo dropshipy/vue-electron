@@ -559,7 +559,6 @@
                           >
                           <textarea
                             v-model="selectedCrawlCreator.replyMessage"
-                            
                             placeholder="masukkan pesan undangan"
                             name="pesanUndangan"
                             class="block w-full border border-gray-400 rounded-md py-2 px-3"
@@ -583,7 +582,7 @@
                           @click="processCrawlCreator"
                           class="bg-black text-white px-4 py-3 rounded-md w-full hover:opacity-80 mt-4"
                         >
-                         Start
+                          Start
                         </button>
                       </div>
                     </div>
@@ -742,162 +741,164 @@
           <!-- auto unfollow -->
           <section v-if="activeTab == 'auto-unfollow'" class="w-max mx-auto">
             <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px]">
-              <h1 class="text-xl font-semibold mb-8 text-center">Auto Unfollow</h1>
+              <h1 class="text-xl font-semibold mb-8 text-center">
+                Auto Unfollow
+              </h1>
               <!-- Rounded switch -->
               <div class="flex items-center gap-4 mx-auto w-max">
                 <label class="switch">
                   <input type="checkbox" v-model="autoUnffolowCount" />
                   <span class="slider round"></span>
                 </label>
-                <p class="font-semibold text-lg" :class="[autoUnffolowCount? 'text-[#f3694a]':'text-gray-500']">Semua</p>
+                <p
+                  class="font-semibold text-lg"
+                  :class="[autoUnffolowCount? 'text-[#f3694a]':'text-gray-500']"
+                >
+                  Semua
+                </p>
               </div>
               <div
                 class="overflow-hidden transition-all ease-in-out duration-200 mx-auto w-max"
                 :class="[!autoUnffolowCount ? 'h-max py-2' :' h-0']"
               >
-                  <section class="py-2">
-                    <input
-                      type="number"
-                      id="iteration-unfollow"
-                      v-model="iterationUnfollow"
-                      class="border border-gray-200 rounded focus:outline-none block"
-                    />
-                    <label for="iteration-unfollow " class="text-xs italic text-[#f3694a]">Jumlah yang ingin di unfollow</label>
-                  </section>
-
-                </div>
-                <div class="text-center mt-6">
-                  <button
-                    class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
-                    @click="processUnfollow"
-                  >
-                    Start
-                  </button>
-                </div>
-              </div>
-              <!-- <section>
-                <label for="" class="block text-xs"
-                  >Jumlah yang ingin di unfollow</label
-                >
-                <div class="relative w-[200px]">
-                  <img
-                    src="./assets/icons/chevron.svg"
-                    alt="chevron"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 transition-all ease-in-out rotate-180"
-                    :class="{'rotate-0' : isShow}"
-                  />
+                <section class="py-2">
                   <input
-                    @click="isShow = !isShow"
-                    readonly
-                    :value="iterationUnfollow"
-                    class="rounded-[5px] cursor-pointer text-gray-500 border border-gray-700 focus:outline-[#EE4D2D] h-full w-full py-1 px-2"
+                    type="number"
+                    id="iteration-unfollow"
+                    v-model="iterationUnfollow"
+                    class="border border-gray-200 rounded focus:outline-none block"
                   />
-                  <div
-                    class="shadow absolute top-[100%] z-30 bg-white"
-                    :class="[isShow? 'h-max' :' hidden']"
+                  <label
+                    for="iteration-unfollow "
+                    class="text-xs italic text-[#f3694a]"
+                    >Jumlah yang ingin di unfollow</label
                   >
-                    <div class="px-4 py-1 space-y-2">
-                      <section
-                        class="cursor-pointer hover:text-[#EE4D2D]"
-                        :class="{'text-[#EE4D2D]': iterationUnfollow == 'Semua'}"
-                        @click="iterationUnfollow = 'Semua'"
-                      >
-                        Semua
-                      </section>
-                      <section>
-                        <input
-                          type="number"
-                          v-model="iterationUnfollow"
-                          class="border border-gray-200"
-                        />
-                      </section>
-                      <button class="border px-2 py-1" @click="isShow = false">
-                        Simpan
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </section>
-              <div class="text-center mt-10" :class="{'mt-50': !isShow}">
+                </section>
+              </div>
+              <div class="text-center mt-6">
                 <button
-                  class="bg-black text-white px-4 py-3 rounded-md hover:opacity-80 text-xs"
+                  class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
                   @click="processUnfollow"
                 >
-                  Auto Unfollow
+                  Start
                 </button>
-              </div> -->
+              </div>
+            </div>
+          </section>
+          <section
+            v-if="activeTab == 'auto-follow-by-reviews'"
+            class="w-max mx-auto"
+          >
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[700px]">
+              <h1 class="text-xl font-semibold mb-8 text-center">
+                Auto Follow
+              </h1>
+              <!-- Rounded switch -->
+
+              <div class="w-full space-y-3">
+                <section class="pt-4">
+                  <label for="" class="text-sm text-gray-700 font-medium"
+                    >Link Toko</label
+                  >
+                  <input
+                    type="text"
+                    v-model="linkForAutoFollowByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                  />
+                </section>
+                <section class="pt-4">
+                  <label for="" class="text-sm text-gray-700 font-medium"
+                    >Mulai dari ulasan ke
+                  </label>
+                  <input
+                    type="text"
+                    v-model="startPointFollowByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                  />
+                </section>
+                <section class="py-2">
+                  <label for="" class="text-sm text-gray-700 font-medium"
+                    >Total Follow</label
+                  >
+                  <input
+                    type="number"
+                    id="iteration-follow-by-reviews"
+                    v-model="iterationFollowByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                  />
+                </section>
+              </div>
+              <div class="text-center mt-6">
+                <button
+                  class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                  @click="processAutoFollowByReviews"
+                >
+                  Start
+                </button>
+              </div>
             </div>
           </section>
           <section v-if="activeTab == 'auto-follow'" class="w-max mx-auto">
             <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px]">
-              <h1 class="text-xl font-semibold mb-8 text-center">Auto Follow</h1>
+              <h1 class="text-xl font-semibold mb-8 text-center">
+                Auto Follow
+              </h1>
+
               <!-- Rounded switch -->
               <div class="flex items-center gap-4 mx-auto w-max">
-                <label class="switch">
-                  <input type="checkbox" v-model="autoFollowCount" />
-                  <span class="slider round"></span>
-                </label>
-                <p class="font-semibold text-lg" :class="[autoFollowCount? 'text-[#f3694a]':'text-gray-500']">Semua</p>
+                <div>
+                  <div class="mx-auto w-max">
+                    <label class="switch">
+                      <input type="checkbox" v-model="autoFollowCount" />
+                      <span class="slider round"></span>
+                    </label>
+                    <p
+                      class="font-semibold text-lg"
+                      :class="[autoFollowCount? 'text-[#f3694a]':'text-gray-500']"
+                    >
+                      Semua
+                    </p>
+                  </div>
+                  <section class="pt-4">
+                    <label for="" class="text-xs text-gray-700 font-medium"
+                      >Link Toko</label
+                    >
+                    <input
+                      type="text"
+                      v-model="linkForAutoFollow"
+                      class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1"
+                    />
+                  </section>
+                </div>
               </div>
               <div
                 class="overflow-hidden transition-all ease-in-out duration-200 mx-auto w-max"
                 :class="[!autoFollowCount ? 'h-max py-2' :' h-0']"
               >
-                  <section class="py-2">
-                    <input
-                      type="number"
-                      id="iteration-follow"
-                      v-model="iterationFollow"
-                      class="border border-gray-200 rounded focus:outline-none block"
-                    />
-                    <label for="iteration-follow " class="text-xs italic text-[#f3694a]">Jumlah yang ingin di follow</label>
-                  </section>
-
-                </div>
-                <div class="text-center mt-6">
-                  <button
-                    class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
-                    @click="processFollow"
+                <section class="py-2">
+                  <input
+                    type="number"
+                    id="iteration-follow"
+                    v-model="iterationFollow"
+                    class="border border-gray-200 rounded focus:outline-none block"
+                  />
+                  <label
+                    for="iteration-follow "
+                    class="text-xs italic text-[#f3694a]"
+                    >Jumlah yang ingin di follow</label
                   >
-                    Start
-                  </button>
-                </div>
+                </section>
+              </div>
+              <div class="text-center mt-6">
+                <button
+                  class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                  @click="processAutoFollow"
+                >
+                  Start
+                </button>
               </div>
             </div>
           </section>
-          <!-- <section v-if="activeTab == 'database-creator'" class="w-full">
-            <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
-              <table class="w-full">
-                <tr>
-                  <a href="http://supportseller.com" target="_blank"
-                    >Go to supp seller</a
-                  >
-                  <thead>
-                    <th>No</th>
-                    <th>Display name</th>
-                    <th>Username</th>
-                    <th>Kategori Kreator</th>
-                    <th>Sosial Media</th>
-                    <th>Pesanan</th>
-                    <th>Jumlah Follower</th>
-                  </thead>
-                </tr>
-                <tbody>
-                  <tr v-for="(creator,id) in dataCreator.list" :key="id">
-                    <td>{{id + 1}}</td>
-                    <td>{{creator.displayName}}</td>
-                    <td>{{creator.username}}</td>
-                    <td>{{creator.relatedCategoris}}</td>
-                    <td>--</td>
-                    <td>{{creator.orderRange}}</td>
-                    <td>{{creator.totalFollower}}</td>
-                  </tr>
-                  <button @click="prevPageCreator" class="mr-4">Prev</button>
-                  <button @click="nextPageCreator">Next</button>
-                </tbody>
-              </table>
-            </div>
-          </section> -->
         </main>
       </template>
       <template v-else> Kamu Belum Login </template>
@@ -1014,6 +1015,7 @@
           isShow: false,
           iterationUnfollow: null,
           iterationFollow: null,
+          iterationFollowByReviews: 1,
           sidebarMenu: [
             {
               name: "Beranda",
@@ -1023,9 +1025,13 @@
               name: "Auto Unfollow",
               slug: "auto-unfollow",
             },
+            // {
+            //   name: "Auto Follow",
+            //   slug: "auto-follow",
+            // },
             {
-              name: "Auto Follow",
-              slug: "auto-follow",
+              name: "Auto Follow Ulasan",
+              slug: "auto-follow-by-reviews",
             },
             {
               name: "Auto Chat Kreator",
@@ -1035,7 +1041,7 @@
               name: "Balas Ulasan Otomatis",
               slug: "auto-reply-reviews",
             },
-           
+
             // {
             //   name: "Database Creator",
             //   slug: "database-creator",
@@ -1258,7 +1264,7 @@
             ],
           },
           categoryValue: [],
-          
+
           selectedCrawlCreator: {
             iteration: 1,
             socialMedias: "",
@@ -1352,6 +1358,10 @@
           flags: null,
           autoUnffolowCount: true,
           autoFollowCount: true,
+          autoFollowByReviewsCount: true,
+          linkForAutoFollow: "",
+          linkForAutoFollowByReviews: "",
+          startPointFollowByReviews: 1,
         },
         mounted() {
           this.flags = flags();
@@ -1394,6 +1404,19 @@
           if (!this.userInfo) {
             window.location.href = "./html/login-page.html";
           }
+
+          // auto follow
+          const getLinkAutoFollow = electronStore.get("link-auto-follow");
+          if (getLinkAutoFollow) {
+            this.linkForAutoFollow = getLinkAutoFollow;
+          }
+          const getLinkAutoFollowByReviews = electronStore.get(
+            "link-auto-follow-by-reviews"
+          );
+          if (getLinkAutoFollowByReviews) {
+            this.linkForAutoFollowByReviews = getLinkAutoFollowByReviews;
+          }
+
           this.getAccountSubscription();
         },
         methods: {
@@ -1500,9 +1523,10 @@
               }
             }
           },
-      
+
           handleSubmitCrawlCreator() {
-            this.selectedCrawlCreator.replyMessage = this.selectedCrawlCreator.replyMessage.trim()
+            this.selectedCrawlCreator.replyMessage =
+              this.selectedCrawlCreator.replyMessage.trim();
             const { selectedCrawlCreator } = this;
             const category = this.categoryValue;
             const payload = {
@@ -1533,18 +1557,18 @@
 
           //start scrapper
           processUnfollow() {
-          
             if (this.autoUnffolowCount) {
-              this.iterationUnfollow = "Semua"
+              this.iterationUnfollow = "Semua";
               window.electron.ipcRenderer.send(
-                  "process-auto-unfollow",
-                  this.iterationUnfollow
-                );
+                "process-auto-unfollow",
+                this.iterationUnfollow
+              );
             } else {
               if (!this.iterationUnfollow) {
-                this.toastError("Masukkan jumlah yang ingin di unffollow jika tidak ingin semuanya");
-              }else{
-
+                this.toastError(
+                  "Masukkan jumlah yang ingin di unffollow jika tidak ingin semuanya"
+                );
+              } else {
                 window.electron.ipcRenderer.send(
                   "process-auto-unfollow",
                   this.iterationUnfollow
@@ -1552,27 +1576,60 @@
               }
             }
           },
-          processFollow(){
-            console.log(this.autoFollowCount);
-            if (this.autoFollowCount) {
-              this.iterationFollow = "Semua"
-              console.log('iteration follow',this.iterationFollow);
-              // window.electron.ipcRenderer.send(
-              //     "process-auto-unfollow",
-              //     this.iterationFollow
-              //   );
+          processAutoFollow() {
+            if (!this.linkForAutoFollow) {
+              this.toastError("Link toko masih kosong");
             } else {
-              if (!this.iterationFollow) {
-                this.toastError("Masukkan jumlah yang ingin di follow jika tidak ingin semuanya");
-              }else{
-                console.log('this', this.iterationFollow);
-                // window.electron.ipcRenderer.send(
-                //   "process-auto-unfollow",
-                //   this.iterationFollow
-                // );
+              electronStore.set("link-auto-follow", this.linkForAutoFollow);
+              console.log(this.autoFollowCount);
+              if (this.autoFollowCount) {
+                this.iterationFollow = "Semua";
+                console.log("iteration follow", this.iterationFollow);
+                window.electron.ipcRenderer.send(
+                  "process-auto-follow",
+                  this.iterationFollow
+                );
+              } else {
+                if (!this.iterationFollow) {
+                  this.toastError(
+                    "Masukkan jumlah yang ingin di follow jika tidak ingin semuanya"
+                  );
+                } else {
+                  console.log("this", this.iterationFollow);
+                  window.electron.ipcRenderer.send(
+                    "process-auto-follow",
+                    this.iterationFollow
+                  );
+                }
               }
             }
           },
+          processAutoFollowByReviews() {
+            if (!this.linkForAutoFollowByReviews) {
+              this.toastError("Link toko masih kosong");
+            } else {
+              electronStore.set(
+                "link-auto-follow-by-reviews",
+                this.linkForAutoFollowByReviews
+              );
+              const { startPointFollowByReviews, iterationFollowByReviews } =
+                this;
+              const context = {
+                startPointFollowByReviews,
+                iterationFollowByReviews,
+              };
+              context.iterationFollowByReviews = parseInt(
+                this.iterationFollowByReviews
+              );
+
+              console.log("if =", { context });
+              window.electron.ipcRenderer.send(
+                "process-auto-follow-by-reviews",
+                context
+              );
+            }
+          },
+
           processCrawlCreator() {
             const context = electronStore.get("selected-crawl-creator");
             console.log({ context });

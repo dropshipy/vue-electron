@@ -17,7 +17,10 @@ const {
 const { saveCookies, loadCookies } = require("./helpers/utils");
 require("dotenv").config();
 const ElectronStore = require("electron-store");
-
+const { runAutoFollow } = require("./function/auto-follow/auto-follow");
+const {
+  runAutoFollowByReviews,
+} = require("./function/auto-follow/auto-follow-by-reviews");
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -182,6 +185,45 @@ async function runReplyReviews(config) {
     console.error("Error in the main process:", error);
   }
 }
+// https://shopee.co.id/shop/113475604/following
+ipcMain.on("process-auto-follow", async (event, iteration) => {
+  try {
+    const browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: null,
+      executablePath: chromePath,
+    });
+    const page = await browser.newPage();
+    await page.setViewport({
+      width: 1300,
+      height: 1080,
+      deviceScaleFactor: 1,
+    });
+    const context = {
+      iteration,
+      page,
+    };
+    await loginShopee(page, browser);
+    await runAutoFollow(context);
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+});
+
+//autofollow by reviews
+ipcMain.on("process-auto-follow-by-reviews", async (event, data) => {
+  try {
+    const context = {
+      chromePath,
+      data,
+    };
+    await runAutoFollowByReviews(context);
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+});
 
 ipcMain.on("get-subscription-info", async () => {
   const res = await axios.get(

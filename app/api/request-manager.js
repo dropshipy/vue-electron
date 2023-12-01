@@ -35,6 +35,15 @@ async function patchData(endpoint = "", data = {}, options = {}, Honeybadger) {
     return error.response;
   }
 }
+async function getDataShopee(endpoint = "", options = {}, Honeybadger) {
+  try {
+    const url = endpoint;
+    const response = await axios.get(url, options);
+    return response;
+  } catch (error) {
+    console.log(error?.message || error);
+  }
+}
 
 async function postDataShopee(
   endpoint = "",
@@ -52,4 +61,10 @@ async function postDataShopee(
   }
 }
 
-module.exports = { postData, getData, patchData, postDataShopee };
+module.exports = {
+  postData,
+  getData,
+  patchData,
+  postDataShopee,
+  getDataShopee,
+};

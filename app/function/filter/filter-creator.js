@@ -23,7 +23,7 @@ async function filterCreator({ page, config }) {
     config.configMessageBlast;
   console.log({ config });
   try {
-    if (category !== "Semua") {
+    if (category !== "Semua" || !category) {
       try {
         await page.waitForSelector(categoryDropdown);
         await page.click(categoryDropdown);
@@ -48,7 +48,7 @@ async function filterCreator({ page, config }) {
         console.log(error);
       }
     }
-    if (socialMedias !== "Semua") {
+    if (socialMedias !== "Semua" || !socialMedias) {
       try {
         await page.click(mediaSocialDropdown);
         await page.waitForTimeout(2000);
@@ -85,7 +85,7 @@ async function filterCreator({ page, config }) {
         console.log(error);
       }
     }
-    if (followerCount !== "Semua") {
+    if (followerCount !== "Semua" || !followerCount) {
       try {
         await page.click(followerCountDropdown);
         await page.waitForTimeout(2000);
@@ -105,7 +105,7 @@ async function filterCreator({ page, config }) {
         console.log(error);
       }
     }
-    if (followerAge !== "Semua") {
+    if (followerAge !== "Semua" || !followerAge) {
       try {
         await page.click(followerAgeDropdown);
         await page.waitForTimeout(2000);
@@ -125,7 +125,7 @@ async function filterCreator({ page, config }) {
         console.log(error);
       }
     }
-    if (followerGender !== "Semua") {
+    if (followerGender !== "Semua" || !followerGender) {
       try {
         await page.click(followerGenderDropdown);
         await page.waitForTimeout(2000);

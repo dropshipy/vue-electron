@@ -2,11 +2,15 @@
 const postData = require("./request-manager.js").postData;
 const postDataShopee = require("./request-manager.js").postDataShopee;
 const getData = require("./request-manager.js").getData;
+const getDataShopee = require("./request-manager.js").getDataShopee;
 const patchData = require("./request-manager.js").patchData;
 const { parseCookieHeader } = require("../helpers/utils.js");
 
 const postGetCreatorList = async (endpoint, data, options) => {
   return await postDataShopee(endpoint, data, options);
+};
+const postGetUserReviews = async (endpoint, options) => {
+  return await getDataShopee(endpoint, options);
 };
 // async function addExposeFunction({ page, config, sessionId }) {
 //   await page.exposeFunction("sendCreatorData", async (creator) => {
@@ -20,7 +24,6 @@ const postGetCreatorList = async (endpoint, data, options) => {
 const postAddCreator = async (data, options) => {
   return await postData("/shopee/shopee-creators", data, options);
 };
-
 const authenticateBot = async (data, options) => {
   const response = await postData(
     "/shopee-users/authenticate-bot",
@@ -76,7 +79,9 @@ const getUserSubscriptionByCode = async (options) => {
   const { params } = options;
   return await getData(`/shopee-subscriptions/code/${params.code}`, options);
 };
-
+const postFollowUser = async (endpoint, data, options) => {
+  return await postDataShopee(endpoint, data, options);
+};
 module.exports = {
   postGetCreatorList,
   postAddCreator,
@@ -86,4 +91,6 @@ module.exports = {
   getUserSubscriptionByCode,
   getUserMessageBlastConfigBySubscriptionId,
   updateSubscriptionStatus,
+  postGetUserReviews,
+  postFollowUser,
 };

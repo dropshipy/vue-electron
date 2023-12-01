@@ -93,6 +93,11 @@ async function messageBlast({
               "#shopee-mini-chat-embedded > div.UvGSSkd1qQ > div.Z8RjJZsXy1 > div.C8Jzw7jkTU > div.Mj9lh6KccD > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
             await page.waitForSelector(textArea);
             let isAlreadySent = false;
+            try {
+              await page.waitForSelector("div.QwyBL5p0DA", { timeout: 1000 });
+            } catch (error) {
+              isAlreadySent = false;
+            }
             await page
               .evaluate(async (text) => {
                 const divs = document.querySelectorAll("div.QwyBL5p0DA");
