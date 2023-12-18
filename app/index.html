@@ -134,6 +134,22 @@
                       Akun SPT
                     </p>
                   </div>
+
+                  <div
+                    class="flex gap-2 cursor-pointer hover:text-black"
+                    @click="isShowModalShopeeAccount = true"
+                  >
+                    <img
+                      src="./assets/icons/shopee.svg"
+                      alt="shopee account"
+                      class="w-5 h-5"
+                    />
+
+                    <p class="text-sm whitespace-nowrap leading-normal">
+                      Akun Shopee
+                    </p>
+                  </div>
+
                   <div
                     class="flex gap-2 cursor-pointer hover:text-black"
                     @click="isShowModalDelete = true"
@@ -990,9 +1006,95 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal Setup Shopee Account -->
+      <div
+        class="fixed top-0 left-0 right-0 bottom-0 bg-black/40 z-50"
+        v-if="isShowModalShopeeAccount"
+      >
+        <div
+          class="space-y-4 bg-white rounded-lg p-5 w-max relative top-40 left-1/2 -translate-x-1/2 min-w-[420px]"
+        >
+          <img
+            src="./assets/icons/close.svg"
+            alt="close"
+            class="w-6 h-6 absolute left-[102%] top-1 cursor-pointer"
+            @click="isShowModalShopeeAccount = !isShowModalShopeeAccount"
+          />
+          <h1>Akun Shopee</h1>
+          <section>
+            <label
+              for="shopeeUserContact"
+              class="block text-sm text-[#66738F] pb-1"
+            >
+              No. Handphone/Username/Email
+            </label>
+            <input
+              v-model="shopeeUserContact"
+              id="shopeeUserContact"
+              type="text"
+              placeholder="Masukkan no.handphone/username/email kamu disini"
+              class="border focus:outline-none py-2 px-3 w-full rounded text-sm text-[#66738F]"
+            />
+          </section>
+          <section>
+            <label
+              for="shopeeUserPassword"
+              class="block text-sm text-[#66738F] pb-1"
+            >
+              Password
+            </label>
+            <div class="relative">
+              <img
+                :src="[isShowShopeeUserPassword ?'./assets/icons/eye-show.svg':'./assets/icons/eye-hide.svg' ]"
+                alt="togle password"
+                class="w-6 h-6 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer"
+                @click="isShowShopeeUserPassword = !isShowShopeeUserPassword"
+              />
+              <input
+                :type="[isShowShopeeUserPassword? 'text':'password']"
+                id="shopeeUserPassword"
+                v-model="shopeeUserPassword"
+                placeholder="Masukkan password kamu disini"
+                class="border focus:outline-none py-2 px-3 w-full rounded text-sm text-[#66738F]"
+              />
+            </div>
+          </section>
+
+          <section>
+            <div class="flex items-center gap-2 mx-auto w-full">
+              <label class="switch">
+                <input type="checkbox" v-model="isShopeeLoginWithQRCode" />
+                <span class="slider round"></span>
+              </label>
+              <p
+                class="text-sm"
+                :class="[isShopeeLoginWithQRCode? 'text-[#f3694a]':'text-[#66738F]']"
+              >
+                Login dengan QR Code
+              </p>
+            </div>
+          </section>
+
+          <div class="!mt-10 text-right">
+            <button
+              @click="saveShopeeAccount"
+              class="text-sm font-medium bg-[#f3694a] text-white py-2 px-4 rounded-lg hover:opacity-80"
+            >
+              Simpan
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="./function/browser/flags.js"></script>
     <script>
+      const STORE_SHOPEE_ACCOUNT = "shopee-account";
+      const SHOPEE_LOGIN_METHOD = {
+        QR_CODE: "qr-code",
+        CONTACT: "contact",
+      };
+
       Vue.use(Toasted);
       new Vue({
         el: "#app",
@@ -1347,6 +1449,11 @@
           linkForAutoFollow: "",
           linkForAutoFollowByReviews: "",
           startPointFollowByReviews: 1,
+          isShowModalShopeeAccount: false,
+          shopeeUserContact: "",
+          shopeeUserPassword: "",
+          isShopeeLoginWithQRCode: true,
+          isShowShopeeUserPassword: false,
         },
         mounted() {
           this.flags = flags();
@@ -1507,6 +1614,35 @@
                 this.categoryValue = finalArr;
               }
             }
+          },
+
+          getShopeeAccount() {
+            const account = electronStore.get(STORE_SHOPEE_ACCOUNT);
+            console.log({ account });
+            if (account) {
+              this.shopeeUserContact = account.contact;
+              this.shopeeUserPassword = account.password;
+              this.isShopeeLoginWithQRCode =
+                account.loginMethod === SHOPEE_LOGIN_METHOD.QR_CODE;
+            }
+          },
+
+          saveShopeeAccount() {
+            const payload = {
+              contact: this.shopeeUserContact,
+              password: this.shopeeUserPassword,
+              loginMethod: this.isShopeeLoginWithQRCode
+                ? SHOPEE_LOGIN_METHOD.QR_CODE
+                : SHOPEE_LOGIN_METHOD.CONTACT,
+            };
+            electronStore.set(STORE_SHOPEE_ACCOUNT, payload);
+            this.$toasted.show("Berhasil menyimpan informasi akun shopee", {
+              icon: "",
+              position: "top-right",
+              duration: 3000,
+              type: "success",
+            });
+            this.isShowModalShopeeAccount = false;
           },
 
           handleSubmitCrawlCreator() {
@@ -1677,6 +1813,13 @@
               date = "-";
             }
             return date;
+          },
+        },
+        watch: {
+          isShowModalShopeeAccount: function (isShow) {
+            if (isShow) {
+              this.getShopeeAccount();
+            }
           },
         },
       });
