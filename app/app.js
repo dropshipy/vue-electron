@@ -186,24 +186,12 @@ async function runReplyReviews(config) {
   }
 }
 // https://shopee.co.id/shop/113475604/following
-ipcMain.on("process-auto-follow", async (event, iteration) => {
+ipcMain.on("process-auto-follow", async (event, data) => {
   try {
-    const browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: null,
-      executablePath: chromePath,
-    });
-    const page = await browser.newPage();
-    await page.setViewport({
-      width: 1300,
-      height: 1080,
-      deviceScaleFactor: 1,
-    });
     const context = {
-      iteration,
-      page,
+      chromePath,
+      iteration: data,
     };
-    await loginShopee(page, browser);
     await runAutoFollow(context);
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });

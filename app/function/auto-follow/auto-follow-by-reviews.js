@@ -119,7 +119,7 @@ async function followByReviews({
           toastBar.style.borderRadius = "10px";
           toastBar.style.zIndex = "9999";
           // Set the text content of the toast bar
-          toastBar.textContent = `Berhasil follow user ${authorUsernmae}`;
+          toastBar.textContent = `Berhasil follow  ${authorUsernmae}`;
           // Append the toast bar to the body
           header.appendChild(toastBar);
           toastBar.style.opacity = "0";
@@ -130,10 +130,10 @@ async function followByReviews({
           setTimeout(() => {
             toastBar.style.opacity = "0";
             toastBar.remove();
-          }, 800);
+          }, 1000);
         }, username);
 
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(1200);
         console.log(followingCount, "~ status = ", follow.status);
         currentIndex++;
         followingCount++;

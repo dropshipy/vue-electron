@@ -21,6 +21,9 @@ const postGetUserReviews = async (endpoint, options) => {
 //     });
 //   });
 // }
+const postGetFollowers = async (endpoint, options) => {
+  return await getDataShopee(endpoint, options);
+};
 const postAddCreator = async (data, options) => {
   return await postData("/shopee/shopee-creators", data, options);
 };
@@ -93,4 +96,5 @@ module.exports = {
   updateSubscriptionStatus,
   postGetUserReviews,
   postFollowUser,
+  postGetFollowers,
 };

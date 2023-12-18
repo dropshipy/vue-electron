@@ -787,18 +787,18 @@
           </section>
           <section
             v-if="activeTab == 'auto-follow-by-reviews'"
-            class="w-max mx-auto"
+            class="w-max mx-auto overflow-x-scroll"
           >
             <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[700px]">
               <h1 class="text-xl font-semibold mb-8 text-center">
-                Auto Follow
+                Auto Follow Dari Ulasan
               </h1>
-              <!-- Rounded switch -->
-
               <div class="w-full space-y-3">
                 <section class="pt-4">
-                  <label for="" class="text-sm text-gray-700 font-medium"
-                    >Link Toko</label
+                  <label
+                    for=""
+                    class="text-sm text-gray-700 font-medium tracking-wider"
+                    >Link Produk/Ulasan</label
                   >
                   <input
                     type="text"
@@ -839,64 +839,49 @@
             </div>
           </section>
           <section v-if="activeTab == 'auto-follow'" class="w-max mx-auto">
-            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px]">
-              <h1 class="text-xl font-semibold mb-8 text-center">
-                Auto Follow
-              </h1>
-
-              <!-- Rounded switch -->
-              <div class="flex items-center gap-4 mx-auto w-max">
-                <div>
-                  <div class="mx-auto w-max">
-                    <label class="switch">
-                      <input type="checkbox" v-model="autoFollowCount" />
-                      <span class="slider round"></span>
-                    </label>
-                    <p
-                      class="font-semibold text-lg"
-                      :class="[autoFollowCount? 'text-[#f3694a]':'text-gray-500']"
-                    >
-                      Semua
-                    </p>
-                  </div>
-                  <section class="pt-4">
-                    <label for="" class="text-xs text-gray-700 font-medium"
-                      >Link Toko</label
-                    >
-                    <input
-                      type="text"
-                      v-model="linkForAutoFollow"
-                      class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1"
-                    />
-                  </section>
-                </div>
-              </div>
-              <div
-                class="overflow-hidden transition-all ease-in-out duration-200 mx-auto w-max"
-                :class="[!autoFollowCount ? 'h-max py-2' :' h-0']"
-              >
+            <div
+              class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px] overflow-x-scroll"
+            >
+              <h1 class="text-xl font-semibold text-center">Auto Follow</h1>
+              <p class="text-base font-medium pt-1 mb-8 text-center">
+                Dari Followers Toko
+              </p>
+              <div class="gap-4 mx-auto w-[700px] space-y-4">
+                <section class="pt-4">
+                  <label
+                    for=""
+                    class="text-sm font-medium text-gray-700 font-medium"
+                    >Link toko</label
+                  >
+                  <input
+                    type="text"
+                    v-model="linkForAutoFollow"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-4 py-2 w-full"
+                  />
+                </section>
                 <section class="py-2">
+                  <label
+                    for=""
+                    class="text-sm font-medium text-gray-700 font-medium"
+                    >Jumlah Yang Ingin Di Follow
+                  </label>
                   <input
                     type="number"
                     id="iteration-follow"
                     v-model="iterationFollow"
-                    class="border border-gray-200 rounded focus:outline-none block"
+                    class="border border-gray-200 rounded focus:outline-none block px-4 py-2 w-full"
                   />
-                  <label
-                    for="iteration-follow "
-                    class="text-xs italic text-[#f3694a]"
-                    >Jumlah yang ingin di follow</label
-                  >
                 </section>
               </div>
-              <div class="text-center mt-6">
-                <button
-                  class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
-                  @click="processAutoFollow"
-                >
-                  Start
-                </button>
-              </div>
+            </div>
+
+            <div class="text-center mt-6">
+              <button
+                class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                @click="processAutoFollow"
+              >
+                Start
+              </button>
             </div>
           </section>
         </main>
@@ -1025,10 +1010,10 @@
               name: "Auto Unfollow",
               slug: "auto-unfollow",
             },
-            // {
-            //   name: "Auto Follow",
-            //   slug: "auto-follow",
-            // },
+            {
+              name: "Auto Follow ",
+              slug: "auto-follow",
+            },
             {
               name: "Auto Follow Ulasan",
               slug: "auto-follow-by-reviews",
@@ -1582,25 +1567,13 @@
             } else {
               electronStore.set("link-auto-follow", this.linkForAutoFollow);
               console.log(this.autoFollowCount);
-              if (this.autoFollowCount) {
-                this.iterationFollow = "Semua";
-                console.log("iteration follow", this.iterationFollow);
+              if (!this.iterationFollow) {
+                this.toastError("Masukkan jumlah yang ingin di follow ");
+              } else {
                 window.electron.ipcRenderer.send(
                   "process-auto-follow",
                   this.iterationFollow
                 );
-              } else {
-                if (!this.iterationFollow) {
-                  this.toastError(
-                    "Masukkan jumlah yang ingin di follow jika tidak ingin semuanya"
-                  );
-                } else {
-                  console.log("this", this.iterationFollow);
-                  window.electron.ipcRenderer.send(
-                    "process-auto-follow",
-                    this.iterationFollow
-                  );
-                }
               }
             }
           },
