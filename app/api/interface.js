@@ -85,6 +85,12 @@ const getUserSubscriptionByCode = async (options) => {
 const postFollowUser = async (endpoint, data, options) => {
   return await postDataShopee(endpoint, data, options);
 };
+
+const getShopeeFollowingList = async ({ limit, offset, shopId, headers }) => {
+  const endpoint = `https://shopee.co.id/api/v4/pages/get_followee_list?limit=${limit}&offset=${offset}&shopid=${shopId}`;
+  return await getDataShopee(endpoint, { headers });
+};
+
 module.exports = {
   postGetCreatorList,
   postAddCreator,
@@ -97,4 +103,5 @@ module.exports = {
   postGetUserReviews,
   postFollowUser,
   postGetFollowers,
+  getShopeeFollowingList,
 };
