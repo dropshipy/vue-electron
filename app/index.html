@@ -1088,12 +1088,11 @@
       </div>
     </div>
     <script src="./function/browser/flags.js"></script>
-    <script>
-      const STORE_SHOPEE_ACCOUNT = "shopee-account";
-      const SHOPEE_LOGIN_METHOD = {
-        QR_CODE: "qr-code",
-        CONTACT: "contact",
-      };
+    <script type="module">
+      import {
+        SHOPEE_ACCOUNT_STORE_KEY,
+        SHOPEE_LOGIN_METHOD,
+      } from "./constants/shopee.constant.js";
 
       Vue.use(Toasted);
       new Vue({
@@ -1617,8 +1616,8 @@
           },
 
           getShopeeAccount() {
-            const account = electronStore.get(STORE_SHOPEE_ACCOUNT);
-            console.log({ account });
+            const account = electronStore.get(SHOPEE_ACCOUNT_STORE_KEY);
+
             if (account) {
               this.shopeeUserContact = account.contact;
               this.shopeeUserPassword = account.password;
@@ -1635,7 +1634,7 @@
                 ? SHOPEE_LOGIN_METHOD.QR_CODE
                 : SHOPEE_LOGIN_METHOD.CONTACT,
             };
-            electronStore.set(STORE_SHOPEE_ACCOUNT, payload);
+            electronStore.set(SHOPEE_ACCOUNT_STORE_KEY, payload);
             this.$toasted.show("Berhasil menyimpan informasi akun shopee", {
               icon: "",
               position: "top-right",
