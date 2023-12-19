@@ -28,6 +28,7 @@ async function autoUnfollow({ page, iteration }) {
     ) {
       const responseData = await response.json();
       const data = responseData.data;
+
       shopeeProfile.push(data);
     }
   });

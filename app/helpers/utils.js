@@ -29,9 +29,44 @@ async function loadCookies(path) {
     return cookies;
   }
 }
+
+// example : generateCustomSelector('div','test)
+const generateCustomSelector = (element, text) =>
+  `; //${element}[contains(text(),'${text}')]`;
+const waitForElementWithText = async (page, element, text) => {
+  const selector = generateCustomSelector(element, text);
+
+  try {
+    await page.waitForXPath(selector);
+  } catch (error) {
+    console.error(`Error: Element with text '${text}' not found`);
+  }
+};
+
+// example   clickByText(page, "test");
+const clickByText = async (page, text) => {
+  const xpath = `// *[contains(text(), '${text}')]`;
+  try {
+    await page.waitForXPath(xpath);
+    const [element] = await page.$x(xpath);
+
+    if (element) {
+      await element.click();
+    } else {
+      console.error(`Element with text '${text}' not found`);
+    }
+  } catch (error) {
+    console.error(`Error while waiting for XPath: ${error}`);
+  }
+};
+
 module.exports = {
   waitForTimeout,
   parseCookieHeader,
   saveCookies,
   loadCookies,
+  generateCustomSelector,
+  waitForElementWithText,
+  waitAndClick,
+  clickByText,
 };
