@@ -5,6 +5,7 @@ const ElectronStore = require("electron-store");
 const store = new ElectronStore();
 const { updateSubscriptionStatus } = require("../api/interface");
 const { dialog } = require("electron");
+
 async function saveCookies(page, browser) {
   const cookies = await page.cookies();
   store.set("cookies-shopee-account", cookies);
@@ -161,12 +162,41 @@ async function loginShopee(page, browser) {
         console.log(error);
       }
     } else {
-      console.log("No cookies found. Logging in with barcode...");
+      const account = store.get("shopee-account");
+      const loginMethod = account?.loginMethod || "qr-code";
+
+      console.log(`No cookies found. Logging in with ${loginMethod}...`);
+
       try {
-        await page.goto("https://shopee.co.id/seller/login/qr", {
+        const loginUrl =
+          loginMethod === "qr-code"
+            ? "https://shopee.co.id/seller/login/qr"
+            : "https://shopee.co.id/seller/login";
+
+        await page.goto(loginUrl, {
           waitUntil: "networkidle2",
           timeout: 0,
         });
+
+        if (loginMethod === "contact") {
+          const contactEl = await page.$('input[name="loginKey"]');
+          await contactEl.click();
+          await page.keyboard.type(account.contact);
+          await page.keyboard.press("Tab");
+          await page.keyboard.type(account.password);
+          await page.keyboard.press("Enter");
+          /**
+           * Wait until user redirect to:
+           * https://shopee.co.id/user/account/profile?is_from_login=true
+           * OR
+           * https://shopee.co.id/?is_from_login=true
+           */
+          await page.waitForFunction(
+            () => document.location.href.includes("?is_from_login=true"),
+            { timeout: 0 }
+          );
+        }
+
         await page.waitForNavigation();
         console.log("Login successful. Saving cookies...");
         await saveCookies(page);
