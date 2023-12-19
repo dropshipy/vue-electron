@@ -1,35 +1,51 @@
-const puppeteer = require("puppeteer");
 const { dialog } = require("electron");
+const {
+  getShopeeFollowingList,
+  postShopeeUnfollow,
+} = require("../api/interface");
+const { showToast } = require("../helpers/toast");
 
-async function clickButtonByIteration(page, count) {
-  try {
-    await page.waitForSelector("button", { timeout: 5000 });
+async function requestListAndUnfollow(payload) {
+  const responseGetList = await getShopeeFollowingList(payload);
+  console.log({ responseGetList });
 
-    const buttons = await page.$$("button");
-    if (buttons.length > 0) {
-      for (let i = 0; i < Math.min(count, buttons.length); i++) {
-        await page.waitForTimeout(1000);
-        // await buttons.click();
+  const accounts = responseGetList.data.accounts || [];
 
-        await page.evaluate((element) => {
-          element.click();
-        }, buttons[i]);
-      }
-    }
-  } catch (error) {
-    console.error("Error clicking buttons:", error);
+  const { headers, page } = payload;
+
+  for (const account of accounts) {
+    const responseUnfollow = await postShopeeUnfollow({
+      userId: account.userId,
+      headers,
+    });
+
+    console.log({ responseUnfollow });
+
+    const username = account.username;
+    await page.evaluate((_username) => {
+      showToast({
+        wrapperSelector: ".shopee-top.container-wrapper",
+        textContent: `Berhasil unfollow ${_username}`,
+      });
+    }, username);
+    await page.waitForTimeout(1200);
   }
+
+  return responseGetList.data.nomore;
 }
+
 async function autoUnfollow({ page, iteration }) {
-  const shopeeProfile = [];
+  let shopeeProfile = null;
+  let headers = null;
+
   page.on("response", async (response) => {
     if (
       response.url().includes("https://shopee.co.id/api/v4/account/get_profile")
     ) {
       const responseData = await response.json();
       const data = responseData.data;
-
-      shopeeProfile.push(data);
+      shopeeProfile = data;
+      headers = response.headers();
     }
   });
 
@@ -40,62 +56,47 @@ async function autoUnfollow({ page, iteration }) {
     }),
   ]);
 
-  if (shopeeProfile.length > 0) {
-    await page.emulate(puppeteer.devices["iPhone 11"]);
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-      page.goto(
-        `https://shopee.co.id/shop/${shopeeProfile[0].user_profile.shopid}/following`,
-        {
-          waitUntil: "networkidle2",
-        }
-      ),
-    ]);
-    try {
-      console.log("run", { iteration });
-      await scrollAndHandleModal(page);
-      await page.evaluate(() => {
-        window.scrollTo(0, 0);
-      });
-      if (iteration == "Semua") {
-        const buttons = await page.$$("button");
+  try {
+    if (shopeeProfile) {
+      const shopeeMaxLimit = 50;
+      const isLoopRequired =
+        iteration === "Semua" || iteration > shopeeMaxLimit;
+      const limit = isLoopRequired ? shopeeMaxLimit : iteration;
+      let offset = 0;
+      let nomore = false;
 
-        for (const button of buttons) {
-          await page.waitForTimeout(1000);
-          await button.evaluate((element) => {
-            element.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-              inline: "center",
-            });
+      const shopId = shopeeProfile.shopId;
+
+      if (isLoopRequired) {
+        while (!nomore) {
+          const isNomore = await requestListAndUnfollow({
+            limit,
+            offset,
+            shopId,
+            headers,
+            page,
           });
-          await button.click();
+
+          nomore = isNomore;
+          offset += limit;
         }
       } else {
-        await clickButtonByIteration(page, iteration);
+        await requestListAndUnfollow({
+          limit,
+          offset,
+          shopId,
+          headers,
+          page,
+        });
       }
-      await page.waitForTimeout(2000);
-      await page.evaluate(() => {
-        window.alert("Program Unffollow Otomatis Telah Selesai");
-      });
-    } catch (error) {
-      dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
-      console.log("error", error);
     }
+    dialog.showMessageBox({
+      message: `Program Telah Selesai`,
+      buttons: ["OK"],
+    });
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
   }
 }
-async function scrollAndHandleModal(page) {
-  await page.evaluate(() => {
-    window.scrollBy(0, 100);
-  });
-
-  await page.waitForSelector("#modal > aside > div.c7huf3.undefined > div", {
-    timeout: 5000,
-  });
-
-  await page.click(
-    "#modal > aside > div.c7huf3.undefined > div > button.Y47Tdy.bOZVyD"
-  );
-}
-
 module.exports = { autoUnfollow };
