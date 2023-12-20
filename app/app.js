@@ -119,6 +119,7 @@ async function handleAutoUnfolow(iteration) {
     const context = {
       iteration,
       page,
+      browser,
     };
     await loginShopee(page, browser);
     await autoUnfollow(context);

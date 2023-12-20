@@ -94,7 +94,7 @@ const getShopeeFollowingList = async ({ limit, offset, shopId, headers }) => {
 
 const postShopeeUnfollow = async ({ userId, headers }) => {
   const endpoint = "https://shopee.co.id/api/v4/pages/unfollow";
-  return await postDataShopee(endpoint, { params: { userId } }, { headers });
+  return await postDataShopee(endpoint, { userid: userId }, { headers });
 };
 
 module.exports = {

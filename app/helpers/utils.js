@@ -67,6 +67,6 @@ module.exports = {
   loadCookies,
   generateCustomSelector,
   waitForElementWithText,
-  waitAndClick,
+  // waitAndClick,
   clickByText,
 };
