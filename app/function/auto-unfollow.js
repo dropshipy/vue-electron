@@ -21,9 +21,14 @@ async function autoUnfollow({ page, iteration, browser }) {
     }
   });
 
-  page.on("request", (request) => {
+  page.on("request", async (request) => {
     if (request.url().includes(urlGetProfile)) {
       headers = request.headers();
+
+      const pageCookies = await page.cookies();
+      headers["cookie"] = pageCookies
+        .map(({ name, value }) => `${name}=${value}`)
+        .join(";");
     }
   });
 
@@ -62,10 +67,13 @@ async function autoUnfollow({ page, iteration, browser }) {
         await requestListAndUnfollow(payload);
       }
     }
-    dialog.showMessageBox({
+
+    await dialog.showMessageBox({
       message: `Program Telah Selesai`,
       buttons: ["OK"],
     });
+
+    await browser.close();
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
@@ -95,8 +103,9 @@ async function requestListAndUnfollow(payload) {
         headers,
       });
 
-      if (responseUnfollow.data.data) {
-        const username = account.username;
+      if (responseUnfollow.status === 200) {
+        const username = account.nickname || account.shopname;
+
         await page.evaluate((_username) => {
           const showToast = ({ wrapperSelector, textContent }) => {
             const wrapper = document.querySelector(wrapperSelector);
@@ -114,7 +123,7 @@ async function requestListAndUnfollow(payload) {
               fontWeight: "600",
               minWidth: "500px",
               maxWidth: "90%",
-              fontSize: "40px",
+              fontSize: "36px",
               padding: "20px 30px",
               borderRadius: "10px",
               zIndex: "9999",
