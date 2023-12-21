@@ -47,7 +47,6 @@ async function autoUnfollow({ page, iteration, browser }) {
 
       const payload = {
         limit: isLoopRequired ? shopeeMaxLimit : iteration,
-        offset: 0,
         shopId: profile.user_profile.shopid,
         headers,
         page,
@@ -55,13 +54,27 @@ async function autoUnfollow({ page, iteration, browser }) {
       };
 
       let nomore = false;
+      let unfollowCount = 0;
 
       if (isLoopRequired) {
-        while (!nomore) {
-          const isNomore = await requestListAndUnfollow(payload);
+        const shouldLooping = () => {
+          let continueLooping = !nomore;
 
+          if (iteration !== "Semua") {
+            continueLooping = !nomore && unfollowCount < iteration;
+          }
+
+          return continueLooping;
+        };
+
+        while (shouldLooping()) {
+          const isNomore = await requestListAndUnfollow(payload);
           nomore = isNomore;
-          payload.offset += payload.limit;
+          unfollowCount += +payload.limit;
+
+          const remaining = iteration - unfollowCount;
+          payload.limit =
+            remaining > shopeeMaxLimit ? shopeeMaxLimit : remaining;
         }
       } else {
         await requestListAndUnfollow(payload);
@@ -113,10 +126,9 @@ async function requestListAndUnfollow(payload) {
 
             // Assign styles using an object
             Object.assign(toastBar.style, {
-              position: "absolute",
-              top: "100px",
-              left: "50%",
-              transform: "translateX(-50%)",
+              position: "fixed",
+              top: "80px",
+              left: "80px",
               backgroundColor: "#3a373c",
               border: "1px solid #3a373c",
               color: "#52c81e",
@@ -145,17 +157,21 @@ async function requestListAndUnfollow(payload) {
           };
 
           showToast({
-            wrapperSelector: ".shopee-top.container-wrapper",
+            wrapperSelector: "body",
             textContent: `Berhasil unfollow ${_username}`,
           });
         }, username);
       }
-      await page.waitForTimeout(1200);
+      await page.waitForTimeout(1000);
     }
 
-    return resData.nomore || true;
+    return resData.nomore;
   } catch (error) {
-    console.log("Error", error?.message);
+    await dialog.showMessageBox({
+      message: `Terjadi kesalahan: ${error?.message}`,
+      buttons: ["OK"],
+    });
+    console.log("Error: ", error?.message);
   }
 }
 

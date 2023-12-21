@@ -87,8 +87,8 @@ const postFollowUser = async (endpoint, data, options) => {
   return await postDataShopee(endpoint, data, options);
 };
 
-const getShopeeFollowingList = async ({ limit, offset, shopId, headers }) => {
-  const endpoint = `https://shopee.co.id/api/v4/pages/get_followee_list?limit=${limit}&offset=${offset}&shopid=${shopId}`;
+const getShopeeFollowingList = async ({ limit, shopId, headers }) => {
+  const endpoint = `https://shopee.co.id/api/v4/pages/get_followee_list?limit=${limit}&offset=0&shopid=${shopId}`;
   return await getDataShopee(endpoint, { headers });
 };
 
