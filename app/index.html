@@ -175,23 +175,33 @@
           </div>
         </nav>
         <main class="flex gap-10 !w-ful">
-          <aside class="bg-white min-w-[230px] min-h-screen space-y-4 pt-10">
+          <aside class="bg-white min-w-[240px] min-h-screen space-y-4 pt-10">
             <div
               v-for="(menu,id) in sidebarMenu"
               :key="id"
-              class="cursor-pointer pl-5 hover:text-[#f3694a]"
+              class="flex items-center space-x-2 cursor-pointer pl-5 hover:text-[#f3694a]"
               :class="[activeTab == menu.slug ? 'text-[#f3694a]':'text-[#66738F]']"
               @click="handleSidebar(menu.slug)"
             >
+              <svg width="20" height="20" fill="none" class="text-red">
+                <use
+                  :xlink:href="`./assets/icons/sidebar/${menu.slug}.svg#icon`"
+                />
+              </svg>
               <h1>{{menu.name}}</h1>
             </div>
-            <div class="mt-4 ml-5">
+            <div
+              class="flex items-center space-x-2 mt-4 ml-5 text-[#66738F] hover:text-[#f3694a]"
+            >
+              <svg width="20" height="20" fill="none" class="text-red">
+                <use xlink:href="./assets/icons/sidebar/db-creator.svg#icon" />
+              </svg>
               <a
                 :href="`https://supportseller.com/${flags.linkCreator}`"
                 target="_blank"
-                class="text-[#66738F] hover:text-[#f3694a]"
-                >Database Creator</a
               >
+                Database Creator
+              </a>
             </div>
           </aside>
           <section
@@ -1686,7 +1696,7 @@
             } else {
               if (!this.iterationUnfollow) {
                 this.toastError(
-                  "Masukkan jumlah yang ingin di unffollow jika tidak ingin semuanya"
+                  "Masukkan jumlah yang ingin di unfollow jika tidak ingin semuanya"
                 );
               } else {
                 window.electron.ipcRenderer.send(
