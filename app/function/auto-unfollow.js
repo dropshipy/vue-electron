@@ -72,9 +72,11 @@ async function autoUnfollow({ page, iteration, browser }) {
           nomore = isNomore;
           unfollowCount += +payload.limit;
 
-          const remaining = iteration - unfollowCount;
-          payload.limit =
-            remaining > shopeeMaxLimit ? shopeeMaxLimit : remaining;
+          if (iteration !== "Semua") {
+            const remaining = iteration - unfollowCount;
+            payload.limit =
+              remaining > shopeeMaxLimit ? shopeeMaxLimit : remaining;
+          }
         }
       } else {
         await requestListAndUnfollow(payload);
