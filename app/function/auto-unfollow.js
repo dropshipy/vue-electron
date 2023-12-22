@@ -56,6 +56,8 @@ async function autoUnfollow({ page, iteration, browser }) {
       let nomore = false;
       let unfollowCount = 0;
 
+      console.log(`--- START: Unfollow ${iteration} users ---`);
+
       if (isLoopRequired) {
         const shouldLooping = () => {
           let continueLooping = !nomore;
@@ -97,11 +99,22 @@ async function autoUnfollow({ page, iteration, browser }) {
 
 async function requestListAndUnfollow(payload) {
   try {
-    const responseGetList = await getShopeeFollowingList(payload);
-    const resData = responseGetList.data.data;
-    const accounts = resData.accounts || [];
+    const { headers, page, browser, limit } = payload;
 
-    const { headers, page, browser } = payload;
+    const responseGetList = await getShopeeFollowingList(payload);
+
+    console.log("Get following list:", {
+      status: responseGetList.status,
+      limit,
+    });
+
+    if (responseGetList.status !== 200) {
+      console.log("Failed to get following list:", responseGetList);
+      return true;
+    }
+
+    const resData = responseGetList.data?.data;
+    const accounts = resData.accounts || [];
 
     if (!accounts.length) {
       await dialog.showMessageBox({
@@ -112,15 +125,23 @@ async function requestListAndUnfollow(payload) {
       return true;
     }
 
-    for (const account of accounts) {
+    for (let i = 0; i < accounts.length; i++) {
+      const account = accounts[i];
+
       const responseUnfollow = await postShopeeUnfollow({
         userId: account.userid,
         headers,
       });
 
-      if (responseUnfollow.status === 200) {
-        const username = account.nickname || account.shopname;
+      const username = account.nickname || account.shopname;
 
+      console.log("Response unfollow:", {
+        status: responseUnfollow.status,
+        order: i + 1,
+        username,
+      });
+
+      if (responseUnfollow.status === 200) {
         await page.evaluate((_username) => {
           const showToast = ({ wrapperSelector, textContent }) => {
             const wrapper = document.querySelector(wrapperSelector);
@@ -163,6 +184,11 @@ async function requestListAndUnfollow(payload) {
             textContent: `Berhasil unfollow ${_username}`,
           });
         }, username);
+      } else {
+        await dialog.showMessageBox({
+          message: `Gagal unfollow ${username}`,
+          buttons: ["OK"],
+        });
       }
       await page.waitForTimeout(1000);
     }
@@ -173,7 +199,7 @@ async function requestListAndUnfollow(payload) {
       message: `Terjadi kesalahan: ${error?.message}`,
       buttons: ["OK"],
     });
-    console.log("Error: ", error?.message);
+    console.log("Error in requestListAndUnfollow: ", error?.message);
   }
 }
 
