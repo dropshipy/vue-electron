@@ -97,6 +97,24 @@ const postShopeeUnfollow = async ({ userId, headers }) => {
   return await postDataShopee(endpoint, { userid: userId }, { headers });
 };
 
+const postShopeeMessage = async ({ payload, headers }) => {
+  const endpoint = "https://seller.shopee.co.id/webchat/api/v1.2/mini/messages";
+
+  const data = {
+    request_id: `request_id_${Date.now()}`,
+    entry_point: "direct_chat_entry_point",
+    source: "minichat",
+    type: "text",
+    chat_send_option: {
+      force_send_cancel_order_warning: false,
+      comply_cancel_order_warning: false,
+    },
+    ...payload,
+  };
+
+  return await postDataShopee(endpoint, data, { headers });
+};
+
 module.exports = {
   postGetCreatorList,
   postAddCreator,
@@ -111,4 +129,5 @@ module.exports = {
   postGetFollowers,
   getShopeeFollowingList,
   postShopeeUnfollow,
+  postShopeeMessage,
 };

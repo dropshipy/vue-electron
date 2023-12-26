@@ -136,13 +136,11 @@ async function followByReviews({
         currentIndex++;
         followingCount++;
 
-        console.log(
+        console.log({
           followingCount,
-          "~ status = ",
-          follow.status,
-          "~ username = ",
-          username
-        );
+          status: follow.status,
+          username: username,
+        });
       }
     }
     dialog.showMessageBox({

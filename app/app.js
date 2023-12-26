@@ -1,26 +1,24 @@
-const { app, BrowserWindow, ipcMain, session } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const puppeteer = require("puppeteer");
 const path = require("node:path");
-const fs = require("fs");
-const os = require("os");
 const { loginShopee } = require("./function/login");
 const { autoUnfollow } = require("./function/auto-unfollow");
 const { crawlCreator } = require("./function/invite-creator/crawl-creator");
 const { replyReviews } = require("./function/reply-reviews");
 const { dialog } = require("electron");
 const axios = require("axios");
-const { log } = require("node:console");
-const { authenticateUser } = require("./function/authenticate-user");
 const {
   authenticateUserShopeeTools,
 } = require("./function/browser/authenticate-shopee-tools");
-const { saveCookies, loadCookies } = require("./helpers/utils");
 require("dotenv").config();
 const ElectronStore = require("electron-store");
 const { runAutoFollow } = require("./function/auto-follow/auto-follow");
 const {
   runAutoFollowByReviews,
 } = require("./function/auto-follow/auto-follow-by-reviews");
+const {
+  runAutoChatByReviews,
+} = require("./function/auto-chat/auto-chat-by-reviews");
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -208,6 +206,15 @@ ipcMain.on("process-auto-follow-by-reviews", async (event, data) => {
       data,
     };
     await runAutoFollowByReviews(context);
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+});
+
+ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
+  try {
+    await runAutoChatByReviews({ ...chromePath, data });
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
