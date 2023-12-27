@@ -8,7 +8,16 @@ const {
   postGetUserReviews,
   postShopeeMessage,
 } = require("../../api/interface");
-const { waitForTimeout } = require("../../helpers/utils");
+const {
+  waitForTimeout,
+  waitForLocalStorageData,
+  getLocalStorageData,
+} = require("../../helpers/utils");
+const {
+  extractIdsFromProductUrl,
+} = require("../../helpers/extract-shopee-ids");
+
+const DEFAULT_LIMIT = 20;
 
 async function runAutoChatByReviews({ chromePath, data }) {
   try {
@@ -23,6 +32,31 @@ async function runAutoChatByReviews({ chromePath, data }) {
 
     await loginShopee(page, browser);
 
+    const requestData = {
+      url: null,
+      headers: null,
+    };
+
+    const source = {
+      shopId: null,
+      itemId: null,
+    };
+
+    const productIds = extractIdsFromProductUrl(url);
+
+    if (productIds) {
+      source.shopId = productIds.shopId;
+      source.itemId = productIds.itemId;
+    } else {
+      throw new Error("Produk tidak ditemukan");
+    }
+
+    page.on("request", async (request) => {
+      if (request.url().includes("/get_account_info")) {
+        requestData.headers = request.headers();
+      }
+    });
+
     page.on("response", async (response) => {
       if (response.url().includes("/get_account_info")) {
         const res = await response.json();
@@ -30,39 +64,36 @@ async function runAutoChatByReviews({ chromePath, data }) {
           data["shopId"] = res.data.shopid;
         }
 
-        await waitForTimeout(2000);
-
-        await page.waitForSelector(".page-product__shop");
-        await page.evaluate(() => {
-          // Note: scroll down to trigger fetch /get_ratings
-          const shopElement = document.querySelector(".page-product__shop");
-          if (shopElement) {
-            shopElement.scrollIntoView({ behavior: "smooth" });
-          }
-        });
-      }
-    });
-
-    page.on("request", async (request) => {
-      if (request.url().includes("/get_ratings")) {
-        const headers = request.headers();
-
-        const miniSession = await page.evaluate(() =>
-          JSON.parse(localStorage.getItem("mini-session") || "{}")
+        let getReviewsURL = new URL(
+          "https://shopee.co.id/api/v2/item/get_ratings"
         );
+        getReviewsURL.searchParams.set("exclude_filter", "1");
+        getReviewsURL.searchParams.set("flag", "1");
+        getReviewsURL.searchParams.set("relevant_reviews", "false");
+        getReviewsURL.searchParams.set("request_source", "2");
+        getReviewsURL.searchParams.set("type", "0");
+        getReviewsURL.searchParams.set("limit", DEFAULT_LIMIT);
+        getReviewsURL.searchParams.set("itemid", source.itemId);
+        getReviewsURL.searchParams.set("shopid", source.shopId);
 
-        if (miniSession && miniSession.token) {
-          headers["authorization"] = `Bearer ${miniSession?.token}`;
+        requestData.url = getReviewsURL;
+
+        await waitForLocalStorageData(page, "mini-session");
+
+        const miniSessionData = await getLocalStorageData(page, "mini-session");
+        if (miniSessionData) {
+          const token = JSON.parse(miniSessionData)?.token;
+          if (token) {
+            requestData.headers["authorization"] = `Bearer ${token}`;
+          }
+        } else {
+          throw new Error("Token tidak ditemukan");
         }
-
-        const requestData = {
-          headers,
-          url: request.url(),
-        };
 
         await chatByReviews({
           requestData,
           page,
+          browser,
           ...data,
         });
       }
@@ -78,17 +109,14 @@ async function runAutoChatByReviews({ chromePath, data }) {
 async function chatByReviews({
   requestData,
   page,
+  browser,
   startPoint,
   iteration,
   template,
   shopId,
 }) {
-  const DEFAULT_LIMIT = 20;
-
-  const { url, headers } = requestData;
-  let endpoint = url.replace(/limit=\d+/, `limit=${DEFAULT_LIMIT}`);
-
   try {
+    const { url, headers } = requestData;
     let chatCount = 0;
 
     while (chatCount < iteration) {
@@ -97,7 +125,9 @@ async function chatByReviews({
         offset = +startPoint + chatCount - 1;
       }
 
-      endpoint = endpoint.replace(/offset=\d+/, `offset=${offset}`);
+      url.searchParams.set("offset", offset);
+
+      const endpoint = url.toString();
 
       const resReviews = await postGetUserReviews(endpoint, {
         headers,
@@ -178,10 +208,11 @@ async function chatByReviews({
         });
       }
     }
-    dialog.showMessageBox({
+    await dialog.showMessageBox({
       message: `Program Telah Selesai`,
       buttons: ["OK"],
     });
+    await browser.close();
   } catch (error) {
     await dialog.showMessageBox({
       message: `Terjadi kesalahan: ${error?.message}`,
