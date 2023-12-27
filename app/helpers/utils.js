@@ -60,6 +60,22 @@ const clickByText = async (page, text) => {
   }
 };
 
+async function waitForLocalStorageData(page, key) {
+  await page.waitForFunction(
+    (key) => {
+      return localStorage.getItem(key) !== null;
+    },
+    {},
+    key
+  );
+}
+
+async function getLocalStorageData(page, key) {
+  return page.evaluate((key) => {
+    return localStorage.getItem(key);
+  }, key);
+}
+
 module.exports = {
   waitForTimeout,
   parseCookieHeader,
@@ -69,4 +85,6 @@ module.exports = {
   waitForElementWithText,
   // waitAndClick,
   clickByText,
+  waitForLocalStorageData,
+  getLocalStorageData,
 };

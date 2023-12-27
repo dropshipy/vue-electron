@@ -632,6 +632,71 @@
             </div>
           </section>
 
+          <section
+            v-if="activeTab == 'auto-chat-by-reviews'"
+            class="w-max mx-auto overflow-x-scroll"
+          >
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[700px]">
+              <h1 class="text-xl font-semibold mb-8 text-center">
+                Auto Chat Dari Ulasan
+              </h1>
+              <div class="w-full space-y-3">
+                <section>
+                  <label
+                    class="text-sm text-gray-700 font-medium tracking-wider"
+                  >
+                    Link Produk/Ulasan
+                  </label>
+                  <input
+                    type="text"
+                    v-model="linkForAutoChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                  />
+                </section>
+                <section>
+                  <label class="text-sm text-gray-700 font-medium">
+                    Mulai dari ulasan ke
+                  </label>
+                  <input
+                    type="text"
+                    v-model="startPointChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                  />
+                </section>
+                <section>
+                  <label class="text-sm text-gray-700 font-medium">
+                    Total Chat
+                  </label>
+                  <input
+                    type="number"
+                    id="iteration-follow-by-reviews"
+                    v-model="iterationChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                  />
+                </section>
+                <section>
+                  <label class="text-sm text-gray-700 font-medium">
+                    Template Chat
+                  </label>
+                  <textarea
+                    v-model="templateChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                    maxlength="300"
+                    rows="4"
+                  ></textarea>
+                </section>
+              </div>
+              <div class="text-center mt-6">
+                <button
+                  class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                  @click="processAutoChatByReviews"
+                >
+                  Start
+                </button>
+              </div>
+            </div>
+          </section>
+
           <!-- reply reviews  -->
           <section v-if="activeTab == 'auto-reply-reviews'" class="w-full">
             <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
@@ -1099,10 +1164,11 @@
     </div>
     <script src="./function/browser/flags.js"></script>
     <script type="module">
+      import { SHOPEE_LOGIN_METHOD } from "./constants/shopee.constant.js";
       import {
         SHOPEE_ACCOUNT_STORE_KEY,
-        SHOPEE_LOGIN_METHOD,
-      } from "./constants/shopee.constant.js";
+        AUTO_CHAT_BY_REVIEWS_LINK_STORE_KEY,
+      } from "./constants/store.constant.js";
 
       Vue.use(Toasted);
       new Vue({
@@ -1132,6 +1198,10 @@
             {
               name: "Auto Chat Kreator",
               slug: "auto-chat-creator",
+            },
+            {
+              name: "Auto Chat Ulasan",
+              slug: "auto-chat-by-reviews",
             },
             {
               name: "Balas Ulasan Otomatis",
@@ -1463,6 +1533,10 @@
           shopeeUserPassword: "",
           isShopeeLoginWithQRCode: true,
           isShowShopeeUserPassword: false,
+          linkForAutoChatByReviews: "",
+          startPointChatByReviews: 1,
+          templateChatByReviews: "",
+          iterationChatByReviews: 1,
         },
         mounted() {
           this.flags = flags();
@@ -1516,6 +1590,13 @@
           );
           if (getLinkAutoFollowByReviews) {
             this.linkForAutoFollowByReviews = getLinkAutoFollowByReviews;
+          }
+
+          const getLinkAutoChatByReviews = electronStore.get(
+            AUTO_CHAT_BY_REVIEWS_LINK_STORE_KEY
+          );
+          if (getLinkAutoChatByReviews) {
+            this.linkForAutoChatByReviews = getLinkAutoChatByReviews;
           }
 
           this.getAccountSubscription();
@@ -1746,6 +1827,35 @@
                 context
               );
             }
+          },
+
+          processAutoChatByReviews() {
+            const hasEmptyField =
+              !this.linkForAutoChatByReviews ||
+              !this.startPointChatByReviews ||
+              !this.templateChatByReviews ||
+              !this.iterationChatByReviews;
+
+            if (hasEmptyField) {
+              this.toastError("Silakan isi semua field terlebih dahulu");
+              return;
+            }
+
+            electronStore.set(
+              AUTO_CHAT_BY_REVIEWS_LINK_STORE_KEY,
+              this.linkForAutoChatByReviews
+            );
+
+            const context = {
+              startPoint: this.startPointChatByReviews,
+              iteration: +this.iterationChatByReviews,
+              template: this.templateChatByReviews,
+            };
+
+            window.electron.ipcRenderer.send(
+              "process-auto-chat-by-reviews",
+              context
+            );
           },
 
           processCrawlCreator() {

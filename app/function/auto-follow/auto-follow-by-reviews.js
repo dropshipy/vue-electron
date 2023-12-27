@@ -2,9 +2,7 @@ const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { dialog } = require("electron");
 const ElectronStore = require("electron-store");
-const { Browser } = require("puppeteer");
 const store = new ElectronStore();
-const { executablePath } = require("puppeteer");
 const { loginShopee } = require("../login");
 const { postGetUserReviews } = require("../../api/interface");
 const { postFollowUser } = require("../../api/interface");
@@ -41,7 +39,23 @@ async function runAutoFollowByReviews({ chromePath, data }) {
         request.continue();
       }
     });
+
     await loginShopee(page, browser);
+
+    page.on("response", async (response) => {
+      if (response.url().includes("/get_account_info")) {
+        await page.waitForTimeout(2000);
+        await page.waitForSelector(".page-product__shop");
+        await page.evaluate(() => {
+          // Note: scroll down to trigger fetch /get_ratings
+          const shopElement = document.querySelector(".page-product__shop");
+          if (shopElement) {
+            shopElement.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      }
+    });
+
     await page.goto(url);
     while (requestDataList.length <= 0) {
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -69,25 +83,27 @@ async function followByReviews({
   const header = requestDataList[0]?.requestHeaders;
   endpoint = endpoint.replace(/limit=\d+/, `limit=${20}`);
   try {
-    let followingCount = 1;
-    let currentIndex = 0;
-    while (followingCount <= iteration) {
-      console.log({ iteration });
-      console.log({ followingCount });
-      if (followingCount == 1) {
-        endpoint = endpoint.replace(/offset=\d+/, `offset=${startPoint - 1}`);
-      } else {
-        endpoint = endpoint.replace(
-          /offset=\d+/,
-          `offset=${followingCount - 1}`
-        );
+    let followingCount = 0;
+
+    while (followingCount < iteration) {
+      console.log({ iteration, followingCount });
+
+      let offset = +startPoint - 1;
+
+      if (followingCount > 0) {
+        offset = +startPoint + followingCount - 1;
       }
+
+      endpoint = endpoint.replace(/offset=\d+/, `offset=${offset}`);
+
       const getUser = await postGetUserReviews(endpoint, {
         headers: header,
       });
-      currentIndex = 0;
+
+      let currentIndex = 0;
       console.log({ currentIndex });
-      while (followingCount <= iteration && currentIndex < 20) {
+
+      while (followingCount < iteration && currentIndex < 20) {
         const follow = await postFollowUser(
           "https://shopee.co.id/api/v4/pages/follow",
           { userid: getUser.data.data.ratings[currentIndex].userid },
@@ -104,10 +120,9 @@ async function followByReviews({
           );
           const toastBar = document.createElement("div");
           // Set some basic styles
-          toastBar.style.position = "absolute";
-          toastBar.style.top = "100px";
-          toastBar.style.left = "50%";
-          toastBar.style.transform = "translateX(-50%)";
+          toastBar.style.position = "fixed";
+          toastBar.style.top = "80px";
+          toastBar.style.left = "80px";
           toastBar.style.backgroundColor = "#3a373c";
           toastBar.style.border = "1px solid #3a373c";
           toastBar.style.color = "#52c81e ";
@@ -134,9 +149,14 @@ async function followByReviews({
         }, username);
 
         await page.waitForTimeout(1200);
-        console.log(followingCount, "~ status = ", follow.status);
         currentIndex++;
         followingCount++;
+
+        console.log({
+          followingCount,
+          status: follow.status,
+          username: username,
+        });
       }
     }
     dialog.showMessageBox({
