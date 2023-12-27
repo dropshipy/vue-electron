@@ -1,5 +1,4 @@
 const puppeteer = require("puppeteer");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { dialog } = require("electron");
 const ElectronStore = require("electron-store");
 const store = new ElectronStore();
@@ -16,7 +15,6 @@ const {
 const {
   extractIdsFromProductUrl,
 } = require("../../helpers/extract-shopee-ids");
-// puppeteer.use(StealthPlugin());
 
 const DEFAULT_LIMIT = 20;
 
@@ -104,8 +102,6 @@ async function runAutoChatByReviews({ chromePath, data }) {
         });
       }
     });
-
-    // await page.goto(url);
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
