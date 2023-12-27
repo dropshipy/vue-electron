@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer-extra");
+const puppeteer = require("puppeteer");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { dialog } = require("electron");
 const ElectronStore = require("electron-store");
@@ -16,20 +16,26 @@ const {
 const {
   extractIdsFromProductUrl,
 } = require("../../helpers/extract-shopee-ids");
+// puppeteer.use(StealthPlugin());
 
 const DEFAULT_LIMIT = 20;
 
 async function runAutoChatByReviews({ chromePath, data }) {
   try {
-    puppeteer.use(StealthPlugin());
-
     const url = store.get("link-auto-chat-by-reviews");
     const browser = await puppeteer.launch({
       headless: false,
       executablePath: chromePath,
     });
     const page = await browser.newPage();
+    const { width, height } = await page.evaluate(() => {
+      return {
+        width: window.screen.width,
+        height: window.screen.height,
+      };
+    });
 
+    await page.setViewport({ width, height });
     await loginShopee(page, browser);
 
     const requestData = {
@@ -50,15 +56,15 @@ async function runAutoChatByReviews({ chromePath, data }) {
     } else {
       throw new Error("Produk tidak ditemukan");
     }
-
+    await page.reload();
     page.on("request", async (request) => {
-      if (request.url().includes("/get_account_info")) {
+      if (request.url().includes("/selleraccount/shop_info/")) {
         requestData.headers = request.headers();
       }
     });
 
     page.on("response", async (response) => {
-      if (response.url().includes("/get_account_info")) {
+      if (response.url().includes("/selleraccount/shop_info/")) {
         const res = await response.json();
         if (res.data) {
           data["shopId"] = res.data.shopid;
@@ -99,7 +105,7 @@ async function runAutoChatByReviews({ chromePath, data }) {
       }
     });
 
-    await page.goto(url);
+    // await page.goto(url);
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
