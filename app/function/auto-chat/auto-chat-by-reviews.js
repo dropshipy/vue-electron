@@ -67,7 +67,7 @@ async function runAutoChatByReviews({ chromePath, data }) {
       if (response.url().includes("/selleraccount/shop_info/")) {
         const res = await response.json();
         if (res.data) {
-          data["shopId"] = res.data.shopid;
+          data["shopId"] = res.data.shop_id;
         }
 
         let getReviewsURL = new URL(
