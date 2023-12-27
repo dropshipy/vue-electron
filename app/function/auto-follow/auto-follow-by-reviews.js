@@ -39,7 +39,23 @@ async function runAutoFollowByReviews({ chromePath, data }) {
         request.continue();
       }
     });
+
     await loginShopee(page, browser);
+
+    page.on("response", async (response) => {
+      if (response.url().includes("/get_account_info")) {
+        await page.waitForTimeout(2000);
+        await page.waitForSelector(".page-product__shop");
+        await page.evaluate(() => {
+          // Note: scroll down to trigger fetch /get_ratings
+          const shopElement = document.querySelector(".page-product__shop");
+          if (shopElement) {
+            shopElement.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      }
+    });
+
     await page.goto(url);
     while (requestDataList.length <= 0) {
       await new Promise((resolve) => setTimeout(resolve, 500));
