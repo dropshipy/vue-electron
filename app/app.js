@@ -214,7 +214,7 @@ ipcMain.on("process-auto-follow-by-reviews", async (event, data) => {
 
 ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
   try {
-    await runAutoChatByReviews({ ...chromePath, data });
+    await runAutoChatByReviews({ chromePath, data });
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
