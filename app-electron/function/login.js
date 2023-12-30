@@ -19,6 +19,7 @@ async function loadCookiesShopee(page) {
 
 async function authenticateBotStatus(page, browser) {
   const accountSubscription = store.get("account-subscription");
+  console.log({accountSubscription})
 
   // fetch fingerprint
   const osVersion = os.version();
@@ -59,7 +60,7 @@ async function authenticateBotStatus(page, browser) {
     };
     try {
       if (accountSubscription) {
-        const authenticateBotCookie = "";
+        const authenticateBotCookie = store.get("cookies-spt");
         const authenticateBotRes = await authenticateBot(payloadAuthBot, {
           headers: {
             Cookie: authenticateBotCookie,
@@ -79,6 +80,7 @@ async function authenticateBotStatus(page, browser) {
           });
           await browser.close();
         } else {
+          console.log({authenticateBotRes})
           const subscriptionData = authenticateBotRes.user.subscription;
           const authenticateBotResponse = {
             sessionId: authenticateBotRes?.sessionId,
@@ -126,6 +128,7 @@ async function authenticateBotStatus(page, browser) {
         await browser.close();
       }
     } catch (error) {
+      console.log({error})
       dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
       await page.evaluate(() => {
         window.alert("Gagal menghubungkan shopee power tools");
@@ -175,7 +178,7 @@ async function loginShopee(page, browser) {
 
         await page.goto(loginUrl, {
           waitUntil: "networkidle2",
-          timeout: 0,
+          timeout: 10000,
         });
 
         if (loginMethod === "contact") {

@@ -290,7 +290,7 @@
                 <div class="flex items-center gap-2">
                   <h1>Kamu belum berlangganan</h1>
                   <img
-                    @click="location.reload()"
+                    @click="$router.reload()"
                     src="./assets/icons/refresh.svg"
                     alt="reload"
                     class="w-6 h-6 cursor-pointer"
@@ -1611,7 +1611,7 @@
             // if (val == "database-creator") {
             //   location.href = "http://supportseller.com";
             // }
-            location.reload();
+            th$router.reload();
           },
           toastSuccsess(val) {
             this.$toasted.show(`${val}`, {

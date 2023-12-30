@@ -74,7 +74,12 @@ function createWindow() {
       },
     },
   });
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  if (process.env.ENTRY_SOURCE === 'dev_server') {
+    mainWindow.loadURL('http://localhost:3000')
+    mainWindow.webContents.openDevTools()
+  } else {
+    mainWindow.loadFile(path.join(__dirname, 'dist/index.html'))
+  }
 }
 
 app.on("ready", () => {
