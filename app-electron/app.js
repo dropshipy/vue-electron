@@ -87,12 +87,12 @@ function createWindow() {
     // Serve all files in the specified directory
     appServer.use(express.static(directoryPath));
 
-    // Start the server on a specific port (e.g., 3000)
-    const PORT = process.env.PORT || 3000;
+    // Start the server on a specific port (e.g., 9999)
+    const PORT = process.env.PORT || 9999;
     appServer.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
-    mainWindow.loadURL('http://localhost:3000')
+    mainWindow.loadURL('http://localhost:9999')
   }
 }
 
