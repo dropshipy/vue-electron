@@ -7,6 +7,7 @@ const { crawlCreator } = require("./function/invite-creator/crawl-creator");
 const { replyReviews } = require("./function/reply-reviews");
 const { dialog } = require("electron");
 const axios = require("axios");
+const express = require("express")
 const {
   authenticateUserShopeeTools,
 } = require("./function/browser/authenticate-shopee-tools");
@@ -78,7 +79,20 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000')
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, 'dist/index.html'))
+    const appServer = express();
+
+    // Specify the directory you want to serve files from
+    const directoryPath = path.join(__dirname, 'dist');
+
+    // Serve all files in the specified directory
+    appServer.use(express.static(directoryPath));
+
+    // Start the server on a specific port (e.g., 3000)
+    const PORT = process.env.PORT || 3000;
+    appServer.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+    mainWindow.loadURL('http://localhost:3000')
   }
 }
 

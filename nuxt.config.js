@@ -73,8 +73,9 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    publicPath: '/dist/_nuxt/'
   },
   generate: {
     dir: 'app-electron/dist' // Replace 'dist' with your desired destination directory
-  }
+  },
 }
