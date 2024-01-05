@@ -1,11 +1,11 @@
 <script>
 export default {
   middleware({ redirect }) {
-    return redirect('/home')
+    return redirect('/database-creator/tiktok')
   }
 }
 </script>
 
 <template>
-  <h1>Index</h1>
+  <h1>Database Creator Index</h1>
 </template>
