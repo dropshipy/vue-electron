@@ -7,7 +7,7 @@ const { crawlCreator } = require("./function/invite-creator/crawl-creator");
 const { replyReviews } = require("./function/reply-reviews");
 const { dialog } = require("electron");
 const axios = require("axios");
-const express = require("express")
+const express = require("express");
 const {
   authenticateUserShopeeTools,
 } = require("./function/browser/authenticate-shopee-tools");
@@ -75,14 +75,15 @@ function createWindow() {
       },
     },
   });
-  if (process.env.ENTRY_SOURCE === 'dev_server') {
-    mainWindow.loadURL('http://localhost:3000')
-    mainWindow.webContents.openDevTools()
+  if (process.env.ENTRY_SOURCE === "dev_server") {
+    mainWindow.loadURL("http://localhost:3000");
+    mainWindow.webContents.openDevTools();
+    mainWindow.setFullScreen(true);
   } else {
     const appServer = express();
 
     // Specify the directory you want to serve files from
-    const directoryPath = path.join(__dirname, 'dist');
+    const directoryPath = path.join(__dirname, "dist");
 
     // Serve all files in the specified directory
     appServer.use(express.static(directoryPath));
@@ -92,7 +93,7 @@ function createWindow() {
     appServer.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
-    mainWindow.loadURL('http://localhost:9999')
+    mainWindow.loadURL("http://localhost:9999");
   }
 }
 
