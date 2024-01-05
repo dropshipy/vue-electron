@@ -1,0 +1,1574 @@
+<template>
+  <main class="bg-[#EEEDFA]">
+    <div id="app" class="w-full" @click="handleCloseSetting">
+      <h1 class="text-primary">Halooooo</h1>
+      <template v-if="userInfo">
+        <nav class="w-full flex justify-between items-center px-8 bg-white h-[70px] border"
+          style="box-shadow: 0px 2px 20px 0px rgba(8, 0, 27, 0.1)">
+          <img :src="`~/assets/brand/${flags.logo}`" alt="shopee power tools" class="w-[125px] h-auto" />
+
+          <div class="flex gap-10 items-center">
+            <div class="relative">
+              <section class="flex cursor-pointer" id="menu-button" @click="isOpenSetting = !isOpenSetting">
+                <div class="flex items-center gap-2">
+                  <img src="~/assets/icons/setting.svg" alt="setting" class="w-5 h-5 ease-in-out transition-all"
+                    :class="{ 'rotate-90': isOpenSetting }" />
+                  <p>Setting</p>
+                </div>
+              </section>
+              <div
+                class="transition-all ease-in-out absolute top-[200%] right-[80%] bg-white w-max shadow rounded-lg text-[#66738F]">
+                <section :class="[isOpenSetting ? 'h-max py-5' : 'h-0']"
+                  class="overflow-hidden ease-in transition-all space-y-3 px-5">
+                  <div class="flex gap-2 cursor-pointer hover:text-black" @click="isShowModalAccountSubscription = true">
+                    <img src="~/assets/icons/profile.svg" alt="account" class="w-5 h-5" />
+
+                    <p class="text-sm whitespace-nowrap leading-normal">
+                      Akun SPT
+                    </p>
+                  </div>
+
+                  <div class="flex gap-2 cursor-pointer hover:text-black" @click="isShowModalShopeeAccount = true">
+                    <img src="~/assets/icons/shopee.svg" alt="shopee account" class="w-5 h-5" />
+
+                    <p class="text-sm whitespace-nowrap leading-normal">
+                      Akun Shopee
+                    </p>
+                  </div>
+
+                  <div class="flex gap-2 cursor-pointer hover:text-black" @click="isShowModalDelete = true">
+                    <img src="~/assets/icons/delete.svg" alt="account" class="w-5 h-5" />
+                    <p class="text-sm whitespace-nowrap leading-normal">
+                      Hapus Sesi Login Shopee
+                    </p>
+                  </div>
+                </section>
+              </div>
+            </div>
+            <button @click="logout"
+              class="text-base font-bold bg-[#f3694a] text-white h-9 px-4 rounded-lg hover:opacity-80">
+              Logout
+            </button>
+          </div>
+        </nav>
+        <main class="flex gap-10 !w-ful">
+          <aside class="bg-white min-w-[240px] min-h-screen space-y-4 pt-10">
+            <div v-for="(menu, id) in sidebarMenu" :key="id"
+              class="flex items-center space-x-2 cursor-pointer pl-5 hover:text-[#f3694a]"
+              :class="[activeTab == menu.slug ? 'text-[#f3694a]' : 'text-[#66738F]']" @click="handleSidebar(menu.slug)">
+              <svg width="20" height="20" fill="none">
+                <use :xlink:href="`~/assets/icons/sidebar/${menu.slug}.svg#icon`" />
+              </svg>
+              <h1>{{ menu.name }}</h1>
+            </div>
+            <div class="flex items-center space-x-2 mt-4 ml-5 text-[#66738F] hover:text-[#f3694a]">
+              <svg width="20" height="20" fill="none" class="text-red">
+                <use xlink:href="~/assets/icons/sidebar/database-creator.svg#icon" />
+              </svg>
+              <a :href="`https://supportseller.com/${flags.linkCreator}`" target="_blank">
+                Database Creator
+              </a>
+            </div>
+          </aside>
+          <section v-if="activeTab == 'home' || activeTab == 'database-creator'"
+            class="bg-white w-full rounded-l-2xl mt-10 p-5">
+            <div>
+              <h1 class="text-2xl font-semibold">Data Profil</h1>
+              <div class="p-4 border rounded-lg min-w-[500px] w-max mt-4">
+                <p>Nama: {{ userInfo.fullName }}</p>
+                <p>Email: {{ userInfo.email }}</p>
+                <p>No HP: {{ userInfo.phoneNumber }}</p>
+              </div>
+            </div>
+            <div class="min-w-[500px] w-max mt-10">
+              <h1 class="text-2xl font-semibold">Data Berlangganan</h1>
+              <div v-if="dataSubscription" class="mt-4">
+                <div class="w-full rounded-lg border overflow-hidden mb-4"
+                  :class="[dataSubscription.status == 'active' ? 'border-teal-400' : 'border-yellow-500']">
+                  <div class="py-2 text-center text-white" :class="dataSubscription.status === 'active'
+                      ? 'bg-teal-400'
+                      : dataSubscription.status === 'register'
+                        ? 'bg-yellow-500'
+                        : 'bg-teal-400'
+                    ">
+                    <p>{{ dataSubscription.code }}</p>
+                  </div>
+                  <div class="p-4">
+                    <div class="flex justify-between items-center">
+                      <div>
+                        <p class="font-bold">
+                          {{ dataSubscription.subscriptionPlan?.description }}
+                        </p>
+                        <p class="text-lg">
+                          {{ toRupiah(dataSubscription.subscriptionPlan?.price)
+                          }}
+                        </p>
+                      </div>
+                      <div v-if="dataSubscription.status === 'active'"
+                        class="rounded-md max-w-max px-2 border border-w-400 text-teal-400">
+                        <p class="text-sm">Aktif</p>
+                      </div>
+                      <div v-else-if="dataSubscription.status === 'register'"
+                        class="rounded-md max-w-max px-2 border border-yellow-500 text-yellow-500">
+                        <p class="text-sm">Belum aktif</p>
+                      </div>
+                      <div v-else-if="dataSubscription.status === 'inactive'"
+                        class="rounded-md max-w-max px-2 border border-red-400 text-red-400">
+                        <p class="text-sm">Tidak aktif</p>
+                      </div>
+                    </div>
+                    <div class="mt-2" v-if="dataSubscription.status !== 'register'">
+                      <hr class="mb-2" />
+                      <p>Periode: {{ dataSubscription.cycle }}</p>
+                      <p>
+                        Tanggal mulai: {{ toddmmyyyy(dataSubscription.startAt)
+                        }}
+                      </p>
+                      <p>
+                        Berakhir pada: {{ toddmmyyyy(dataSubscription.expiredAt)
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else
+                class="w-full rounded-lg border overflow-hidden min-h-[100px] flex justify-center items-center mt-4">
+                <div class="flex items-center gap-2">
+                  <h1>Kamu belum berlangganan</h1>
+                  <img @click="location.reload()" src="~/assets/icons/refresh.svg" alt="reload"
+                    class="w-6 h-6 cursor-pointer" />
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="w-full" v-if="activeTab == 'hide'">
+            <div class="mx-auto w-full max-w-[370px] mt-10">
+              <h1
+                class="text-center text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f3694a] to-[#f79e44]">
+                Konfigurasi Shopee Power Tools
+              </h1>
+              <div class="mt-10 space-y-4">
+                <a href="./html/auto-unfollow.html">
+                  <div
+                    class="bg-[#f3694a] h-10 flex items-center justify-center rounded text-white font-medium hover:scale-y-110 transition-all ease-in hover:opacity-90">
+                    <button>Auto unfollow</button>
+                  </div>
+                </a>
+                <a href="./html/crawl-creator.html" class="block">
+                  <div
+                    class="bg-[#f3694a] h-10 flex items-center justify-center rounded text-white font-medium hover:scale-y-110 transition-all ease-in hover:opacity-90">
+                    <button>Auto Chat Creator</button>
+                  </div>
+                </a>
+                <a href="./html/reply-reviews.html" class="block">
+                  <div
+                    class="bg-[#f3694a] h-10 flex items-center justify-center rounded text-white font-medium hover:scale-y-110 transition-all ease-in hover:opacity-90">
+                    <button>Balas Ulasan Otomatis</button>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <!-- crawl-creator -->
+          <section v-if="activeTab == 'auto-chat-creator'" class="w-full">
+            <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
+              <h1 class="text-xl font-semibold mb-6">
+                Konfigurasi Kirim Pesan ke Kreator
+              </h1>
+              <div>
+                <main>
+                  <div class="md:grid md:grid-cols-1 lg:grid-cols-2 xl:gap-6 w-full mt-3">
+                    <div class="w-full">
+                      <!-- Pilihan Login -->
+                      <!-- <div class="py-3 px-2 lg:px-5 h-fit">
+                      <h2 class="text-lg font-bold mb-4">
+                        Pilihan Login Tiktok Seller
+                      </h2>
+                      <div class="mb-4">
+                        <div
+                          v-for="(method, id) in options.loginMethods"
+                          :key="id"
+                          class="my-1"
+                        >
+                          <input
+                            :id="method.name"
+                            v-model="selectedCrawlCreator.loginMethod"
+                            type="radio"
+                            :name="method.name"
+                            :value="method.value"
+                            class="cursor-pointer"
+                          />
+                          <label
+                            class="text-gray-700 font-medium ml-2 cursor-pointer"
+                            :for="method.name"
+                          >
+                            {{ method.name }}
+                          </label>
+                        </div>
+                      </div>
+                    </div> -->
+
+                      <!-- Konfigurasi Undangan untuk Affiliator -->
+                      <div class="py-3 px-2 lg:px-5 h-fit">
+                        <h2 class="text-lg font-bold mb-2">
+                          Konfigurasi Bot Automasi
+                        </h2>
+                        <div class="mb-4">
+                          <label class="block text-gray-700 font-medium mb-2" for="whatsapp">Jumlah pengulangan
+                            automasi</label>
+                          <input id="bot-iteration" v-model="selectedCrawlCreator.iteration" type="number"
+                            class="block w-full border border-gray-400 rounded-md py-2 px-3" />
+                        </div>
+                      </div>
+
+                      <!-- Kategori Utama -->
+                      <div class="py-3 px-2 lg:px-5 h-fit">
+                        <h2 class="text-lg font-bold mb-4">Kategori Utama</h2>
+                        <div class="mb-4">
+                          <label class="block text-gray-700 font-medium mb-2" for="category">
+                            Kategori
+                          </label>
+                          <div class="relative cursor-pointer border border-gray-400 rounded-md py-2 px-3">
+                            <div class="absolute top-0 left-0 right-0 h-[40px] z-40"
+                              @click="isShowCategory = !isShowCategory"></div>
+                            <img src="~/assets/icons/chevron.svg" alt="chevron"
+                              class="absolute top-1/2 -translate-y-1/2 right-[10px] z-30 transition-all ease-in-out duration-200 rotate-180"
+                              :class="{ 'rotate-0': isShowCategory }" />
+                            <input :value="categoryValue" type="text" placeholder="Pilih kategori" readonly
+                              class="cursor-pointer relative block w-full focus:outline-none truncate" :class="{
+                                'max-w-[90px] md:max-w-[250px] lg:max-w-[140px] xl:max-w-[70%]':
+                                  isShowCategory,
+                              }" />
+                            <button v-if="isShowCategory && categoryValue.length > 0"
+                              class="text-[#EE4D2D] text-xs font-medium absolute right-14 z-40 top-1/2 -translate-y-1/2 px-1 md:px-2 py-1 border-[1px] rounded border-[#EE4D2D]"
+                              @click="deleteCategoryVal">
+                              Hapus Semua
+                            </button>
+                            <div v-if="isShowCategory"
+                              class="absolute bg-white h-40 overflow-y-scroll space-y-2 w-full shadow rounded-b top-[105%] left-0">
+                              <section v-for="(category, id) in optionsCrawlCreator.categoryOptions" :key="id"
+                                class="flex items-center justify-between hover:bg-primary/[10%] px-2">
+                                <div class="w-full">
+                                  <p @click="handleCategoryOption(category.name)" class="hover:opacity-60" :class="{
+                                    'text-[#EE4D2D]': categoryValue.includes(
+                                      category.name
+                                    ),
+                                  }">
+                                    {{ category.name }}
+                                  </p>
+                                </div>
+                                <img v-if="categoryValue.includes(category.name)" src="~/assets/icons/radio.svg"
+                                  alt="succsess" class="mr-3" />
+                              </section>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Atribut Kreator -->
+                      <div class="py-3 px-2 lg:px-5 h-fit">
+                        <h2 class="text-lg font-bold mb-4">Atribut Kreator</h2>
+                        <div class="mb-4">
+                          <label class="block text-gray-700 font-medium mb-2">Media Sosial
+                          </label>
+                          <select v-model="selectedCrawlCreator.socialMedias"
+                            class="border border-gray-400 p-2 rounded-md w-full">
+                            <option value="" disabled selectedCrawlCreator>
+                              Pilih Sosial Media Kreator
+                            </option>
+                            <option v-for="item in optionsCrawlCreator.socialMedia" :key="item.id" :value="item.value">
+                              {{ item.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="w-full">
+                      <!-- Profil Pengikut -->
+                      <div class="py-3 px-2 lg:px-5 h-fit">
+                        <h2 class="text-lg font-bold mb-4">
+                          Filter Jumlah Pengikut
+                        </h2>
+                        <div class="mb-4">
+                          <label class="block text-gray-700 font-medium mb-2" for="jumlah-pengikut">
+                            Pengikut</label>
+                          <select id="jumlah-pengikut" v-model="selectedCrawlCreator.followerCount"
+                            class="border border-gray-400 p-2 rounded-md w-full">
+                            <option value="" disabled selectedCrawlCreator>
+                              Pilih jumlah pengikut
+                            </option>
+                            <option v-for="item in optionsCrawlCreator.followerCountOptions" :key="item.id"
+                              :value="item.value">
+                              {{ item.name }}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="mb-4">
+                          <label class="block text-gray-700 font-medium mb-2" for="usia-pengikut">Usia
+                          </label>
+                          <select id="usia-pengikut" v-model="selectedCrawlCreator.followerAge"
+                            class="border border-gray-400 p-2 rounded-md w-full">
+                            <option value="" disabled selectedCrawlCreator>
+                              Pilih usia pengikut
+                            </option>
+                            <option v-for="item in optionsCrawlCreator.followerAgeOptions" :key="item.id"
+                              :value="item.value">
+                              {{ item.name }}
+                            </option>
+                          </select>
+                        </div>
+                        <div class="mb-4">
+                          <label class="block text-gray-700 font-medium mb-2" for="gender-pengikut">Jenis Kelamin
+                          </label>
+                          <select id="gender-pengikut" v-model="selectedCrawlCreator.followerGender"
+                            class="border border-gray-400 p-2 rounded-md w-full">
+                            <option value="" disabled selectedCrawlCreator>
+                              Pilih gender pengikut
+                            </option>
+                            <option v-for="item in optionsCrawlCreator.followerGenderOptions" :key="item.id"
+                              :value="item.value">
+                              {{ item.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Konfigurasi Undangan untuk Affiliator -->
+                      <div class="py-3 px-2 lg:px-5 h-fit">
+                        <h2 class="text-lg font-bold mb-2">
+                          Pesan Undangan ke Kreator
+                        </h2>
+                        <div class="mb-4">
+                          <label class="block text-gray-700 font-medium mb-2" for="pesanUndangan">Pesan undangan ke
+                            affiliator (Harus diisi)</label>
+                          <textarea v-model="selectedCrawlCreator.replyMessage" placeholder="masukkan pesan undangan"
+                            name="pesanUndangan" class="block w-full border border-gray-400 rounded-md py-2 px-3"
+                            maxlength="300"></textarea>
+                          <span v-if="error.replyMessage" class="text-red-500 text-sm ml-2">{{ error.replyMessage
+                          }}</span>
+                        </div>
+                      </div>
+                      <div class="w-full hidden lg:block mt-3 lg:px-4">
+                        <button @click="handleSubmitCrawlCreator"
+                          class="bg-black text-white px-4 py-3 rounded-md hover:bg-opacity-80 w-full">
+                          Simpan
+                        </button>
+                        <button @click="processCrawlCreator"
+                          class="bg-black text-white px-4 py-3 rounded-md w-full hover:opacity-80 mt-4">
+                          Start
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex gap-2 lg:hidden mt-3 lg:px-4">
+                    <button @click="handleSubmitCrawlCreator"
+                      class="bg-black text-white px-4 py-3 rounded-md hover:opacity-80 w-full mt-4">
+                      Simpan
+                    </button>
+                    <button @click="processCrawlCreator"
+                      class="bg-black text-white px-4 py-3 rounded-md w-full hover:opacity-80 mt-4">
+                      Proses Chat Otomatis
+                    </button>
+                  </div>
+                </main>
+              </div>
+            </div>
+          </section>
+
+          <section v-if="activeTab == 'auto-chat-by-reviews'" class="w-max mx-auto overflow-x-scroll">
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[700px]">
+              <h1 class="text-xl font-semibold mb-8 text-center">
+                Auto Chat Dari Ulasan
+              </h1>
+              <div class="w-full space-y-3">
+                <section>
+                  <label class="text-sm text-gray-700 font-medium tracking-wider">
+                    Link Produk/Ulasan
+                  </label>
+                  <input type="text" v-model="linkForAutoChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full" />
+                </section>
+                <section>
+                  <label class="text-sm text-gray-700 font-medium">
+                    Mulai dari ulasan ke
+                  </label>
+                  <input type="text" v-model="startPointChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full" />
+                </section>
+                <section>
+                  <label class="text-sm text-gray-700 font-medium">
+                    Total Chat
+                  </label>
+                  <input type="number" id="iteration-follow-by-reviews" v-model="iterationChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full" />
+                </section>
+                <section>
+                  <label class="text-sm text-gray-700 font-medium">
+                    Template Chat
+                  </label>
+                  <textarea v-model="templateChatByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full"
+                    maxlength="300" rows="4"></textarea>
+                </section>
+              </div>
+              <div class="text-center mt-6">
+                <button class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                  @click="processAutoChatByReviews">
+                  Start
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- reply reviews  -->
+          <section v-if="activeTab == 'auto-reply-reviews'" class="w-full">
+            <div class="bg-white w-full rounded-l-2xl mt-10 p-5">
+              <h1 class="text-xl font-semibold mb-6">Balas Ulasan Otomatis</h1>
+              <div class="md:grid md:grid-cols-1 lg:grid-cols-2 xl:gap-6 w-full mt-3">
+                <div class="w-full">
+                  <!-- Konfigurasi Undangan untuk Affiliator -->
+                  <div class="py-3 px-2 lg:px-5 h-fit">
+                    <h2 class="text-lg font-bold mb-2">
+                      Konfigurasi Bot Automasi
+                    </h2>
+                    <div class="mb-4">
+                      <label class="block text-gray-700 font-medium mb-2" for="whatsapp">Jumlah balas ulasan</label>
+                      <input id="bot-iteration" v-model="selectedReplyReviews.iteration" type="number"
+                        class="block w-full border border-gray-400 rounded-md py-2 px-3 focus:outline-none focus:border-gray-900" />
+                    </div>
+                    <div>
+                      <label class="block text-gray-700 font-medium mb-2" for="whatsapp">Pesan ulasan</label>
+                      <textarea v-model="selectedReplyReviews.replyMessage" placeholder="masukkan balasan ulasan"
+                        class="block w-full border border-gray-400 rounded-md py-2 px-3 focus:outline-none focus:border-gray-900"
+                        rows="4" maxlength="500"></textarea>
+                      <span v-if="error.replyMessage" class="text-red-500 text-sm ml-2">
+                        {{ error.replyMessage }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Atribut Kreator -->
+                </div>
+                <div class="py-3 px-2 lg:px-5 h-fit">
+                  <div class="mb-4">
+                    <h2 class="text-lg font-bold">Filter Ulasan</h2>
+                    <p class="text-xs lg:text-sm font-medium text-[#9999]">
+                      Tidak wajib diisi
+                    </p>
+                  </div>
+                  <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2" for="whatsapp">Nama Produk</label>
+                    <input id="bot-product-name" placeholder="Masukkan nama produk"
+                      v-model="selectedReplyReviews.productName" type="text"
+                      class="block w-full border border-gray-400 rounded-md py-2 px-3 focus:outline-none focus:border-gray-900" />
+                  </div>
+                  <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2" for="whatsapp">Rating Ulasan</label>
+                    <div class="mb-4 grid grid-cols-2">
+                      <div v-for="(rating, id) in options.ratingComment" :key="id" class="my-1">
+                        <input v-model="selectedReplyReviews.ratingComment" :id="rating.name" type="radio" name="rating"
+                          :value="rating.value" class="cursor-pointer" />
+                        <label class="text-gray-700 font-medium ml-2 cursor-pointer" :for="rating.name">
+                          {{ rating.name }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-full hidden lg:block mt-3 lg:px-4">
+                    <button @click="handleSubmitReplyReviews"
+                      class="bg-black text-white px-4 py-3 rounded-md hover:opacity-80 w-full">
+                      Simpan
+                    </button>
+                    <button @click="processReplyReviews"
+                      class="bg-black text-white px-4 py-3 rounded-md w-full hover:opacity-80 mt-4">
+                      Start
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="w-full lg:hidden mt-3 lg:px-4">
+                <button @click="handleSubmitReplyReviews"
+                  class="bg-black text-white px-4 py-3 rounded-md hover:opacity-80 w-full">
+                  Simpan
+                </button>
+                <button @click="processReplyReviews"
+                  class="bg-black text-white px-4 py-3 rounded-md w-full hover:opacity-80 mt-4">
+                  Start
+                </button>
+              </div>
+            </div>
+          </section>
+          <!-- auto unfollow -->
+          <section v-if="activeTab == 'auto-unfollow'" class="w-max mx-auto">
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px]">
+              <h1 class="text-xl font-semibold mb-8 text-center">
+                Auto Unfollow
+              </h1>
+              <!-- Rounded switch -->
+              <div class="flex items-center gap-4 mx-auto w-max">
+                <label class="switch">
+                  <input type="checkbox" v-model="autoUnffolowCount" />
+                  <span class="slider round"></span>
+                </label>
+                <p class="font-semibold text-lg" :class="[autoUnffolowCount ? 'text-[#f3694a]' : 'text-gray-500']">
+                  Semua
+                </p>
+              </div>
+              <div class="overflow-hidden transition-all ease-in-out duration-200 mx-auto w-max"
+                :class="[!autoUnffolowCount ? 'h-max py-2' : ' h-0']">
+                <section class="py-2">
+                  <input type="number" id="iteration-unfollow" v-model="iterationUnfollow"
+                    class="border border-gray-200 rounded focus:outline-none block" />
+                  <label for="iteration-unfollow " class="text-xs italic text-[#f3694a]">Jumlah yang ingin di
+                    unfollow</label>
+                </section>
+              </div>
+              <div class="text-center mt-6">
+                <button class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                  @click="processUnfollow">
+                  Start
+                </button>
+              </div>
+            </div>
+          </section>
+          <section v-if="activeTab == 'auto-follow-by-reviews'" class="w-max mx-auto overflow-x-scroll">
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[700px]">
+              <h1 class="text-xl font-semibold mb-8 text-center">
+                Auto Follow Dari Ulasan
+              </h1>
+              <div class="w-full space-y-3">
+                <section class="pt-4">
+                  <label for="" class="text-sm text-gray-700 font-medium tracking-wider">Link Produk/Ulasan</label>
+                  <input type="text" v-model="linkForAutoFollowByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full" />
+                </section>
+                <section class="pt-4">
+                  <label for="" class="text-sm text-gray-700 font-medium">Mulai dari ulasan ke
+                  </label>
+                  <input type="text" v-model="startPointFollowByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full" />
+                </section>
+                <section class="py-2">
+                  <label for="" class="text-sm text-gray-700 font-medium">Total Follow</label>
+                  <input type="number" id="iteration-follow-by-reviews" v-model="iterationFollowByReviews"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-2 py-1 w-full" />
+                </section>
+              </div>
+              <div class="text-center mt-6">
+                <button class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                  @click="processAutoFollowByReviews">
+                  Start
+                </button>
+              </div>
+            </div>
+          </section>
+          <section v-if="activeTab == 'auto-follow'" class="w-max mx-auto">
+            <div class="bg-white w-full rounded-2xl mt-10 p-5 w-[500px] overflow-x-scroll">
+              <h1 class="text-xl font-semibold text-center">Auto Follow</h1>
+              <p class="text-base font-medium pt-1 mb-8 text-center">
+                Dari Followers Toko
+              </p>
+              <div class="gap-4 mx-auto w-[700px] space-y-4">
+                <section class="pt-4">
+                  <label for="" class="text-sm font-medium text-gray-700 font-medium">Link toko</label>
+                  <input type="text" v-model="linkForAutoFollow"
+                    class="border border-gray-200 rounded focus:outline-none block text-sm px-4 py-2 w-full" />
+                </section>
+                <section class="py-2">
+                  <label for="" class="text-sm font-medium text-gray-700 font-medium">Jumlah Yang Ingin Di Follow
+                  </label>
+                  <input type="number" id="iteration-follow" v-model="iterationFollow"
+                    class="border border-gray-200 rounded focus:outline-none block px-4 py-2 w-full" />
+                </section>
+              </div>
+            </div>
+
+            <div class="text-center mt-6">
+              <button class="bg-black text-white w-[170px] py-3 rounded-md hover:opacity-80 text-sm font-medium"
+                @click="processAutoFollow">
+                Start
+              </button>
+            </div>
+          </section>
+        </main>
+      </template>
+      <template v-else> Kamu Belum Login </template>
+
+      <!-- modal component -->
+      <div v-if="isShowModalDelete" class="fixed z-50 bg-black/40 top-0 left-0 right-0 bottom-0">
+        <div class="bg-white fixed top-40 left-1/2 -translate-x-1/2 p-5 rounded-lg w-[400px]">
+          <h1 class="text-base text-black font-medium">
+            Hapus Sesi Login Shopee
+          </h1>
+          <p class="text-sm text-[#656565] pt-2">
+            Apakah kamu ingin menghapus info sesi login pada akun shopee kamu?
+          </p>
+          <div class="text-sm flex justify-end gap-2 mt-7">
+            <button @click="isShowModalDelete = !isShowModalDelete"
+              class="bg-white text-[#f3694a] h-8 w-[80px] border-[#f3694a] rounded border hover:opacity-80">
+              Batal
+            </button>
+            <button @click="deleteCookies"
+              class="bg-[#f3694a] text-white h-8 w-[80px] rounded border hover:opacity-80 border-[#f3694a]">
+              Hapus
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="fixed top-0 left-0 right-0 bottom-0 bg-black/40 z-50" v-if="isShowModalAccountSubscription">
+        <div class="space-y-4 bg-white rounded-lg p-5 w-max relative top-40 left-1/2 -translate-x-1/2 min-w-[400px]">
+          <img src="~/assets/icons/close.svg" alt="close" class="w-6 h-6 absolute left-[102%] top-1 cursor-pointer"
+            @click="isShowModalAccountSubscription = !isShowModalAccountSubscription" />
+          <h1>Akun Shopee Power Tools</h1>
+          <section>
+            <label for="emailSubscription" class="block text-sm text-[#66738F] pb-1">Email</label>
+            <input v-model="emailSubscription" id="emailSubscription" type="email"
+              placeholder="Masukkan email kamu disini"
+              class="border focus:outline-none py-2 px-3 w-full rounded text-sm text-[#66738F]" />
+          </section>
+          <section>
+            <label for="passwordSubscription" class="block text-sm text-[#66738F] pb-1">Password</label>
+            <div class="relative">
+              <img :src="[isShowPasswordSubscription ? '~/assets/icons/eye-show.svg' : '~/assets/icons/eye-hide.svg']"
+                alt="togle password" class="w-6 h-6 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer"
+                @click="isShowPasswordSubscription = !isShowPasswordSubscription" />
+              <input :type="[isShowPasswordSubscription ? 'text' : 'password']" id="passwordSubscription"
+                v-model="passwordSubscription" placeholder="Masukkan password kamu disini"
+                class="border focus:outline-none py-2 px-3 w-full rounded text-sm text-[#66738F]" />
+            </div>
+          </section>
+          <section>
+            <label for="subscription" class="block text-sm text-[#66738F] pb-1">Subscription Code</label>
+            <input v-model="subscriptionCode" id="subscription" type="text"
+              placeholder="Masukkan subscription code kamu disini"
+              class="border focus:outline-none py-2 px-3 w-full rounded text-sm text-[#66738F]" />
+          </section>
+          <div class="mt-5 text-right">
+            <button @click="saveAccountSubscription"
+              class="text-sm font-medium bg-[#f3694a] text-white py-2 px-4 rounded-lg hover:opacity-80">
+              Simpan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Setup Shopee Account -->
+      <div class="fixed top-0 left-0 right-0 bottom-0 bg-black/40 z-50" v-if="isShowModalShopeeAccount">
+        <div class="space-y-4 bg-white rounded-lg p-5 w-max relative top-40 left-1/2 -translate-x-1/2 min-w-[420px]">
+          <img src="~/assets/icons/close.svg" alt="close" class="w-6 h-6 absolute left-[102%] top-1 cursor-pointer"
+            @click="isShowModalShopeeAccount = !isShowModalShopeeAccount" />
+          <h1>Akun Shopee</h1>
+          <section>
+            <label for="shopeeUserContact" class="block text-sm text-[#66738F] pb-1">
+              No. Handphone/Username/Email
+            </label>
+            <input v-model="shopeeUserContact" id="shopeeUserContact" type="text"
+              placeholder="Masukkan no.handphone/username/email kamu disini"
+              class="border focus:outline-none py-2 px-3 w-full rounded text-sm text-[#66738F]" />
+          </section>
+          <section>
+            <label for="shopeeUserPassword" class="block text-sm text-[#66738F] pb-1">
+              Password
+            </label>
+            <div class="relative">
+              <img :src="[isShowShopeeUserPassword ? '~/assets/icons/eye-show.svg' : '~/assets/icons/eye-hide.svg']"
+                alt="togle password" class="w-6 h-6 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer"
+                @click="isShowShopeeUserPassword = !isShowShopeeUserPassword" />
+              <input :type="[isShowShopeeUserPassword ? 'text' : 'password']" id="shopeeUserPassword"
+                v-model="shopeeUserPassword" placeholder="Masukkan password kamu disini"
+                class="border focus:outline-none py-2 px-3 w-full rounded text-sm text-[#66738F]" />
+            </div>
+          </section>
+
+          <section>
+            <div class="flex items-center gap-2 mx-auto w-full">
+              <label class="switch">
+                <input type="checkbox" v-model="isShopeeLoginWithQRCode" />
+                <span class="slider round"></span>
+              </label>
+              <p class="text-sm" :class="[isShopeeLoginWithQRCode ? 'text-[#f3694a]' : 'text-[#66738F]']">
+                Login dengan QR Code
+              </p>
+            </div>
+          </section>
+
+          <div class="!mt-10 text-right">
+            <button @click="saveShopeeAccount"
+              class="text-sm font-medium bg-[#f3694a] text-white py-2 px-4 rounded-lg hover:opacity-80">
+              Simpan
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</template>
+
+<script>
+import { SHOPEE_LOGIN_METHOD } from "~/constants/shopee.constant.js";
+import {
+  SHOPEE_ACCOUNT_STORE_KEY,
+  AUTO_CHAT_BY_REVIEWS_LINK_STORE_KEY,
+} from "~/constants/store.constant.js";
+
+export default {
+  name: 'IndexPage',
+  head() {
+    return {
+      title: "Shopee Power Tools"
+    }
+  },
+  data() {
+    return {
+      isShow: false,
+      iterationUnfollow: null,
+      iterationFollow: null,
+      iterationFollowByReviews: 1,
+      sidebarMenu: [
+        {
+          name: "Beranda",
+          slug: "home",
+        },
+        {
+          name: "Auto Unfollow",
+          slug: "auto-unfollow",
+        },
+        {
+          name: "Auto Follow ",
+          slug: "auto-follow",
+        },
+        {
+          name: "Auto Follow Ulasan",
+          slug: "auto-follow-by-reviews",
+        },
+        {
+          name: "Auto Chat Kreator",
+          slug: "auto-chat-creator",
+        },
+        {
+          name: "Auto Chat Ulasan",
+          slug: "auto-chat-by-reviews",
+        },
+        {
+          name: "Balas Ulasan Otomatis",
+          slug: "auto-reply-reviews",
+        },
+
+        // {
+        //   name: "Database Creator",
+        //   slug: "database-creator",
+        // },
+      ],
+      baseUrl: process.env.NUXT_ENV_API_BASE_URL,
+      userInfo: null,
+      cookies: null,
+      isOpenSetting: false,
+      isShowModalDelete: false,
+      isShowModalAccountSubscription: false,
+      isShowPasswordSubscription: false,
+      emailSubscription: null,
+      passwordSubscription: null,
+      subscriptionCode: null,
+      isShowCategory: false,
+      activeTab: electronStore.get("activeTab"),
+      dataSubscription: null,
+      // crawl creator
+      optionsCrawlCreator: {
+        loginMethods: [
+          {
+            id: 1,
+            name: "Dengan Qr",
+            value: "qr",
+          },
+          {
+            id: 2,
+            name: "Akun Shopee Seller (No HP/Email)",
+            value: "seller_phone",
+          },
+          {
+            id: 3,
+            name: "Akun Gmail",
+            value: "seller_gmail",
+          },
+          {
+            id: 4,
+            name: "Akun Facebook",
+            value: "seller_facebook",
+          },
+        ],
+        categoryOptions: [
+          { id: 1, name: "Semua", value: "Semua" },
+          { id: 2, name: "Kesehatan", value: "Kesehatan" },
+          { id: 3, name: "Aksesoris Fashion", value: "Aksesoris Fashion" },
+          { id: 4, name: "Elektronik", value: "Elektronik" },
+          { id: 5, name: "Pakaian Pria", value: "Pakaian Pria" },
+          { id: 6, name: "Sepatu Pria", value: "Sepatu Pria" },
+          {
+            id: 7,
+            name: "Handphone & Aksesoris",
+            value: "Handphone & Aksesoris",
+          },
+          {
+            id: 8,
+            name: "Fashion Muslim",
+            value: "Fashion Muslim",
+          },
+          {
+            id: 8,
+            name: "Koper & Tas Travel",
+            value: "Koper & Tas Travel",
+          },
+          {
+            id: 9,
+            name: "Tas Wanita",
+            value: "Tas Wanita",
+          },
+          {
+            id: 10,
+            name: "Pakaian Wanita",
+            value: "Pakaian Wanita",
+          },
+          {
+            id: 11,
+            name: "Food Delivery",
+            value: "Food Delivery",
+          },
+          {
+            id: 12,
+            name: "Sepatu Wanita",
+            value: "Sepatu Wanita",
+          },
+          {
+            id: 13,
+            name: "Tas Pria",
+            value: "Tas Pria",
+          },
+          {
+            id: 14,
+            name: "Jam Tangan",
+            value: "Jam Tangan",
+          },
+          {
+            id: 15,
+            name: "Audio",
+            value: "Audio",
+          },
+          {
+            id: 16,
+            name: "Makanan & Minuman",
+            value: "Makanan & Minuman",
+          },
+          {
+            id: 17,
+            name: "Perawatan & Kecantikan",
+            value: "Perawatan & Kecantikan",
+          },
+          {
+            id: 18,
+            name: "Hewan Peliharaan",
+            value: "Hewan Peliharaan",
+          },
+          {
+            id: 19,
+            name: "Ibu & Bayi",
+            value: "Ibu & Bayi",
+          },
+          {
+            id: 20,
+            name: "Fashion Bayi & Anak",
+            value: "Fashion Bayi & Anak",
+          },
+          {
+            id: 21,
+            name: "Gaming & Konsol",
+            value: "Gaming & Konsol",
+          },
+          {
+            id: 22,
+            name: "Kamera & Drone",
+            value: "Kamera & Drone",
+          },
+          {
+            id: 23,
+            name: "Perlengkapan Rumah",
+            value: "Perlengkapan Rumah",
+          },
+          {
+            id: 24,
+            name: "Olahraga & Outdoor",
+            value: "Olahraga & Outdoor",
+          },
+          {
+            id: 25,
+            name: "Buku & Alat Tulis",
+            value: "Buku & Alat Tulis",
+          },
+          {
+            id: 26,
+            name: "Hobi & Koleksi",
+            value: "Hobi & Koleksi",
+          },
+          {
+            id: 27,
+            name: "Mobil",
+            value: "Mobil",
+          },
+          {
+            id: 28,
+            name: "Sepeda Motor",
+            value: "Sepeda Motor",
+          },
+          {
+            id: 29,
+            name: "Tiket, Voucher, & Layanan",
+            value: "Tiket, Voucher, & Layanan",
+          },
+          {
+            id: 30,
+            name: "Buku & Majalah",
+            value: "Buku & Majalah",
+          },
+          {
+            id: 31,
+            name: "Komputer & Aksesoris",
+            value: "Komputer & Aksesoris",
+          },
+          {
+            id: 32,
+            name: "Deals Sekitarmu",
+            value: "Deals Sekitarmu",
+          },
+        ],
+        socialMedia: [
+          { id: 1, name: "Semua", value: "Semua" },
+          { id: 2, name: "Shopee", value: "Shopee" },
+          { id: 3, name: "Instagram", value: "Instagram" },
+          { id: 4, name: "Tiktok", value: "Tiktok" },
+          { id: 5, name: "Facebook", value: "Facebook" },
+          { id: 6, name: "Twitter", value: "Twitter" },
+          { id: 7, name: "Youtube", value: "Youtube" },
+        ],
+
+        followerCountOptions: [
+          { id: 1, name: "Semua", value: "Semua" },
+          { id: 2, name: "≥ 1RB", value: "1RB" },
+          { id: 3, name: "≥ 5RB", value: "5RB" },
+          { id: 4, name: "≥ 10RB", value: "10RB" },
+          { id: 5, name: "≥ 50RB", value: "50RB" },
+          { id: 6, name: "≥ 100RB", value: "100RB" },
+          { id: 7, name: "≥ 500RB", value: "500RB" },
+          { id: 8, name: "≥ 5JT", value: "5JT" },
+        ],
+        followerAgeOptions: [
+          { id: 1, name: "Semua", value: "Semua" },
+          { id: 2, name: "13-", value: "13-" },
+          { id: 3, name: "13-17", value: "13-17" },
+          { id: 4, name: "18-22", value: "18-22" },
+          { id: 5, name: "23-32", value: "23-32" },
+          { id: 6, name: "33-42", value: "33-42" },
+          { id: 7, name: "43-52", value: "43-52" },
+          { id: 8, name: "53+", value: "53+" },
+        ],
+        followerGenderOptions: [
+          { id: 1, name: "Semua", value: "Semua" },
+          { id: 2, name: "Perempuan", value: "Perempuan" },
+          { id: 3, name: "Laki-laki", value: "Laki-laki" },
+        ],
+      },
+      categoryValue: [],
+
+      selectedCrawlCreator: {
+        iteration: 1,
+        socialMedias: "",
+        followerCount: "",
+        followerAge: "",
+        followerGender: "",
+        invitationMessage: "",
+        loginMethod: "qr",
+        replyMessage: "",
+      },
+      errorMessage: false,
+      // reply reviews
+      productName: "",
+      options: {
+        loginMethods: [
+          {
+            id: 1,
+            name: "Dengan Qr",
+            value: "qr",
+          },
+          {
+            id: 2,
+            name: "Akun Shopee Seller (No HP/Email)",
+            value: "seller_phone",
+          },
+          {
+            id: 3,
+            name: "Akun Gmail",
+            value: "seller_gmail",
+          },
+          {
+            id: 4,
+            name: "Akun Facebook",
+            value: "seller_facebook",
+          },
+        ],
+        ratingComment: [
+          {
+            id: 1,
+            name: "Semua",
+            value: "semua",
+          },
+          {
+            id: 2,
+            name: "5 Bintang",
+            value: "5 Bintang",
+          },
+          {
+            id: 3,
+            name: "4 Bintang",
+            value: "4 Bintang",
+          },
+          {
+            id: 4,
+            name: "3 Bintang",
+            value: "3 Bintang",
+          },
+          {
+            id: 5,
+            name: "2 Bintang",
+            value: "2 Bintang",
+          },
+          {
+            id: 6,
+            name: "1 Bintang",
+            value: "1 Bintang",
+          },
+        ],
+      },
+      selectedReplyReviews: {
+        loginMethod: "qr",
+        iteration: 1,
+        replyMessage: "",
+        ratingComment: "semua",
+        productName: "",
+      },
+      paramGetShopeeCreators: {
+        page: 1,
+        limit: 10,
+        category: "",
+        followerCount: "",
+        search: "",
+      },
+      dataCreator: {
+        list: [],
+        pagination: {},
+      },
+      error: {
+        replyMessage: "",
+      },
+      flags: null,
+      autoUnffolowCount: true,
+      autoFollowCount: true,
+      autoFollowByReviewsCount: true,
+      linkForAutoFollow: "",
+      linkForAutoFollowByReviews: "",
+      startPointFollowByReviews: 1,
+      isShowModalShopeeAccount: false,
+      shopeeUserContact: "",
+      shopeeUserPassword: "",
+      isShopeeLoginWithQRCode: true,
+      isShowShopeeUserPassword: false,
+      linkForAutoChatByReviews: "",
+      startPointChatByReviews: 1,
+      templateChatByReviews: "",
+      iterationChatByReviews: 1,
+    }
+  },
+  mounted() {
+    console.log("SHOPEE_ACCOUNT_STORE_KEY: ", SHOPEE_ACCOUNT_STORE_KEY)
+    this.flags = this.getFlags();
+    // clear electron store before make dekstop app
+    // electronStore.clearAll();
+    // localStorage.clear();
+    // electronStore.set("activeTab", "home");
+    console.log(electronStore.get("activeTab"));
+    // this.getDataCreator();
+    const listDatabaseCreator = electronStore.get("database-creator");
+    if (listDatabaseCreator) {
+      this.dataCreator.list = listDatabaseCreator.data;
+      this.paramGetShopeeCreators.page =
+        listDatabaseCreator.pagination.currentPage;
+    }
+
+    // electronStore.delete("database-creator");
+    const getdataSubscription = electronStore.get("data-subscription");
+    if (getdataSubscription) {
+      this.dataSubscription = getdataSubscription.data;
+    }
+    this.getSubscriptionInfo();
+    // crawl creator config
+    const dataSelectedCrawlCreator = electronStore.get(
+      "selected-crawl-creator"
+    );
+    if (dataSelectedCrawlCreator) {
+      (this.selectedCrawlCreator = dataSelectedCrawlCreator),
+        (this.categoryValue = dataSelectedCrawlCreator.category);
+    }
+    // reply reviews config
+    const dataSelectedReplyReviews = electronStore.get(
+      "selected-reply-reviews"
+    );
+    if (dataSelectedReplyReviews) {
+      this.selectedReplyReviews = dataSelectedReplyReviews;
+    }
+    const getUserInfo = localStorage.getItem("user_info");
+    this.userInfo = JSON.parse(getUserInfo);
+    if (!this.userInfo) {
+      this.$router.push("/login")
+    }
+
+    // auto follow
+    const getLinkAutoFollow = electronStore.get("link-auto-follow");
+    if (getLinkAutoFollow) {
+      this.linkForAutoFollow = getLinkAutoFollow;
+    }
+    const getLinkAutoFollowByReviews = electronStore.get(
+      "link-auto-follow-by-reviews"
+    );
+    if (getLinkAutoFollowByReviews) {
+      this.linkForAutoFollowByReviews = getLinkAutoFollowByReviews;
+    }
+
+    const getLinkAutoChatByReviews = electronStore.get(
+      AUTO_CHAT_BY_REVIEWS_LINK_STORE_KEY
+    );
+    if (getLinkAutoChatByReviews) {
+      this.linkForAutoChatByReviews = getLinkAutoChatByReviews;
+    }
+
+    this.getAccountSubscription();
+  },
+  methods: {
+    getFlags() {
+      // shopee-power-tools || support-seller
+      const flags = "shopee-power-tools";
+      const result = {};
+      // logo
+      if (flags == "shopee-power-tools") {
+        result.linkCreator = "login-spt";
+        result.logo = "spt.png";
+      } else {
+        result.linkCreator = "login-spt-ss";
+        result.logo = "support-seller.png";
+      }
+      return result;
+    },
+    deleteCategoryVal() {
+      this.categoryValue = [];
+    },
+    handleSidebar(val) {
+      electronStore.set("activeTab", val);
+      // if (val == "database-creator") {
+      //   location.href = "http://supportseller.com";
+      // }
+      this.$router.go();
+    },
+    toastSuccsess(val) {
+      this.$toasted.show(`${val}`, {
+        icon: "",
+        position: "top-right",
+        duration: 3000,
+        type: "success",
+      });
+    },
+    toastError(val) {
+      this.$toasted.show(`${val}`, {
+        icon: "",
+        position: "top-right",
+        duration: 3000,
+        type: "error",
+      });
+    },
+    deleteCookies() {
+      electronStore.delete("cookies-shopee-account");
+      this.isShowModalDelete = !this.isShowModalDelete;
+      this.$toasted.show(
+        `Berhasil menghapus sesi login akun shopee kamu`,
+        {
+          icon: "",
+          position: "top-right",
+          duration: 3000,
+          type: "success",
+        }
+      );
+    },
+    logout() {
+      localStorage.removeItem("user_info");
+      electronStore.delete("data-subscription");
+      this.$router.push("/login")
+    },
+    saveAccountSubscription() {
+      const {
+        emailSubscription,
+        passwordSubscription,
+        subscriptionCode,
+      } = this;
+      if (
+        !emailSubscription ||
+        !passwordSubscription ||
+        !subscriptionCode
+      ) {
+        alert("Form tidak lengkap");
+      } else {
+        const accountShopeeTools = {
+          email: emailSubscription,
+          password: passwordSubscription,
+          subscription: subscriptionCode,
+        };
+        electronStore.set("account-subscription", accountShopeeTools);
+        this.toastSuccsess("Berhasil menyimpan info akun");
+        this.isShowModalAccountSubscription =
+          !this.isShowModalAccountSubscription;
+      }
+    },
+    getAccountSubscription() {
+      const data = electronStore.get("account-subscription");
+      if (data) {
+        this.emailSubscription = data.email;
+        this.passwordSubscription = data.password;
+        this.subscriptionCode = data.subscription;
+      }
+    },
+    handleCloseSetting(event) {
+      const menuButton = document.getElementById("menu-button");
+      if (!menuButton.contains(event.target)) {
+        this.isOpenSetting = false;
+      }
+    },
+    handleCategoryOption(val) {
+      console.log(val);
+      if (val === "Semua") {
+        this.categoryValue = ["Semua"];
+      } else {
+        if (!this.categoryValue.includes(val)) {
+          this.categoryValue.push(val);
+          const finalArr = this.categoryValue.filter(
+            (fil) => fil !== "Semua"
+          );
+          this.categoryValue = finalArr;
+        } else {
+          const filterArr = this.categoryValue.filter(
+            (fil) => fil !== val
+          );
+          const finalArr = filterArr.filter((fil) => fil !== "Semua");
+          this.categoryValue = finalArr;
+        }
+      }
+    },
+
+    getShopeeAccount() {
+      const account = electronStore.get(SHOPEE_ACCOUNT_STORE_KEY);
+
+      if (account) {
+        this.shopeeUserContact = account.contact;
+        this.shopeeUserPassword = account.password;
+        this.isShopeeLoginWithQRCode =
+          account.loginMethod === SHOPEE_LOGIN_METHOD.QR_CODE;
+      }
+    },
+
+    saveShopeeAccount() {
+      const payload = {
+        contact: this.shopeeUserContact,
+        password: this.shopeeUserPassword,
+        loginMethod: this.isShopeeLoginWithQRCode
+          ? SHOPEE_LOGIN_METHOD.QR_CODE
+          : SHOPEE_LOGIN_METHOD.CONTACT,
+      };
+      electronStore.set(SHOPEE_ACCOUNT_STORE_KEY, payload);
+      this.$toasted.show("Berhasil menyimpan informasi akun shopee", {
+        icon: "",
+        position: "top-right",
+        duration: 3000,
+        type: "success",
+      });
+      this.isShowModalShopeeAccount = false;
+    },
+
+    handleSubmitCrawlCreator() {
+      this.selectedCrawlCreator.replyMessage =
+        this.selectedCrawlCreator.replyMessage.trim();
+      const { selectedCrawlCreator } = this;
+      const category = this.categoryValue;
+      const payload = {
+        ...selectedCrawlCreator,
+        category,
+      };
+      if (!this.selectedCrawlCreator.replyMessage) {
+        this.error.replyMessage = "Balasan Ulasan tidak boleh kosong";
+      } else {
+        electronStore.set("selected-crawl-creator", payload);
+        this.toastSuccsess("Berhasil menyimpan konfigurasi");
+      }
+    },
+    handleSubmitReplyReviews() {
+      const payload = this.selectedReplyReviews;
+      if (!payload.replyMessage) {
+        this.error.replyMessage = "Balasan Ulasan tidak boleh kosong";
+      } else {
+        electronStore.set("selected-reply-reviews", payload);
+        this.toastSuccsess("Berhasil menyimpan konfigurasi");
+      }
+    },
+
+    //call api
+    getSubscriptionInfo() {
+      window.electron.ipcRenderer.send("get-subscription-info");
+    },
+
+    //start scrapper
+    processUnfollow() {
+      if (this.autoUnffolowCount) {
+        this.iterationUnfollow = "Semua";
+        window.electron.ipcRenderer.send(
+          "process-auto-unfollow",
+          this.iterationUnfollow
+        );
+      } else {
+        if (!this.iterationUnfollow) {
+          this.toastError(
+            "Masukkan jumlah yang ingin di unfollow jika tidak ingin semuanya"
+          );
+        } else {
+          window.electron.ipcRenderer.send(
+            "process-auto-unfollow",
+            this.iterationUnfollow
+          );
+        }
+      }
+    },
+    processAutoFollow() {
+      if (!this.linkForAutoFollow) {
+        this.toastError("Link toko masih kosong");
+      } else {
+        electronStore.set("link-auto-follow", this.linkForAutoFollow);
+        console.log(this.autoFollowCount);
+        if (!this.iterationFollow) {
+          this.toastError("Masukkan jumlah yang ingin di follow ");
+        } else {
+          window.electron.ipcRenderer.send(
+            "process-auto-follow",
+            this.iterationFollow
+          );
+        }
+      }
+    },
+    processAutoFollowByReviews() {
+      if (!this.linkForAutoFollowByReviews) {
+        this.toastError("Link toko masih kosong");
+      } else {
+        electronStore.set(
+          "link-auto-follow-by-reviews",
+          this.linkForAutoFollowByReviews
+        );
+        const { startPointFollowByReviews, iterationFollowByReviews } =
+          this;
+        const context = {
+          startPointFollowByReviews,
+          iterationFollowByReviews,
+        };
+        context.iterationFollowByReviews = parseInt(
+          this.iterationFollowByReviews
+        );
+
+        console.log("if =", { context });
+        window.electron.ipcRenderer.send(
+          "process-auto-follow-by-reviews",
+          context
+        );
+      }
+    },
+
+    processAutoChatByReviews() {
+      const hasEmptyField =
+        !this.linkForAutoChatByReviews ||
+        !this.startPointChatByReviews ||
+        !this.templateChatByReviews ||
+        !this.iterationChatByReviews;
+
+      if (hasEmptyField) {
+        this.toastError("Silakan isi semua field terlebih dahulu");
+        return;
+      }
+
+      electronStore.set(
+        AUTO_CHAT_BY_REVIEWS_LINK_STORE_KEY,
+        this.linkForAutoChatByReviews
+      );
+
+      const context = {
+        startPoint: this.startPointChatByReviews,
+        iteration: +this.iterationChatByReviews,
+        template: this.templateChatByReviews,
+      };
+
+      window.electron.ipcRenderer.send(
+        "process-auto-chat-by-reviews",
+        context
+      );
+    },
+
+    processCrawlCreator() {
+      const context = electronStore.get("selected-crawl-creator");
+      console.log({ context });
+      if (context) {
+        window.electron.ipcRenderer.send("crawl-creator", context);
+      } else {
+        this.toastError("Belum ada konfigurasi");
+      }
+    },
+    processReplyReviews() {
+      const context = electronStore.get("selected-reply-reviews");
+      if (context) {
+        window.electron.ipcRenderer.send(
+          "process-reply-reviews",
+          context
+        );
+      } else {
+        this.toastError("Belum ada konfigurasi");
+      }
+    },
+    getDataCreator() {
+      window.electron.ipcRenderer.send(
+        "get-database-creator",
+        this.paramGetShopeeCreators
+      );
+      const dataCreatorFromStore = electronStore.get("database-creator");
+      if (dataCreatorFromStore) {
+        this.dataCreator.list = dataCreatorFromStore.data;
+        console.log("this", this.dataCreator.list);
+      }
+    },
+    prevPageCreator() {
+      const currentPage = this.paramGetShopeeCreators.page;
+      const totalPage =
+        electronStore.get("database-creator").pagination.totalPages;
+      if (currentPage > 1) {
+        this.paramGetShopeeCreators.page--;
+      }
+      this.getDataCreator();
+      this.$router.go();
+    },
+    nextPageCreator() {
+      const currentPage = this.paramGetShopeeCreators.page;
+      const totalPage =
+        electronStore.get("database-creator").pagination.totalPages;
+
+      if (currentPage < totalPage) {
+        this.paramGetShopeeCreators.page++;
+      }
+      console.log(this.paramGetShopeeCreators.page);
+
+      this.getDataCreator();
+      this.$router.go();
+    },
+    // helpers
+    toRupiah(num) {
+      if (num) {
+        return `Rp${num
+          .toString()
+          .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}`;
+      } else if (num == 0) {
+        return `Rp${num
+          .toString()
+          .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")}`;
+      }
+    },
+    toddmmyyyy(isoDate) {
+      let date;
+      if (isoDate) {
+        date = isoDate.replace(/T.*/, "").split("-").reverse().join("-");
+      } else {
+        date = "-";
+      }
+      return date;
+    },
+  },
+  watch: {
+    isShowModalShopeeAccount: function (isShow) {
+      if (isShow) {
+        this.getShopeeAccount();
+      }
+    },
+  },
+}
+</script>
+
+<style>
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 70px;
+  height: 27px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 22px;
+  left: 0;
+  bottom: 1px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked+.slider {
+  background-color: #f3694a;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #f3694a;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(48px);
+  -ms-transform: translateX(48px);
+  transform: translateX(48px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+</style>
