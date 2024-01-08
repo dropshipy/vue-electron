@@ -13,6 +13,8 @@ module.exports = {
         primary: "#EE3A31",
         dark: "#474747",
         light: "#EEEDFA",
+        success: "#08A081",
+        error: "#EE3331",
       },
       boxShadow: {
         sidebar: "0px 2px 12px 0px #4338C91A",
