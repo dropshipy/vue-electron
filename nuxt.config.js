@@ -32,8 +32,10 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    // NOTE: Remove this plugin if you don't need it
     { src: "~/plugins/toasted.js", mode: "client" },
     { src: "~/plugins/click-outside.js", mode: "client" },
+    { src: "~/plugins/snackbar.js", mode: "client" },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
