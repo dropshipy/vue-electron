@@ -3,12 +3,15 @@ export default {
   data() {
     return {
       isOpenSettings: false,
+      isShowSubscriptionModal: false,
     }
   },
 
   methods: {
-    onClickMenuItem(item) {
-      console.log(item)
+    onClickMenuItem(type) {
+      if (type === 'spt-account') {
+        this.isShowSubscriptionModal = true
+      }
     }
   }
 }
@@ -48,6 +51,8 @@ export default {
       <span>Logout</span>
       <Icon name="logout" />
     </Button>
+
+    <AppSettingsSubscriptionModal v-model="isShowSubscriptionModal" />
   </nav>
 </template>
 

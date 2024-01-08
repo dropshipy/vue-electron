@@ -4,7 +4,7 @@ export default {
     theme: {
       type: String,
       default: 'primary',
-      validator: (value) => ['primary', 'tertiary'].includes(value)
+      validator: (value) => ['primary', 'tertiary', 'primary-outline'].includes(value)
     }
   },
   computed: {
@@ -15,6 +15,16 @@ export default {
         }
       }
       return {}
+    },
+    buttonClasses() {
+      switch (this.theme) {
+        case 'primary':
+          return 'text-white font-bold';
+        case 'primary-outline':
+          return 'text-primary font-medium border border-primary'
+        default:
+          return 'text-dark font-medium';
+      }
     }
   }
 }
@@ -22,8 +32,8 @@ export default {
 
 <template>
   <button v-bind="$attrs" v-on="$listeners"
-    class="flex items-center space-x-2 text-sm py-2 px-4 rounded-lg transition-all"
-    :class="theme === 'primary' ? 'text-white font-bold' : 'text-dark font-medium'" :style="buttonStyle">
+    class="flex items-center justify-center space-x-2 text-sm py-2 px-4 rounded-lg transition-all" :class="buttonClasses"
+    :style="buttonStyle">
     <slot />
   </button>
 </template>
