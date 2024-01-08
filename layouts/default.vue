@@ -10,6 +10,8 @@ export default {
 
 <template>
   <div>
+    <PortalTarget name="layout" />
+
     <LayoutSidebar @expanded="isExpanded = $event" />
 
     <div class="transition-all" :class="isExpanded ? 'ml-[290px]' : 'ml-[84px]'">
@@ -19,5 +21,7 @@ export default {
         <Nuxt />
       </main>
     </div>
+
+    <Snackbar />
   </div>
 </template>
