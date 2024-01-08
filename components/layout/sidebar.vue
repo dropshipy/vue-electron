@@ -2,11 +2,6 @@
 import { SIDEBAR_MENU } from "./sidebar-menu";
 
 export default {
-  async fetch() {
-    const appName = this.$config.appName;
-    this.$store.commit('app/setAppName', appName);
-  },
-
   data() {
     return {
       isOpenMenu: true,
