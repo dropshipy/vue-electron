@@ -45,26 +45,24 @@ export default {
 </script>
 
 <template>
-  <Portal to="layout">
-    <Transition name="modal">
-      <div v-if="isShow" class="modal__overlay" @click="onClose">
-        <div class="modal" :class="modalClass" @click.stop>
-          <h3 class="modal__title">{{ title || 'Title' }}</h3>
+  <Transition name="modal">
+    <div v-if="isShow" class="modal__overlay" @click="onClose">
+      <div class="modal" :class="modalClass" @click.stop>
+        <h3 class="modal__title">{{ title || 'Title' }}</h3>
 
-          <div class="modal__content">
-            <slot></slot>
-          </div>
+        <div class="modal__content">
+          <slot></slot>
+        </div>
 
-          <div class="modal__footer">
-            <slot name="footer">
-              <Button theme="primary-outline" @click="onClose" class="w-28">{{ cancelBtnText }}</Button>
-              <Button @click="$emit('confirm')" class="w-28">{{ confirmBtnText }}</Button>
-            </slot>
-          </div>
+        <div class="modal__footer">
+          <slot name="footer">
+            <Button theme="primary-outline" @click="onClose" class="w-28">{{ cancelBtnText }}</Button>
+            <Button @click="$emit('confirm')" class="w-28">{{ confirmBtnText }}</Button>
+          </slot>
         </div>
       </div>
-    </Transition>
-  </Portal>
+    </div>
+  </Transition>
 </template>
 
 <style scoped lang="postcss">
@@ -72,7 +70,7 @@ export default {
   @apply min-w-[500px] bg-white transition-all p-6 rounded-xl shadow;
 
   &__overlay {
-    @apply flex items-center justify-center fixed z-[999] top-0 left-0 w-full h-full bg-black bg-opacity-40;
+    @apply flex items-center justify-center fixed z-50 top-0 left-0 w-full h-full bg-black bg-opacity-40;
   }
 
   &__title {
