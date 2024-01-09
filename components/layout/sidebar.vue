@@ -48,9 +48,10 @@ export default {
 </script>
 
 <template>
-  <aside class="fixed top-0 bottom-0 w-[290px] px-5 py-3 bg-white transition-all shadow-sidebar z-10"
+  <aside class="fixed top-0 bottom-0 w-[290px] bg-white transition-all overflow-y-auto overflow-x-hidden shadow-sidebar"
     :class="{ 'w-[84px]': !isOpenMenu }">
-    <div class="flex items-center justify-between gap-2" :class="{ 'gap-1 -mx-2': !isOpenMenu }">
+    <div class="flex items-center justify-between gap-2 px-5 py-3 sticky top-0 bg-white"
+      :class="{ 'gap-1 -mx-2': !isOpenMenu }">
       <img :src="logoUrl" alt="logo" class="w-[120px] h-auto" :class="{ 'w-[30px] h-[30px]': !isOpenMenu }" />
 
       <button @click="isOpenMenu = !isOpenMenu" class="text-primary">
@@ -58,7 +59,7 @@ export default {
       </button>
     </div>
 
-    <div class="mt-10">
+    <div class="mt-7 px-5 py-3">
       <NuxtLink v-for="(menu, idx) in  sidebarMenu " :key="idx" class="cursor-pointer" :to="menu.path">
         <div class="menu-item flex items-center justify-between p-3 rounded-lg w-full">
           <div class="flex items-center space-x-2">

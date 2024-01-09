@@ -28,7 +28,7 @@ export default {
     onConfirm() {
       const { email, password, subscription } = this;
       if (!email || !password || !subscription) {
-        alert("Form tidak lengkap");
+        this.$snackbar.error("Form tidak lengkap");
       } else {
         const payload = {
           email,
@@ -67,7 +67,7 @@ export default {
 
 <template>
   <Modal v-model="isShow" title="Akun Shopee Power Tools" @confirm="onConfirm" @close="reset">
-    <div class="my-5 space-y-3">
+    <div class="mt-5 mb-10 space-y-3">
       <Textfield v-model="email" label="Email" placeholder="Masukkan email kamu disini" />
       <Textfield v-model="password" label="Password" placeholder="Masukkan password kamu disini"
         :type="isShowPassword ? 'text' : 'password'" @click:icon="isShowPassword = !isShowPassword"
