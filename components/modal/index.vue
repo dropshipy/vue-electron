@@ -15,11 +15,11 @@ export default {
     },
     cancelBtnText: {
       type: String,
-      default: 'Cancel'
+      default: 'Batal'
     },
     confirmBtnText: {
       type: String,
-      default: 'Submit'
+      default: 'Simpan'
     }
   },
 

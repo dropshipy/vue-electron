@@ -5,15 +5,22 @@ export default {
       isOpenSettings: false,
       isShowSubscriptionModal: false,
       isShowShopeeAccountModal: false,
+      isShowDeleteShopeeSessionModal: false
     }
   },
 
   methods: {
     onClickMenuItem(type) {
-      if (type === 'spt-account') {
-        this.isShowSubscriptionModal = true
-      } else if (type === 'shopee-account') {
-        this.isShowShopeeAccountModal = true
+      switch (type) {
+        case 'spt-account':
+          this.isShowSubscriptionModal = true
+          break;
+        case 'shopee-account':
+          this.isShowShopeeAccountModal = true
+          break;
+        case 'delete-shopee-session':
+          this.isShowDeleteShopeeSessionModal = true
+          break;
       }
     }
   }
@@ -57,6 +64,7 @@ export default {
 
     <AppSettingsSubscriptionModal v-model="isShowSubscriptionModal" />
     <AppSettingsShopeeAccountModal v-model="isShowShopeeAccountModal" />
+    <AppSettingsDeleteShopeeSessionModal v-model="isShowDeleteShopeeSessionModal" />
   </nav>
 </template>
 

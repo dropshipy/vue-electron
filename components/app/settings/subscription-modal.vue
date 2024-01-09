@@ -56,7 +56,6 @@ export default {
   },
   watch: {
     isShow(val) {
-      console.log("is show: ", val)
       if (val) {
         this.getAccountSubscription()
       }
