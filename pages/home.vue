@@ -29,9 +29,6 @@ export default {
     getSubscriptionInfo() {
       window.electron.ipcRenderer.send("get-subscription-info");
     },
-    // TODO: Revisit
-    // I don't know why we can't use formatCurrency in template directly
-    // so we need to wrap it in a function
     dateFormatter(date) {
       return formatDate(date)
     },

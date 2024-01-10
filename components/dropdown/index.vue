@@ -22,6 +22,10 @@ export default {
     value: {
       type: [Array, String],
       default: () => []
+    },
+    maxHeight: {
+      type: Number,
+      default: 180
     }
   },
   data() {
@@ -108,7 +112,7 @@ export default {
       Hapus Semua
     </Button>
 
-    <Menu v-model="isShow" full-width class="absolute left-0 top-[110%]">
+    <Menu v-model="isShow" full-width class="absolute left-0 top-[110%]" :max-height="maxHeight">
       <MenuItem class="justify-between" @click="handleClickOption(optionAll)">
       <span>{{ optionAll.label }}</span>
       <input v-if="multiple" type="checkbox" class="accent-primary w-4 h-4" :value="isAllSelected"

@@ -14,7 +14,6 @@ export default {
       this.type = "success";
     },
     showSnackbar(message, options) {
-      console.log(message, options);
       this.message = message;
       this.type = options?.type || "success";
       this.isVisible = true;
