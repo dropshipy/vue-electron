@@ -32,7 +32,7 @@ export default {
     <Toggle label="Semua" v-model="isFollowAll" class="mt-3" />
 
     <div v-if="!isFollowAll" class="mt-3">
-      <Textfield v-model="unfollowCount" type="number" class="h-11" />
+      <Textfield v-model="unfollowCount" type="number" />
       <div class="flex items-center gap-1 text-primary mt-3">
         <Icon name="info" />
         <p class="italic">Jumlah yang ingin di unfollow</p>
