@@ -28,7 +28,7 @@ export default {
 </script>
 
 <template>
-  <nav class="sticky h-[72px] top-0 bg-white shadow-navbar flex items-center justify-end px-8 py-4">
+  <nav class="sticky h-[72px] top-0 bg-white shadow-navbar flex items-center justify-end px-8 py-4 z-10">
     <Button theme="tertiary" class="relative" @click.stop="isOpenSettings = !isOpenSettings">
       <Icon name="setting" />
       <span>Settings</span>
