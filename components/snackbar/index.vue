@@ -41,9 +41,11 @@ export default {
 
       <div class="flex items-center justify-center w-10 h-10 p-2 mr-3 rounded-full"
         :class="`snackbar__icon-wrapper--${type}`">
-        <div class="flex items-center justify-center w-6 h-6 rounded-full" :class="`snackbar__icon--${type}`">
-          <Icon :name="type === 'success' ? 'check' : 'close'" :size="type === 'success' ? 24 : 16" class="text-white" />
+        <div v-if="type === 'success'" class="snackbar__icon--success">
+          <Icon name="check" :size="24" />
         </div>
+
+        <Icon v-else-if="type === 'error'" name="warning" :size="24" class="snackbar__icon--error" />
       </div>
 
       <div>
@@ -79,7 +81,7 @@ export default {
     }
 
     .snackbar__icon--success {
-      @apply bg-success;
+      @apply bg-success text-white flex items-center justify-center w-6 h-6 rounded-full;
     }
   }
 
@@ -95,7 +97,7 @@ export default {
     }
 
     .snackbar__icon--error {
-      @apply bg-error;
+      @apply text-error;
     }
   }
 }
