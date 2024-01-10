@@ -28,7 +28,7 @@ export default {
 
     <p class="text-center text-gray-600 mt-2 font-medium">Dari Followers Toko</p>
 
-    <Textfield v-model="storeLink" label="Link Toko" placeholder="Masukkan link toko" />
+    <Textfield v-model="storeLink" label="Link Toko" placeholder="Masukkan link toko" class="mt-5" />
     <Textfield v-model="followCount" type="number" label="Jumlah" placeholder="Masukkan jumlah yang ingin difollow"
       class="mt-3" />
     <Button class="w-full mt-7" @click="processFollow">Start</Button>
