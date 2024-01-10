@@ -4,6 +4,16 @@ export default {
     return {
       isExpanded: true
     }
+  },
+  created() {
+    const userInfo = JSON.parse(localStorage.getItem('user_info'));
+    if (userInfo) {
+      this.$store.commit('user/setUserInfo', userInfo);
+    } else {
+      // redirect to login page if user is not logged in
+      // this.$router.push('/login');
+    }
+
   }
 }
 </script>
