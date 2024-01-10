@@ -4,6 +4,14 @@ export default {
     value: {
       type: Boolean,
       default: false
+    },
+    fullWidth: {
+      type: Boolean,
+      default: false
+    },
+    maxHeight: {
+      type: Number,
+      default: 180
     }
   },
 
@@ -30,7 +38,8 @@ export default {
 <template>
   <div v-click-outside="handleClickOutside" class="absolute top-10 right-0 z-10">
     <Transition name="menu">
-      <div v-if="isShow" class="menu-content bg-white drop-shadow z-10 rounded-lg w-max py-2">
+      <div v-if="isShow" class="menu-content bg-white drop-shadow z-10 rounded-lg py-2 overflow-y-auto"
+        :class="fullWidth ? 'w-full' : 'w-max'" :style="{ maxHeight: `${maxHeight}px` }">
         <slot />
       </div>
     </Transition>

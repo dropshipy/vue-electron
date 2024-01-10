@@ -21,6 +21,10 @@ export default {
       type: String,
       default: ''
     },
+    iconSize: {
+      type: Number,
+      default: 24
+    },
     value: {
       type: String,
       default: ''
@@ -28,6 +32,14 @@ export default {
     maxHeight: {
       type: Number,
       default: 44
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    inputClass: {
+      type: [String, Array, Object],
+      default: ''
     }
   }
 }
@@ -36,14 +48,15 @@ export default {
 <template>
   <div>
     <label class="text-[#2D2D2D] mb-3" v-if="label" :for="id">{{ label }}</label>
-    <div class="relative !text-[#2D2D2D]">
+    <div class="relative !text-[#2D2D2D]" @click.stop="$emit('click')">
       <input :value="value" :type="type" :placeholder="placeholder" @input="$emit('input', $event.target.value)" :id="id"
         class="border !border-[#A0A3BD] !border-opacity-40 focus:outline-none focus:ring-2 focus:ring-primary p-3 w-full rounded-[6px] text-base"
-        :style="{ maxHeight: `${maxHeight}px` }" />
+        :class="inputClass" :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly" />
 
-      <button v-if="icon" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#A0A3BD]"
+      <button v-if="icon"
+        class="flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 text-[#A0A3BD]"
         @click.stop="$emit('click:icon')">
-        <Icon :size="24" :name="icon" />
+        <Icon :size="iconSize" :name="icon" />
       </button>
     </div>
   </div>
