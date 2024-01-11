@@ -53,7 +53,7 @@ export default {
 
 <template>
   <div>
-    <label class="flex items-center space-x-3 text-[#2D2D2D] mb-3" v-if="label" :for="id">
+    <label class="flex items-center gap-3 flex-wrap text-[#2D2D2D] mb-3" v-if="label" :for="id">
       <span>{{ label }}</span>
       <slot name="label" />
     </label>
