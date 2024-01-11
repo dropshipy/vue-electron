@@ -58,7 +58,7 @@ export default {
       <slot name="label" />
     </label>
     <div class="relative !text-[#2D2D2D]" @click.stop="$emit('click')">
-      <component v-on="$listeners" :is="elementTag" :value="value" :type="type" :placeholder="placeholder"
+      <component :is="elementTag" :value="value" :type="type" :placeholder="placeholder"
         @input="$emit('input', $event.target.value)" :id="id"
         class="border !border-[#A0A3BD] !border-opacity-40 focus:outline-none focus:ring-2 focus:ring-primary p-3 w-full rounded-[6px] text-base"
         :class="inputClass" :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly" />

@@ -26,6 +26,8 @@ export default {
   },
   methods: {
     onSave() {
+      this.message = this.message.trim()
+
       if (!this.message) {
         this.$snackbar.error("Balasan Ulasan tidak boleh kosong")
         return;
@@ -108,7 +110,7 @@ export default {
 
         <h6 class="text-gray-500 font-medium mt-6">Pesan Undangan Untuk Kreator</h6>
 
-        <Textfield v-model.trim="message" label="Pesan Undangan Ke Affiliator" placeholder="Masukkan pesan undangan"
+        <Textfield v-model="message" label="Pesan Undangan Ke Affiliator" placeholder="Masukkan pesan undangan"
           type="textarea" input-class="min-h-24" :max-height="200" class="mt-3">
           <template #label>
             <div class="flex items-center space-x-1 text-error">

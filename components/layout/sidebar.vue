@@ -48,7 +48,8 @@ export default {
 </script>
 
 <template>
-  <aside class="fixed top-0 bottom-0 w-[290px] bg-white transition-all overflow-y-auto overflow-x-hidden shadow-sidebar"
+  <aside
+    class="fixed top-0 bottom-0 w-[290px] bg-white transition-all overflow-y-auto overflow-x-hidden shadow-sidebar z-20"
     :class="{ 'w-[84px]': !isOpenMenu }">
     <div class="flex items-center justify-between gap-2 px-5 py-3 sticky top-0 bg-white"
       :class="{ 'gap-1 -mx-2': !isOpenMenu }">

@@ -107,8 +107,8 @@ export default {
       :input-class="{ 'pr-[180px] overflow-hidden overflow-ellipsis': multiple && selectedItems.length }"
       @click="toggleMenu" @click:icon="toggleMenu" />
 
-    <Button v-if="multiple && selectedItems.length" theme="primary-outline" class="absolute right-10 top-8 h-7"
-      @click.stop="handleReset">
+    <Button v-if="multiple && selectedItems.length" theme="primary-outline"
+      class="!p-1 lg:!py-2 lg:!px-4 absolute right-10 top-11 h-7" @click.stop="handleReset">
       Hapus Semua
     </Button>
 

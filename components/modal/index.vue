@@ -1,5 +1,10 @@
 <script>
+import Teleport from 'vue2-teleport'
+
 export default {
+  components: {
+    Teleport
+  },
   props: {
     title: {
       type: String,
@@ -45,24 +50,26 @@ export default {
 </script>
 
 <template>
-  <Transition name="modal">
-    <div v-if="isShow" class="modal__overlay" @click="onClose">
-      <div class="modal" :class="modalClass" @click.stop>
-        <h3 class="modal__title">{{ title || 'Title' }}</h3>
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="isShow" class="modal__overlay" @click="onClose">
+        <div class="modal" :class="modalClass" @click.stop>
+          <h3 class="modal__title">{{ title || 'Title' }}</h3>
 
-        <div class="modal__content">
-          <slot></slot>
-        </div>
+          <div class="modal__content">
+            <slot></slot>
+          </div>
 
-        <div class="modal__footer">
-          <slot name="footer">
-            <Button theme="primary-outline" @click="onClose" class="w-28">{{ cancelBtnText }}</Button>
-            <Button @click="$emit('confirm')" class="w-28">{{ confirmBtnText }}</Button>
-          </slot>
+          <div class="modal__footer">
+            <slot name="footer">
+              <Button theme="primary-outline" @click="onClose" class="w-28">{{ cancelBtnText }}</Button>
+              <Button @click="$emit('confirm')" class="w-28">{{ confirmBtnText }}</Button>
+            </slot>
+          </div>
         </div>
       </div>
-    </div>
-  </Transition>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped lang="postcss">

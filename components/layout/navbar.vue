@@ -67,10 +67,3 @@ export default {
     <AppSettingsDeleteShopeeSessionModal v-model="isShowDeleteShopeeSessionModal" />
   </nav>
 </template>
-
-<style scoped>
-nav::before {
-  @apply absolute -left-3 top-0 bottom-0 w-3 content-[''];
-  box-shadow: 8px 0 8px 0px #4338C91A;
-}
-</style>

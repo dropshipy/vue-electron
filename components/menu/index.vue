@@ -36,7 +36,7 @@ export default {
 </script>
 
 <template>
-  <div v-click-outside="handleClickOutside" class="absolute top-10 right-0 z-10">
+  <div v-click-outside="handleClickOutside" class="absolute top-10 right-0 z-[9]">
     <Transition name="menu">
       <div v-if="isShow" class="menu-content bg-white drop-shadow z-10 rounded-lg py-2 overflow-y-auto"
         :class="fullWidth ? 'w-full' : 'w-max'" :style="{ maxHeight: `${maxHeight}px` }">
