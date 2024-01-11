@@ -25,11 +25,6 @@ export const SIDEBAR_MENU = [
     icon: "sidebar/auto-chat-creator",
   },
   {
-    name: "Auto Chat Ulasan",
-    path: "/auto-chat-by-reviews",
-    icon: "sidebar/auto-chat-by-reviews",
-  },
-  {
     name: "Balas Ulasan Otomatis",
     path: "/auto-reply-reviews",
     icon: "sidebar/auto-reply-reviews",
@@ -48,6 +43,19 @@ export const SIDEBAR_MENU = [
         name: "Creator Shopee",
         path: "/database-creator/shopee",
         icon: "sidebar/database-creator/shopee",
+      },
+    ],
+  },
+  { name: "divider" },
+  {
+    name: "Adds On",
+    path: "/adds-on",
+    icon: "sidebar/adds-on",
+    children: [
+      {
+        name: "Auto Chat Ulasan",
+        path: "/adds-on/auto-chat-by-reviews",
+        icon: "sidebar/adds-on/auto-chat-by-reviews",
       },
     ],
   },
