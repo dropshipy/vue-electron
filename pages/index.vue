@@ -1,9 +1,10 @@
 <script>
 export default {
-  middleware({ redirect }) {
-    return redirect('/home')
+  middleware({ route, redirect }) {
+    return redirect({ path: '/home', query: { from_login: route.query.from_login } });
   }
 }
+
 </script>
 
 <template>

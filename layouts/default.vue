@@ -10,10 +10,15 @@ export default {
     if (userInfo) {
       this.$store.commit('user/setUserInfo', userInfo);
     } else {
-      // redirect to login page if user is not logged in
-      // this.$router.push('/login');
+      this.$router.push('/login');
     }
-
+  },
+  mounted() {
+    const userData = this.$store.getters['user/getUserInfo'];
+    if (this.$route.query.from_login) {
+      this.$snackbar.success(`Welcome, ${userData?.fullName}`)
+      this.$router.replace({ path: this.$route.path, query: {} });
+    }
   }
 }
 </script>

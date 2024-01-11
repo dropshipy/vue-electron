@@ -10,8 +10,13 @@ export default {
   computed: {
     buttonStyle() {
       if (this.theme === 'primary') {
+        if (this.$config.appName === 'shopee-power-tools') {
+          return {
+            background: 'linear-gradient(181deg, #EE3A31 -56.56%, #F47922 98.99%)'
+          }
+        }
         return {
-          background: 'linear-gradient(181deg, #EE3A31 -56.56%, #F47922 98.99%)'
+          background: 'linear-gradient(181deg, #FF6E79 -56.56%, #FF6E79 98.99%)'
         }
       }
       return {}

@@ -26,24 +26,26 @@ export default {
       if (status === 'register') return 'Belum aktif'
       if (status === 'inactive') return 'Tidak aktif'
     },
-    getSubscriptionInfo() {
-      window.electron.ipcRenderer.send("get-subscription-info");
+    async getSubscriptionInfo() {
+      try {
+        const resData = await window.electron.ipcRenderer.invoke("get-subscription-info");
+        if (resData) {
+          this.subscription = resData.data
+        }
+      } catch (error) {
+        console.error('Error getting subscription info:', error);
+      }
     },
     dateFormatter(date) {
       return formatDate(date)
     },
     currencyFormatter(amount) {
       return formatCurrency(amount)
-    }
+    },
   },
   mounted() {
     this.getSubscriptionInfo();
-
-    const subscriptionData = electronStore.get('data-subscription');
-    if (subscriptionData) {
-      this.subscription = subscriptionData.data
-    }
-  }
+  },
 }
 </script>
 

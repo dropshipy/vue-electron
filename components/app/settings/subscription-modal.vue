@@ -35,6 +35,7 @@ export default {
           password,
           subscription
         }
+        // TODO: Revisit
         electronStore.set("account-subscription", payload);
         this.$snackbar.success("Berhasil menyimpan info akun");
         this.isShow = false

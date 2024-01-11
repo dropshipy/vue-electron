@@ -22,6 +22,13 @@ export default {
           this.isShowDeleteShopeeSessionModal = true
           break;
       }
+    },
+    logout() {
+      localStorage.removeItem('user_info')
+      electronStore.delete("data-subscription")
+      setTimeout(() => {
+        this.$router.replace('/login')
+      }, 500);
     }
   }
 }
@@ -57,7 +64,7 @@ export default {
       </Menu>
     </Button>
 
-    <Button class="ml-4">
+    <Button class="ml-4" @click="logout">
       <span>Logout</span>
       <Icon name="logout" />
     </Button>

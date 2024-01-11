@@ -241,17 +241,24 @@ ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
   }
 });
 
-ipcMain.on("get-subscription-info", async () => {
-  const res = await axios.get(
-    `https://supportseller.com/api/shopee-subscriptions`,
-    {
-      headers: {
-        Cookie: store.get("cookies-spt"),
-      },
-    }
-  );
-  store.set("data-subscription", res.data);
+ipcMain.handle("get-subscription-info", async () => {
+  try {
+    const res = await axios.get(
+      `https://supportseller.com/api/shopee-subscriptions`,
+      {
+        headers: {
+          Cookie: store.get("cookies-spt"),
+        },
+      }
+    );
+    store.set("data-subscription", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching subscription info:", error);
+    throw error;
+  }
 });
+
 ipcMain.on("get-database-creator", async (event, data) => {
   try {
     const res = await axios.get(
