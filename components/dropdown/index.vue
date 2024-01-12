@@ -96,6 +96,15 @@ export default {
           this.internalValue = this.selectedItems[0]?.value || '';
         }
       }
+    },
+    value(val) {
+      let items = val
+
+      if (!this.multiple) {
+        items = [val]
+      }
+
+      this.selectedItems = this.options.filter(i => items.includes(i.value))
     }
   }
 }
@@ -104,7 +113,7 @@ export default {
 <template>
   <div class="relative">
     <Textfield :label="label" :placeholder="placeholder" readonly :value="valueText" icon="chv-down" :iconSize="20"
-      :input-class="{ 'pr-[180px] overflow-hidden overflow-ellipsis': multiple && selectedItems.length }"
+      :input-class="{ '!pr-[180px] overflow-hidden overflow-ellipsis': multiple && selectedItems.length }"
       @click="toggleMenu" @click:icon="toggleMenu" />
 
     <Button v-if="multiple && selectedItems.length" theme="primary-outline"
