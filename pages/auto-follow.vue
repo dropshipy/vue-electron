@@ -15,6 +15,12 @@ export default {
         window.electron.ipcRenderer.send("process-auto-follow", this.followCount)
       }
     }
+  },
+  mounted() {
+    const linkForAutoFollow = electronStore.get("link-auto-follow");
+    if (linkForAutoFollow) {
+      this.storeLink = linkForAutoFollow
+    }
   }
 }
 </script>

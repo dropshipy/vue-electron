@@ -20,6 +20,12 @@ export default {
         window.electron.ipcRenderer.send("process-auto-follow-by-reviews", payload)
       }
     }
+  },
+  mounted() {
+    const linkForAutoFollowByReviews = electronStore.get("link-auto-follow-by-reviews");
+    if (linkForAutoFollowByReviews) {
+      this.productLink = linkForAutoFollowByReviews
+    }
   }
 }
 </script>

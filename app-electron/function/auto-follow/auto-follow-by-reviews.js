@@ -43,7 +43,7 @@ async function runAutoFollowByReviews({ chromePath, data }) {
     await loginShopee(page, browser);
 
     page.on("response", async (response) => {
-      if (response.url().includes("/get_account_info")) {
+      if (response.url().includes("/get_payment_info")) {
         await page.waitForTimeout(2000);
         await page.waitForSelector(".page-product__shop");
         await page.evaluate(() => {
