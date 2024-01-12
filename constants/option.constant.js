@@ -81,3 +81,31 @@ export const GENDER_OPTIONS = [
   { label: "Perempuan", value: "Perempuan" },
   { label: "Laki-laki", value: "Laki-laki" },
 ];
+
+export const DB_CREATOR_TIKTOK_CATEGORY_OPTIONS = [
+  { label: "Kecantikan", value: "Kecantikan" },
+  { label: "Barang elektronik", value: "Barang elektronik" },
+  { label: "Fashion", value: "Fashion" },
+  { label: "Makanan", value: "Makanan" },
+  { label: "Rumah & Gaya Hidup", value: "Rumah & Gaya Hidup" },
+  { label: "Ibu dan Bayi", value: "Ibu dan Bayi" },
+  {
+    label: "Perawatan & Kesehatan Pribadi",
+    value: "Perawatan & Kesehatan Pribadi",
+  },
+];
+
+export const DB_CREATOR_TIKTOK_FOLLOWER_COUNT_OPTIONS = [
+  { label: "1K - 5K", value: "1000-5000" },
+  { label: "5K - 10K", value: "5000-10000" },
+  { label: "10K - 50K", value: "10000-50000" },
+  { label: "50K - 100K", value: "50000-100000" },
+  { label: "lebih dari 100K", value: "100000-" },
+];
+
+export const DB_CREATOR_TIKTOK_CREATOR_PER_PAGE_OPTIONS = [
+  { label: "10 Creator", value: 10 },
+  { label: "20 Creator", value: 20 },
+  { label: "50 Creator", value: 50 },
+  { label: "100 Creator", value: 100 },
+];

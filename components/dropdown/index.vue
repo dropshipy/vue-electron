@@ -20,12 +20,16 @@ export default {
       default: () => []
     },
     value: {
-      type: [Array, String],
+      type: [Array, String, Number],
       default: () => []
     },
     maxHeight: {
       type: Number,
       default: 180
+    },
+    showOptionAll: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -42,6 +46,7 @@ export default {
       },
       set(value) {
         this.$emit('input', value)
+        this.$emit('change', value)
       }
     },
     valueText() {
@@ -97,14 +102,17 @@ export default {
         }
       }
     },
-    value(val) {
-      let items = val
+    value: {
+      handler(val) {
+        let items = val
 
-      if (!this.multiple) {
-        items = [val]
-      }
+        if (!this.multiple) {
+          items = [val]
+        }
 
-      this.selectedItems = this.options.filter(i => items.includes(i.value))
+        this.selectedItems = this.options.filter(i => items.includes(i.value))
+      },
+      immediate: true
     }
   }
 }
@@ -122,14 +130,14 @@ export default {
     </Button>
 
     <Menu v-model="isShow" full-width class="absolute left-0 top-[110%]" :max-height="maxHeight">
-      <MenuItem class="justify-between" @click="handleClickOption(optionAll)">
+      <MenuItem v-if="showOptionAll" class="justify-between" @click="handleClickOption(optionAll)">
       <span>{{ optionAll.label }}</span>
       <input v-if="multiple" type="checkbox" class="accent-primary w-4 h-4" :value="isAllSelected"
         :checked="isAllSelected" />
       </MenuItem>
 
       <MenuItem v-for="item in options" :key="item.value" class="justify-between" @click="handleClickOption(item)">
-      <span>{{ item.label }}</span>
+      <span :class="{ 'text-primary': isItemChecked(item) }">{{ item.label }}</span>
       <input v-if="multiple" type="checkbox" class="accent-primary w-4 h-4" :value="isItemChecked(item)"
         :checked="isItemChecked(item)" />
       </MenuItem>

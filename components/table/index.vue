@@ -52,22 +52,25 @@ export default {
     },
     onChangePagination(page) {
       this.$emit('change:page', page)
+    },
+    getRowNumber(idx) {
+      return (this.pagination.currentPage - 1) * this.pagination.perPage + idx + 1
     }
   }
 }
 </script>
 
 <template>
-  <div class="bg-[#FBFBFD]">
+  <div>
     <div class="w-full overflow-x-auto overflow-y-hidden">
       <table class="border-collapse table-fixed bg-white min-w-full">
         <thead>
           <tr class="text-sm text-dark2 font-medium">
-            <th v-if="showRowNumber" class="py-3 px-1 w-8">
+            <th v-if="showRowNumber" class="py-3 px-2 text-left" style="min-width: 50px;">
               No
             </th>
 
-            <th v-for="(header, idx) in headers" :key="idx" class="py-3 px-1 select-none text-left"
+            <th v-for="(header, idx) in headers" :key="idx" class="py-3 px-2 select-none text-left"
               :style="getColumnWidth(header.width)">
               {{ header.label }}
             </th>
@@ -98,12 +101,12 @@ export default {
 
           <template v-else>
             <tr v-for="(row, rowIdx) in rows" :key="rowIdx" class="odd:bg-[#EB938F0D] odd:bg-opacity-5">
-              <td v-if="showRowNumber" class="text-gray-500 text-sm whitespace-nowrap px-1 py-[14px]">
-                {{ rowIdx + 1 }}
+              <td v-if="showRowNumber" class="text-gray-500 text-sm whitespace-nowrap px-2 py-[14px]">
+                {{ getRowNumber(rowIdx) }}
               </td>
 
               <td v-for="(col, colIdx) in headers" :key="colIdx"
-                class=" text-gray-500 text-sm px-1 py-[14px] whitespace-nowrap overflow-ellipsis overflow-hidden"
+                class=" text-gray-500 text-sm px-2 py-[14px] whitespace-nowrap overflow-ellipsis overflow-hidden"
                 :style="getColumnWidth(col.width)">
                 <slot :name="`col.${col.key}`" :row="row" :idx="rowIdx">
                   {{ row[col.key] || '-' }}
@@ -114,7 +117,7 @@ export default {
         </tbody>
       </table>
     </div>
-    <div v-if="showPagination && pagination.totalResults" class="flex justify-center p-2.5">
+    <div v-if="showPagination && pagination.totalResults" class="flex justify-center p-2.5 bg-[#FBFBFD]">
       <Pagination :pagination="pagination" :max-displayed-pages="5" @change="onChangePagination" />
     </div>
   </div>

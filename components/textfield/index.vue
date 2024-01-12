@@ -53,12 +53,13 @@ export default {
     </label>
     <div class="relative !text-[#2D2D2D]" @click.stop="$emit('click')">
       <textarea v-if="type === 'textarea'" :value="value" :type="type" :placeholder="placeholder"
-        @input="$emit('input', $event.target.value)" :id="id" class="input-field" :class="inputClass"
-        :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly">
+        @input="$emit('input', $event.target.value)" @change="$emit('change', $event.target.value)" :id="id"
+        class="input-field" :class="inputClass" :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly">
       </textarea>
 
       <input v-else :value="value" :type="type" :placeholder="placeholder" @input="$emit('input', $event.target.value)"
-        :id="id" class="input-field" :class="inputClass" :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly" />
+        @change="$emit('change', $event.target.value)" :id="id" class="input-field" :class="inputClass"
+        :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly" />
 
       <button v-if="icon"
         class="flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 text-[#A0A3BD]"
