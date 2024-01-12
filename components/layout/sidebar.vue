@@ -73,7 +73,7 @@ export default {
             </div>
 
             <button v-if="menu.children && isOpenMenu" class="dropdown-icon transition-all">
-              <Icon name="chv-down" />
+              <Icon name="chv-down" :size="16" />
             </button>
           </div>
 

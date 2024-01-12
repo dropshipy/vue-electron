@@ -112,7 +112,7 @@ export default {
 
 <template>
   <div class="relative">
-    <Textfield :label="label" :placeholder="placeholder" readonly :value="valueText" icon="chv-down" :iconSize="20"
+    <Textfield :label="label" :placeholder="placeholder" readonly :value="valueText" icon="chv-down" :iconSize="16"
       :input-class="{ '!pr-[180px] overflow-hidden overflow-ellipsis': multiple && selectedItems.length }"
       @click="toggleMenu" @click:icon="toggleMenu" />
 
