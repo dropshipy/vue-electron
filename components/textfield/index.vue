@@ -41,12 +41,6 @@ export default {
       type: [String, Array, Object],
       default: ''
     }
-  },
-  computed: {
-    elementTag() {
-      if (this.type === 'textarea') return 'textarea'
-      return 'input'
-    }
   }
 }
 </script>
@@ -58,10 +52,13 @@ export default {
       <slot name="label" />
     </label>
     <div class="relative !text-[#2D2D2D]" @click.stop="$emit('click')">
-      <component :is="elementTag" :value="value" :type="type" :placeholder="placeholder"
-        @input="$emit('input', $event.target.value)" :id="id"
-        class="border !border-[#A0A3BD] !border-opacity-40 focus:outline-none focus:ring-2 focus:ring-primary p-3 w-full rounded-[6px] text-base"
-        :class="inputClass" :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly" />
+      <textarea v-if="type === 'textarea'" :value="value" :type="type" :placeholder="placeholder"
+        @input="$emit('input', $event.target.value)" :id="id" class="input-field" :class="inputClass"
+        :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly">
+      </textarea>
+
+      <input v-else :value="value" :type="type" :placeholder="placeholder" @input="$emit('input', $event.target.value)"
+        :id="id" class="input-field" :class="inputClass" :style="{ maxHeight: `${maxHeight}px` }" :readonly="readonly" />
 
       <button v-if="icon"
         class="flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 text-[#A0A3BD]"
@@ -71,3 +68,9 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.input-field {
+  @apply border !border-[#A0A3BD] !border-opacity-40 focus:outline-none focus:ring-2 focus:ring-primary p-3 w-full rounded-[6px] text-base;
+}
+</style>
