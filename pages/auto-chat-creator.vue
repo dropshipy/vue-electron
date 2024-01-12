@@ -25,7 +25,6 @@ export default {
   },
   computed: {
     followerCountOptions() {
-      console.log('selectedSocialMedia', this.selectedSocialMedia)
       const differentOptions = ['Youtube', 'Shopee']
       if (differentOptions.includes(this.selectedSocialMedia)) {
         return FOLLOWER_COUNT_OPTIONS[this.selectedSocialMedia]
@@ -51,8 +50,6 @@ export default {
         replyMessage: this.message,
         category: this.selectedCategories,
       }
-
-      console.log('payload', payload)
 
       electronStore.set("selected-crawl-creator", payload);
       this.$snackbar.success("Berhasil menyimpan konfigurasi")
