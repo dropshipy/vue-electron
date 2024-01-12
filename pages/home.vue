@@ -34,6 +34,7 @@ export default {
           this.subscription = resData.data
         }
       } catch (error) {
+        this.$snackbar.error('Gagal mengambil informasi subscription');
         console.error('Error getting subscription info:', error);
       }
     },
