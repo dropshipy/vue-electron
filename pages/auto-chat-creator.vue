@@ -13,15 +13,24 @@ export default {
       selectedIteration: 1,
       selectedCategories: [],
       categoryOptions: CATEGORY_OPTIONS,
-      selectedSocialMedia: [],
+      selectedSocialMedia: null,
       socialMediaOptions: SOCIAL_MEDIA_OPTIONS,
       selectedFollowerCount: null,
-      followerCountOptions: FOLLOWER_COUNT_OPTIONS,
       selectedFollowerAge: null,
       followerAgeOptions: FOLLOWER_AGE_OPTIONS,
       selectedGender: null,
       genderOptions: GENDER_OPTIONS,
       message: ''
+    }
+  },
+  computed: {
+    followerCountOptions() {
+      console.log('selectedSocialMedia', this.selectedSocialMedia)
+      const differentOptions = ['Youtube', 'Shopee']
+      if (differentOptions.includes(this.selectedSocialMedia)) {
+        return FOLLOWER_COUNT_OPTIONS[this.selectedSocialMedia]
+      }
+      return FOLLOWER_COUNT_OPTIONS['Default']
     }
   },
   methods: {
@@ -40,7 +49,7 @@ export default {
         followerAge: this.selectedFollowerAge,
         followerGender: this.selectedGender,
         replyMessage: this.message,
-        loginMethod: "qr",
+        category: this.selectedCategories,
       }
 
       console.log('payload', payload)
@@ -67,6 +76,7 @@ export default {
       this.selectedFollowerAge = dataSelectedCrawlCreator.followerAge
       this.selectedGender = dataSelectedCrawlCreator.followerGender
       this.message = dataSelectedCrawlCreator.replyMessage
+      this.selectedCategories = dataSelectedCrawlCreator.category
     }
   }
 }
