@@ -1,6 +1,7 @@
 <script>
 import formatDate from '~/utils/format-date'
 import formatCurrency from '~/utils/format-currency'
+import copyToClipboard from '~/utils/copy-to-clipboard'
 
 export default {
   data() {
@@ -42,6 +43,11 @@ export default {
     currencyFormatter(amount) {
       return formatCurrency(amount)
     },
+    copySubscriptionCode(code) {
+      copyToClipboard(code, () => {
+        this.$snackbar.success('Berhasil menyalin kode subscription')
+      })
+    }
   },
   mounted() {
     this.getSubscriptionInfo();
@@ -75,7 +81,8 @@ export default {
     </Card>
 
     <Card v-else primary class="mt-3 w-full max-w-[530px]">
-      <div class="flex items-center justify-center gap-1 bg-[#FEB186] text-white p-3">
+      <div class="flex items-center justify-center gap-1 bg-[#FEB186] text-white p-3 cursor-pointer"
+        @click="copySubscriptionCode(subscription.code)">
         <Icon name="transaction" />
         <p class="font-bold">{{ subscription.code }}</p>
       </div>
