@@ -49,12 +49,12 @@ export const SOCIAL_MEDIA_OPTIONS = [
 
 export const FOLLOWER_COUNT_OPTIONS = [
   { label: "≥ 1RB", value: "1RB" },
-  { label: "≥ 5RB", value: "5RB" },
+  // { label: "≥ 5RB", value: "5RB" },
   { label: "≥ 10RB", value: "10RB" },
   { label: "≥ 50RB", value: "50RB" },
-  { label: "≥ 100RB", value: "100RB" },
-  { label: "≥ 500RB", value: "500RB" },
-  { label: "≥ 5JT", value: "5JT" },
+  // { label: "≥ 100RB", value: "100RB" },
+  // { label: "≥ 500RB", value: "500RB" },
+  // { label: "≥ 5JT", value: "5JT" },
 ];
 
 export const FOLLOWER_AGE_OPTIONS = [
