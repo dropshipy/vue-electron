@@ -259,7 +259,7 @@ ipcMain.handle("get-subscription-info", async () => {
   }
 });
 
-ipcMain.on("get-database-creator", async (event, data) => {
+ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   try {
     const res = await axios.get(
       `https://supportseller.com/api/shopee/shopee-creators`,
@@ -270,7 +270,27 @@ ipcMain.on("get-database-creator", async (event, data) => {
         params: data,
       }
     );
-    store.set("database-creator", res.data);
+    store.set("database-creator-shopee", res.data);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
+});
+
+ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
+  try {
+    const res = await axios.get(
+      `https://supportseller.com/api/tikblast-creators/app`,
+      {
+        headers: {
+          Cookie: store.get("cookies-spt"),
+        },
+        params: data,
+      }
+    );
+    store.set("database-creator-tiktok", res.data);
+    return res.data;
   } catch (error) {
     console.log(error);
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });

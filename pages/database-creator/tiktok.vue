@@ -96,6 +96,10 @@ export default {
           '_blank'
         )
       }
+    },
+    onSearch() {
+      this.pagination.currentPage = 1
+      this.getDatabaseCreator()
     }
   },
   mounted() {
@@ -122,8 +126,7 @@ export default {
         <div class="flex items-center gap-2">
           <Dropdown v-model="pagination.perPage" :show-option-all="false" placeholder="Pilih jumlah creator"
             :options="creatorPerPageOptions" @change="getDatabaseCreator" />
-          <Textfield v-model="search" placeholder="Search here..." icon="search" :icon-size="24"
-            @change="getDatabaseCreator" />
+          <Textfield v-model="search" placeholder="Search here..." icon="search" :icon-size="24" @change="onSearch" />
         </div>
       </div>
     </div>
