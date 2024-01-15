@@ -128,7 +128,7 @@ export default {
 
 <template>
   <Card class="!p-0">
-    <div class="p-5 bg-[#FBFBFD]">
+    <div class="p-5 bg-[#FBFBFD] rounded-t-[10px]">
       <div class="flex items-center gap-2">
         <Icon name="sidebar/database-creator/shopee" class="text-primary" />
         <h3 class="text-xl text-dark2 font-bold">Database Creator Shopee</h3>
@@ -143,7 +143,7 @@ export default {
     </div>
 
     <Table :rows="rows" :headers="headers" :pagination="pagination" :loading="isLoading" show-row-number
-      @change:page="changePage">
+      @change:page="changePage" class="rounded-b-[10px] overflow-hidden">
       <template #col.relatedCategoris="{ row }">
         {{ (row.relatedCategoris || []).join(', ') }}
       </template>

@@ -10,7 +10,7 @@ export default {
 </script>
 
 <template>
-  <div class="rounded-[10px] overflow-hidden" :class="{
+  <div class="rounded-[10px]" :class="{
     'shadow-card bg-white p-5 ': !primary,
     'bg-[#FFF8F3] border border-[#F9EDE7]': primary
   }">
