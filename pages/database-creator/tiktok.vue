@@ -80,7 +80,7 @@ export default {
         <h3 class="text-xl text-dark2 font-bold">Database Creator Tiktok</h3>
       </div>
 
-      <div class="flex items-center justify-between flex-wrap gap-2 mt-5">
+      <div class="flex items-center justify-between gap-2 mt-5">
         <div class="flex items-center gap-2">
           <Dropdown v-model="filterCategory" placeholder="Pilih kategori" :options="categoryOptions"
             @change="getDatabaseCreator" />
@@ -98,4 +98,5 @@ export default {
 
     <Table :rows="rows" :headers="headers" :pagination="pagination" :loading="isLoading" show-row-number
       @change:page="changePage" />
-</Card></template>
+  </Card>
+</template>
