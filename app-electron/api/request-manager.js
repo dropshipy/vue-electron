@@ -1,7 +1,9 @@
+require("dotenv").config({ path: __dirname + "/../.env" });
+
 const axios = require("axios");
 const { devLog } = require("../helpers/utils");
 
-const baseUrlPro = "https://supportseller.com/api";
+const baseUrlPro = process.env.API_BASE_URL;
 async function postData(endpoint = "", data = {}, options = {}) {
   try {
     const url = baseUrlPro + endpoint;

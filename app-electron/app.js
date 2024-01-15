@@ -1,3 +1,5 @@
+require("dotenv").config({ path: __dirname + "/../.env" });
+
 const { app, BrowserWindow, ipcMain } = require("electron");
 const puppeteer = require("puppeteer");
 const path = require("node:path");
@@ -11,7 +13,6 @@ const express = require("express");
 const {
   authenticateUserShopeeTools,
 } = require("./function/browser/authenticate-shopee-tools");
-require("dotenv").config();
 const ElectronStore = require("electron-store");
 const { runAutoFollow } = require("./function/auto-follow/auto-follow");
 const {
@@ -55,7 +56,7 @@ let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
 const store = new ElectronStore();
-const baseUrlProd = "https://supportseller.com/api";
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -244,14 +245,18 @@ ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
 ipcMain.handle("get-subscription-info", async () => {
   try {
     const res = await axios.get(
-      `https://supportseller.com/api/shopee-subscriptions`,
+      `${process.env.API_BASE_URL}/shopee-subscriptions`,
       {
         headers: {
           Cookie: store.get("cookies-spt"),
         },
       }
     );
-    store.set("data-subscription", res.data);
+    const dataSubscription = store.get("account-subscription") || {};
+    store.set("account-subscription", {
+      ...dataSubscription,
+      subscription: res.data?.data?.code,
+    });
     return res.data;
   } catch (error) {
     console.error("Error fetching subscription info:", error);
@@ -262,7 +267,7 @@ ipcMain.handle("get-subscription-info", async () => {
 ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   try {
     const res = await axios.get(
-      `https://supportseller.com/api/shopee/shopee-creators`,
+      `${process.env.API_BASE_URL}/shopee/shopee-creators`,
       {
         headers: {
           Cookie: store.get("cookies-spt"),
@@ -281,7 +286,7 @@ ipcMain.handle("get-database-creator-shopee", async (event, data) => {
 ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
   try {
     const res = await axios.get(
-      `https://supportseller.com/api/tikblast-creators/app`,
+      `${process.env.API_BASE_URL}/tikblast-creators/app`,
       {
         headers: {
           Cookie: store.get("cookies-spt"),

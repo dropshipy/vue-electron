@@ -35,7 +35,6 @@ export default {
       email: "",
       password: "",
       isShowPassword: false,
-      baseUrl: process.env.NUXT_ENV_API_BASE_URL,
     }
   },
   methods: {
@@ -55,13 +54,19 @@ export default {
           payload
         );
         const response = await this.$axios.post(
-          `${this.baseUrl}/shopee-users/authenticate`,
+          `${this.$config.apiBaseUrl}/shopee-users/authenticate`,
           payload
         );
         if (response?.status === 200) {
           const userData = response.data.user;
 
           localStorage.setItem("user_info", JSON.stringify(userData));
+
+          const accountSubscription = electronStore.get("account-subscription") || {};
+          electronStore.set("account-subscription", {
+            ...accountSubscription,
+            ...payload
+          });
 
           setTimeout(() => {
             this.$router.push('/?from_login=true')

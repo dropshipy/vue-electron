@@ -4,14 +4,12 @@ import formatCurrency from '~/utils/format-currency'
 import copyToClipboard from '~/utils/copy-to-clipboard'
 
 export default {
-  data() {
-    return {
-      subscription: null,
-    }
-  },
   computed: {
     userInfo() {
       return this.$store.getters['user/getUserInfo'] || {}
+    },
+    subscription() {
+      return this.$store.getters['subscription/getSubscriptionInfo']
     },
     dataProfile() {
       return [
@@ -27,17 +25,6 @@ export default {
       if (status === 'register') return 'Belum aktif'
       if (status === 'inactive') return 'Tidak aktif'
     },
-    async getSubscriptionInfo() {
-      try {
-        const resData = await window.electron.ipcRenderer.invoke("get-subscription-info");
-        if (resData) {
-          this.subscription = resData.data
-        }
-      } catch (error) {
-        this.$snackbar.error('Gagal mengambil informasi subscription');
-        console.error('Error getting subscription info:', error);
-      }
-    },
     dateFormatter(date) {
       return formatDate(date)
     },
@@ -49,10 +36,7 @@ export default {
         this.$snackbar.success('Berhasil menyalin kode subscription')
       })
     }
-  },
-  mounted() {
-    this.getSubscriptionInfo();
-  },
+  }
 }
 </script>
 

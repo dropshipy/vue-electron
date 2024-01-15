@@ -1,3 +1,5 @@
+require("dotenv").config({ path: __dirname + "/../.env" });
+
 const fs = require("fs");
 const path = require("node:path");
 const axios = require("axios");
@@ -15,7 +17,7 @@ function authenticateUser(payload) {
   return new Promise((resolve, reject) => {
     // Your authentication logic here, for example using axios
     axios
-      .post(`https://supportseller.com/api/users/authenticate`, payload)
+      .post(`${process.env.API_BASE_URL}/users/authenticate`, payload)
       .then((response) => {
         console.log(response);
         // Assuming the authentication endpoint returns a 'Set-Cookie' header

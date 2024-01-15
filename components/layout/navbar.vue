@@ -25,7 +25,7 @@ export default {
     },
     logout() {
       localStorage.removeItem('user_info')
-      electronStore.delete("data-subscription")
+      electronStore.delete("account-subscription")
       setTimeout(() => {
         this.$router.replace('/login')
       }, 500);
@@ -41,7 +41,7 @@ export default {
       <span>Settings</span>
 
       <Menu v-model="isOpenSettings">
-        <MenuItem @click="onClickMenuItem('spt-account')">
+        <MenuItem v-if="!$config.hideSettingSpt" @click="onClickMenuItem('spt-account')">
         <Icon name="profile" class="text-primary" />
         <p class="text-sm whitespace-nowrap leading-normal">
           Akun SPT

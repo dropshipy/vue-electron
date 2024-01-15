@@ -62,34 +62,36 @@ export default {
 
     <div class="mt-7 px-5 py-3">
       <NuxtLink v-for="(menu, idx) in  sidebarMenu " :key="idx" class="cursor-pointer" :to="menu.path || ''">
-        <template v-if="menu.name !== 'divider'">
-          <div class="menu-item flex items-center justify-between rounded-lg w-full"
-            :class="{ 'p-3': isOpenMenu, 'px-2 py-3 justify-center': !isOpenMenu }">
-            <div class="flex items-center space-x-2">
-              <Icon :name="menu.icon" class="text-primary" />
-              <span v-if="isOpenMenu" class="menu-item__text">
-                {{ menu.name }}
-              </span>
+        <template v-if="typeof menu.isShown === 'function' ? menu.isShown($config) : true">
+          <template v-if="menu.name !== 'divider'">
+            <div class="menu-item flex items-center justify-between rounded-lg w-full"
+              :class="{ 'p-3': isOpenMenu, 'px-2 py-3 justify-center': !isOpenMenu }">
+              <div class="flex items-center space-x-2">
+                <Icon :name="menu.icon" class="text-primary" />
+                <span v-if="isOpenMenu" class="menu-item__text">
+                  {{ menu.name }}
+                </span>
+              </div>
+
+              <button v-if="menu.children && isOpenMenu" class="dropdown-icon transition-all">
+                <Icon name="chv-down" :size="16" />
+              </button>
             </div>
 
-            <button v-if="menu.children && isOpenMenu" class="dropdown-icon transition-all">
-              <Icon name="chv-down" :size="16" />
-            </button>
-          </div>
+            <div v-if="menu.children && isMenuActive(menu)">
+              <NuxtLink v-for="( submenu, submenuIdx ) in  menu.children " :key="submenuIdx" :to="submenu.path"
+                class="submenu-item flex items-center space-x-4 rounded-lg"
+                :class="{ 'ml-5 p-3': isOpenMenu, 'px-2 py-3 justify-center': !isOpenMenu }">
+                <Icon :name="submenu.icon" class="text-primary" />
+                <span v-if="isOpenMenu" class="submenu-item__text">
+                  {{ submenu.name }}
+                </span>
+              </NuxtLink>
+            </div>
+          </template>
 
-          <div v-if="menu.children && isMenuActive(menu)">
-            <NuxtLink v-for="( submenu, submenuIdx ) in  menu.children " :key="submenuIdx" :to="submenu.path"
-              class="submenu-item flex items-center space-x-4 rounded-lg"
-              :class="{ 'ml-5 p-3': isOpenMenu, 'px-2 py-3 justify-center': !isOpenMenu }">
-              <Icon :name="submenu.icon" class="text-primary" />
-              <span v-if="isOpenMenu" class="submenu-item__text">
-                {{ submenu.name }}
-              </span>
-            </NuxtLink>
-          </div>
+          <hr v-else class="mt-6 mb-3 border-gray-200" />
         </template>
-
-        <hr v-else class="mt-6 mb-3 border-gray-200" />
       </NuxtLink>
     </div>
   </aside>

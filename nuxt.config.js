@@ -1,9 +1,6 @@
 require("dotenv").config();
 
 export default {
-  env: {
-    apiBaseUrl: process.env.NUXT_ENV_API_BASE_URL,
-  },
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
@@ -53,8 +50,11 @@ export default {
   ],
 
   publicRuntimeConfig: {
+    apiBaseUrl: process.env.API_BASE_URL,
     // shopee-power-tools || support-seller
     appName: process.env.APP_NAME || "shopee-power-tools",
+    hideSettingSpt: process.env.HIDE_SETTING_SPT === "true",
+    hideAddsOn: process.env.HIDE_ADDS_ON === "true",
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

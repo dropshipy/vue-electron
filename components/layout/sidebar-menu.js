@@ -46,11 +46,15 @@ export const SIDEBAR_MENU = [
       },
     ],
   },
-  { name: "divider" },
+  {
+    name: "divider",
+    isShown: ($config) => !$config.hideAddsOn,
+  },
   {
     name: "Adds On",
     path: "/adds-on",
     icon: "sidebar/adds-on",
+    isShown: ($config) => !$config.hideAddsOn,
     children: [
       {
         name: "Auto Chat Ulasan",
