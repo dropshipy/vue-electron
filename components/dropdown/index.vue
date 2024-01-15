@@ -46,7 +46,6 @@ export default {
       },
       set(value) {
         this.$emit('input', value)
-        this.$emit('change', value)
       }
     },
     valueText() {
@@ -103,7 +102,7 @@ export default {
       }
     },
     value: {
-      handler(val) {
+      handler(val, prevVal) {
         let items = val
 
         if (!this.multiple) {
@@ -111,6 +110,10 @@ export default {
         }
 
         this.selectedItems = this.options.filter(i => items.includes(i.value))
+
+        if (val !== prevVal) {
+          this.$emit('change', val)
+        }
       },
       immediate: true
     }
