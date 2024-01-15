@@ -47,8 +47,8 @@ export default {
         const payload = {
           page: this.pagination.currentPage,
           limit: this.pagination.perPage,
-          category: this.filterCategory,
-          followerCount: this.filterFollowerCount,
+          category: this.filterCategory === 'Semua' ? '' : this.filterCategory,
+          followerCount: this.filterFollowerCount === 'Semua' ? '' : this.filterFollowerCount,
           search: this.search,
         }
 
