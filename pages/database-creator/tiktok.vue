@@ -4,6 +4,11 @@ import {
   DB_CREATOR_TIKTOK_CATEGORY_OPTIONS,
   DB_CREATOR_TIKTOK_FOLLOWER_COUNT_OPTIONS
 } from '~/constants/option.constant'
+import {
+  convertToCompactFormat,
+  convertToFixedNumber,
+  convertToWhatsappNumber
+} from '~/utils/format-number'
 
 export default {
   data() {
@@ -64,6 +69,33 @@ export default {
     changePage(pageNumber) {
       this.pagination.currentPage = pageNumber
       this.getDatabaseCreator()
+    },
+    formatFollowerCount(followerCount) {
+      return convertToCompactFormat(followerCount)
+    },
+    formatCreatorScore(creatorScore) {
+      return convertToFixedNumber(creatorScore, 1)
+    },
+    formatToWhatsappNumber(phoneNumber) {
+      return convertToWhatsappNumber(phoneNumber)
+    },
+    sendWhatsapp(phoneNumber) {
+      if (phoneNumber) {
+        window.open(
+          `https://api.whatsapp.com/send?phone=${this.formatToWhatsappNumber(
+            phoneNumber
+          )}&text=`,
+          '_blank'
+        )
+      }
+    },
+    sendEmail(emailAddress) {
+      if (emailAddress) {
+        window.open(
+          `mailto:${emailAddress}?subject=Undangan Afiliasi Shopee&body=`,
+          '_blank'
+        )
+      }
     }
   },
   mounted() {
@@ -97,6 +129,40 @@ export default {
     </div>
 
     <Table :rows="rows" :headers="headers" :pagination="pagination" :loading="isLoading" show-row-number
-      @change:page="changePage" />
+      @change:page="changePage">
+      <template #col.followerCount="{ row }">
+        <div class="flex items-center gap-1">
+          <img src="~/assets/icons/people-filled.svg" alt="followers" class="w-4 h-4" />
+          <span>
+            {{ formatFollowerCount(row.followerCount || 0) }}
+          </span>
+        </div>
+      </template>
+
+      <template #col.creatorScore="{ row }">
+        <div class="flex items-center gap-1">
+          <img src="~/assets/icons/star-filled.svg" alt="score" class="w-4 h-4" />
+          <span>
+            {{ formatCreatorScore(row.creatorScore || 0) }}
+          </span>
+        </div>
+      </template>
+
+      <template #col.action="{ row }">
+        <div class="flex items-center gap-1">
+          <button @click="sendWhatsapp(row.whatsapp)"
+            :class="row.whatsapp ? 'text-primary cursor-pointer' : 'text-gray-400 pointer-events-none'">
+            <Icon name="whatsapp" />
+          </button>
+
+          <div class="w-[0.5px] h-5 bg-primary bg-opacity-30"></div>
+
+          <button @click="sendEmail(row.email)"
+            :class="row.email ? 'text-primary cursor-pointer' : 'text-gray-400 pointer-events-none'">
+            <Icon name="email" :size="22" />
+          </button>
+        </div>
+      </template>
+    </Table>
   </Card>
 </template>
