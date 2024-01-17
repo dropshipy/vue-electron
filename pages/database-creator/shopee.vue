@@ -62,10 +62,9 @@ export default {
           const urlSosmed = JSON.parse(url)
           const sanitizedUrls = []
           urlSosmed.forEach((val) => {
-            let sosmed = ''
             if (val.website_url) {
-              ; (sosmed = val.website_url.replace(/^\"|\"$/g, '')),
-                sanitizedUrls.push(sosmed)
+              const sosmed = val.website_url.replace(/^\"|\"$/g, '');
+              sanitizedUrls.push(sosmed);
             }
           })
           const link = sanitizedUrls.map(
@@ -82,17 +81,9 @@ export default {
       }
     },
     getWebsiteName(url) {
-      const withoutProtocol = url.replace(/^https?:\/\//, '') // Remove protocol
-      const withoutWWW = withoutProtocol.replace(/^www\./, '') // Remove www
-      const withoutSubdomain = withoutWWW.replace(/vt\.tiktok\.com/g, 'tiktok') // Replace vt.tiktok.com with tiktok
-
-      const match = withoutSubdomain.match(/^(.*?)\//)
-      let platformName = match ? match[1] : url
-
-      // Remove .com from the platform name
-      platformName = platformName.replace(/\.com$/, '')
-
-      return platformName
+      const domainRegex = /(?:https?:\/\/)?(?:[a-zA-Z]+\.)?([^./]+)\./;
+      const matches = url.match(domainRegex);
+      return matches ? matches[1] : null;
     },
     formatFollowerCount(followerCount) {
       return convertToCompactFormat(followerCount)
