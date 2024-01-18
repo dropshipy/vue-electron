@@ -109,7 +109,7 @@ export default {
           items = [val]
         }
 
-        this.selectedItems = this.options.filter(i => items.includes(i.value))
+        this.selectedItems = [this.optionAll, ...this.options].filter(i => items.includes(i.value))
 
         if (val !== prevVal) {
           this.$emit('change', val)
