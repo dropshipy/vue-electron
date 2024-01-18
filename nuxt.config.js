@@ -50,9 +50,11 @@ export default {
   ],
 
   publicRuntimeConfig: {
-    apiBaseUrl: process.env.API_BASE_URL,
-    // shopee-power-tools || support-seller
-    appName: process.env.APP_NAME || "shopee-power-tools",
+    apiBaseUrl:
+      process.env.APP_NAME === "tiksender"
+        ? process.env.API_BASE_URL_TIKSENDER
+        : process.env.API_BASE_URL_SUPPORT_SELLER,
+    appName: process.env.APP_NAME || "tiksender",
     hideSettingSpt: process.env.HIDE_SETTING_SPT === "true",
     hideAddsOn: process.env.HIDE_ADDS_ON === "true",
   },

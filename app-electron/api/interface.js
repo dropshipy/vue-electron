@@ -30,7 +30,7 @@ const postAddCreator = async (data, options) => {
 };
 const authenticateBot = async (data, options) => {
   const response = await postData(
-    "/shopee-users/authenticate-bot",
+    "/users/authenticate-bot-shopee",
     data,
     options
   );

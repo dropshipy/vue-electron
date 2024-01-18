@@ -21,6 +21,7 @@ const {
 const {
   runAutoChatByReviews,
 } = require("./function/auto-chat/auto-chat-by-reviews");
+const { getApiBaseUrl } = require("./helpers/api-url");
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -56,6 +57,8 @@ let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
 const store = new ElectronStore();
+
+const BASE_URL = getApiBaseUrl();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -244,14 +247,11 @@ ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
 
 ipcMain.handle("get-subscription-info", async () => {
   try {
-    const res = await axios.get(
-      `${process.env.API_BASE_URL}/shopee-subscriptions`,
-      {
-        headers: {
-          Cookie: store.get("cookies-spt"),
-        },
-      }
-    );
+    const res = await axios.get(`${BASE_URL}/shopee-subscriptions`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+    });
     const dataSubscription = store.get("account-subscription") || {};
     store.set("account-subscription", {
       ...dataSubscription,
@@ -266,15 +266,12 @@ ipcMain.handle("get-subscription-info", async () => {
 
 ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   try {
-    const res = await axios.get(
-      `${process.env.API_BASE_URL}/shopee/shopee-creators`,
-      {
-        headers: {
-          Cookie: store.get("cookies-spt"),
-        },
-        params: data,
-      }
-    );
+    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: data,
+    });
     store.set("database-creator-shopee", res.data);
     return res.data;
   } catch (error) {
@@ -285,15 +282,12 @@ ipcMain.handle("get-database-creator-shopee", async (event, data) => {
 
 ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
   try {
-    const res = await axios.get(
-      `${process.env.API_BASE_URL}/tikblast-creators/app`,
-      {
-        headers: {
-          Cookie: store.get("cookies-spt"),
-        },
-        params: data,
-      }
-    );
+    const res = await axios.get(`${BASE_URL}/tikblast-creators/app`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: data,
+    });
     store.set("database-creator-tiktok", res.data);
     return res.data;
   } catch (error) {

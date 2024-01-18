@@ -1,12 +1,13 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const axios = require("axios");
-const { devLog } = require("../helpers/utils");
+const { getApiBaseUrl } = require("../helpers/api-url");
 
-const baseUrlPro = process.env.API_BASE_URL;
+const BASE_URL = getApiBaseUrl();
+
 async function postData(endpoint = "", data = {}, options = {}) {
   try {
-    const url = baseUrlPro + endpoint;
+    const url = BASE_URL + endpoint;
     const response = await axios.post(url, data, options);
     return response;
   } catch (error) {
@@ -18,7 +19,7 @@ async function postData(endpoint = "", data = {}, options = {}) {
 
 async function getData(endpoint = "", options = {}, Honeybadger) {
   try {
-    const url = baseUrlPro + endpoint;
+    const url = BASE_URL + endpoint;
     const response = await axios.get(url, options);
     return response;
   } catch (error) {
@@ -28,7 +29,7 @@ async function getData(endpoint = "", options = {}, Honeybadger) {
 
 async function patchData(endpoint = "", data = {}, options = {}, Honeybadger) {
   try {
-    const url = baseUrlPro + endpoint;
+    const url = BASE_URL + endpoint;
     const response = await axios.patch(url, data, options);
 
     return response;
