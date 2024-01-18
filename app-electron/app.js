@@ -266,7 +266,7 @@ ipcMain.handle("get-subscription-info", async () => {
 
 ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   try {
-    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators`, {
+    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators/app`, {
       headers: {
         Cookie: store.get("cookies-spt"),
       },

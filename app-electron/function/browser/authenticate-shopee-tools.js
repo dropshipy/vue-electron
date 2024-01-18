@@ -2,7 +2,7 @@ require("dotenv").config({ path: __dirname + "/../.env" });
 
 const axios = require("axios");
 const ElectronStore = require("electron-store");
-const { getApiBaseUrl } = require("~/app-electron/helpers/api-url");
+const { getApiBaseUrl } = require("../../helpers/api-url");
 const store = new ElectronStore();
 
 const BASE_URL = getApiBaseUrl();
@@ -12,7 +12,7 @@ function handleCookies(payload) {
   return new Promise((resolve, reject) => {
     // Your authentication logic here, for example using axios
     axios
-      .post(`${BASE_URL}/shopee-users/authenticate`, payload)
+      .post(`${BASE_URL}/users/authenticate`, payload)
       .then((response) => {
         // Assuming the authentication endpoint returns a 'Set-Cookie' header
         const setCookieHeader = response.headers["set-cookie"];

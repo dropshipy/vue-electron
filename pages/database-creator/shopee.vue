@@ -1,6 +1,7 @@
 <script>
 import { CATEGORY_OPTIONS } from '~/constants/option.constant'
 import { convertToCompactFormat } from '~/utils/format-number'
+import formatCurrency from '~/utils/format-currency'
 
 export default {
   data() {
@@ -13,10 +14,10 @@ export default {
         { key: 'relatedCategoris', label: 'Kategori Kreator', width: 220 },
         { key: 'socialMedias', label: 'Sosial Media', width: 150 },
         { key: 'totalFollower', label: 'Jumlah Follower', width: 150 },
-        { key: 'x', label: 'Produk Terjual', width: 150 },
+        { key: 'soldProductCount', label: 'Produk Terjual', width: 150 },
         { key: 'orderRange', label: 'Pesanan', width: 150 },
-        { key: 'x', label: 'Penjualan', width: 150 },
-        { key: 'x', label: 'Jenis Kelamin Audiens', width: 180 },
+        { key: 'saleCount', label: 'Penjualan', width: 150 },
+        { key: 'audience', label: 'Jenis Kelamin Audiens', width: 200 },
       ],
       pagination: {
         currentPage: 1,
@@ -88,24 +89,29 @@ export default {
       const matches = url.match(domainRegex);
       return matches ? matches[1] : null;
     },
-    formatFollowerCount(followerCount) {
-      return convertToCompactFormat(followerCount)
-    },
-    formatOrderRange(orderRange) {
-      if (!Array.isArray(orderRange) || orderRange.length !== 2) {
-        return 'Invalid Input';
+    convertToCompactFormat,
+    formatCurrency,
+    formatRangeValue(range, valueType = 'number') {
+      if (!Array.isArray(range) || range.length !== 2) {
+        return '-';
       }
 
-      const [lower, upper] = orderRange;
+      let formatter = convertToCompactFormat;
+
+      if (valueType === 'currency') {
+        formatter = formatCurrency;
+      }
+
+      const [lower, upper] = range;
 
       if (lower !== "-1" && upper !== "-1") {
-        return `${lower}-${upper}`;
+        return `${formatter(lower)}-${formatter(upper)}`;
       }
       if (lower !== "-1") {
-        return `>${lower}`;
+        return `>${formatter(lower)}`;
       }
       if (upper !== "-1") {
-        return `<${upper}`;
+        return `<${formatter(upper)}`;
       }
       return 'Invalid Range';
     },
@@ -147,11 +153,25 @@ export default {
       </template>
 
       <template #col.totalFollower="{ row }">
-        {{ formatFollowerCount(row.totalFollower || 0) }}
+        {{ convertToCompactFormat(row.totalFollower || 0) }}
       </template>
 
       <template #col.orderRange="{ row }">
-        {{ formatOrderRange(row.orderRange) }}
+        {{ formatRangeValue(row.orderRange) }}
+      </template>
+
+      <template #col.soldProductCount="{ row }">
+        {{ formatRangeValue(row.soldProductCount) }}
+      </template>
+
+      <template #col.saleCount="{ row }">
+        {{ formatRangeValue(row.saleCount, 'currency') }}
+      </template>
+
+      <template #col.audience="{ row }">
+        <div class="flex items-center gap-1">
+          <!-- TODO: audience -->
+        </div>
       </template>
     </Table>
   </Card>

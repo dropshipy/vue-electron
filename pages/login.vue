@@ -54,7 +54,7 @@ export default {
           payload
         );
         const response = await this.$axios.post(
-          `${this.$config.apiBaseUrl}/shopee-users/authenticate`,
+          `${this.$config.apiBaseUrl}/users/authenticate`,
           payload
         );
         if (response?.status === 200) {

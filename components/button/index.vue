@@ -10,7 +10,7 @@ export default {
   computed: {
     buttonStyle() {
       if (this.theme === 'primary') {
-        if (this.$config.appName === 'shopee-power-tools') {
+        if (this.$config.appName === 'tiksender') {
           return {
             background: 'linear-gradient(181deg, #EE3A31 -56.56%, #F47922 98.99%)'
           }
