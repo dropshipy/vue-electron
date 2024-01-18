@@ -13,7 +13,10 @@ export default {
         { key: 'relatedCategoris', label: 'Kategori Kreator', width: 220 },
         { key: 'socialMedias', label: 'Sosial Media', width: 150 },
         { key: 'totalFollower', label: 'Jumlah Follower', width: 150 },
+        { key: 'x', label: 'Produk Terjual', width: 150 },
         { key: 'orderRange', label: 'Pesanan', width: 150 },
+        { key: 'x', label: 'Penjualan', width: 150 },
+        { key: 'x', label: 'Jenis Kelamin Audiens', width: 180 },
       ],
       pagination: {
         currentPage: 1,
