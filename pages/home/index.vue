@@ -42,9 +42,16 @@ export default {
 
 <template>
   <Card>
-    <div class="flex items-center gap-2">
-      <img src="~/assets/icons/profile-circle-filled.svg" alt="profile" />
-      <h3 class="text-xl text-dark2 font-bold">Data Profil</h3>
+    <div class="flex justify-between flex-wrap gap-1">
+      <div class="flex items-center jub gap-2">
+        <img src="~/assets/icons/profile-circle-filled.svg" alt="profile" />
+        <h3 class="text-xl text-dark2 font-bold">Data Profil</h3>
+      </div>
+
+      <NuxtLink class="flex items-center gap-1 text-blue" to="/home/change-password">
+        <Icon name="lock" :size="16" />
+        <span class="text-sm font-medium">Ubah Password</span>
+      </NuxtLink>
     </div>
 
     <Card primary class="mt-3 w-full max-w-[530px] space-y-2 p-3">
