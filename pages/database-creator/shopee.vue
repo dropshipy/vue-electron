@@ -17,7 +17,7 @@ export default {
         { key: 'soldProductCount', label: 'Produk Terjual', width: 150 },
         { key: 'orderRange', label: 'Pesanan', width: 150 },
         { key: 'saleCount', label: 'Penjualan', width: 150 },
-        { key: 'audience', label: 'Jenis Kelamin Audiens', width: 200 },
+        { key: 'audience', label: 'Jenis Kelamin Audiens', width: 190 },
       ],
       pagination: {
         currentPage: 1,
@@ -169,8 +169,18 @@ export default {
       </template>
 
       <template #col.audience="{ row }">
-        <div class="flex items-center gap-1">
-          <!-- TODO: audience -->
+        <div v-if="row.maleAudience || row.femaleAudience" class="flex items-center gap-1">
+          <div class="flex items-center gap-1">
+            <img src="~/assets/icons/male.svg" alt="male" class="w-4 h-4" />
+            <p class="text-gray-500">{{ row.maleAudience || '-' }}%</p>
+          </div>
+
+          <div class="w-[0.5px] h-5 bg-primary bg-opacity-30"></div>
+
+          <div class="flex items-center gap-1">
+            <img src="~/assets/icons/female.svg" alt="female" class="w-4 h-4" />
+            <p class="text-gray-500">{{ row.femaleAudience || '-' }}%</p>
+          </div>
         </div>
       </template>
     </Table>
