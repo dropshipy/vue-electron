@@ -23,6 +23,13 @@ export default {
       this.$snackbar.success(`Welcome, ${userData?.fullName}`)
       this.$router.replace({ path: this.$route.path, query: {} });
     }
+
+    const subscriptionStoreData = electronStore.get('account-subscription');
+    if (!subscriptionStoreData?.email || !subscriptionStoreData?.password) {
+      this.$router.replace('/login');
+      return;
+    }
+
     this.fetchUserSubscription()
   },
   methods: {
