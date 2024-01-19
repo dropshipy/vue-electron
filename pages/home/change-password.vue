@@ -24,22 +24,27 @@ export default {
       if (!currentPassword || !newPassword) {
         this.$snackbar.error("Form tidak lengkap");
       } else {
-        // TODO: Integrate with API
-        //   const payload = {
-        //     email,
-        //     password: currentPassword,
-        //     newPassword
-        //   }
-        // const response = await this.$axios.$patch(
-        //   `${this.$config.apiBaseUrl}/users/password`, payload)
-        // console.log('response', response)
-        // const payload = {
-        //   email,
-        //   password,
-        // }
-        // electronStore.set("account-subscription", payload);
-        this.$snackbar.success("Password berhasil diubah");
-        this.$router.push('/home');
+        const payload = {
+          email: this.userInfo.email,
+          password: currentPassword,
+          newPassword
+        }
+        const response = await this.$axios.patch(
+          `${this.$config.apiBaseUrl}/users/password`, payload)
+
+        if (response.status === 201) {
+          const accountSubscription = electronStore.get("account-subscription") || {};
+          electronStore.set("account-subscription", {
+            ...accountSubscription,
+            email: payload.email,
+            password: payload.newPassword,
+          });
+
+          this.$snackbar.success("Password berhasil diubah");
+          this.$router.push('/home');
+        } else {
+          this.$snackbar.error(response.data?.error || response.data?.message);
+        }
       }
     }
   }
