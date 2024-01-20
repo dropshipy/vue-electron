@@ -21,7 +21,6 @@ export default {
     const userData = this.$store.getters['user/getUserInfo'];
     if (this.$route.query.from_login) {
       this.$snackbar.success(`Welcome, ${userData?.fullName}`)
-      this.$router.replace({ path: this.$route.path, query: {} });
     }
 
     const subscriptionStoreData = electronStore.get('account-subscription');
