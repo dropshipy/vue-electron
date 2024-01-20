@@ -104,13 +104,13 @@ export default {
 
       const [lower, upper] = range;
 
-      if (lower !== "-1" && upper !== "-1") {
+      if (lower != "-1" && upper != "-1") {
         return `${formatter(lower)}-${formatter(upper)}`;
       }
-      if (lower !== "-1") {
+      if (lower != "-1") {
         return `>${formatter(lower)}`;
       }
-      if (upper !== "-1") {
+      if (upper != "-1") {
         return `<${formatter(upper)}`;
       }
       return 'Invalid Range';

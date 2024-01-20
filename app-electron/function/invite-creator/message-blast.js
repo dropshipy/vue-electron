@@ -61,7 +61,10 @@ async function messageBlast({
                     email: data.profile.contact_info.email,
                     phoneNumber: data.profile.contact_info.phone,
                     soldProductCount: data.sales_metrics.sold_range,
-                    saleCount: data.sales_metrics.gmv_range,
+                    saleCount: data.sales_metrics.gmv_range.map((el) => {
+                      if (el !== -1) el = el / 100_000;
+                      return el;
+                    }),
                     maleAudience: getPercentageOfAudienceByGender(
                       data?.audience_genders,
                       "male"
