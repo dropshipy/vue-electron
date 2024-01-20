@@ -70,7 +70,7 @@ export default {
 
           setTimeout(() => {
             this.$router.push('/?from_login=true')
-          }, 500);
+          }, 1000);
         }
       } catch (error) {
         if (error.response?.status === 400) {
