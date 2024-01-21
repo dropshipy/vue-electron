@@ -19,7 +19,7 @@ async function loadCookiesShopee(page) {
 
 async function authenticateBotStatus(page, browser) {
   const accountSubscription = store.get("account-subscription");
-  console.log({accountSubscription})
+  console.log({ accountSubscription });
 
   // fetch fingerprint
   const osVersion = os.version();
@@ -72,6 +72,11 @@ async function authenticateBotStatus(page, browser) {
             window.alert("Akun sudah terhubung ke perangkat lain.");
           });
           await browser.close();
+        } else if (authenticateBotRes?.status == 404) {
+          await page.evaluate(() => {
+            window.alert("Email tidak ditemukan.");
+          });
+          await browser.close();
         } else if (authenticateBotRes?.status == 403) {
           await page.evaluate(() => {
             window.alert(
@@ -80,7 +85,6 @@ async function authenticateBotStatus(page, browser) {
           });
           await browser.close();
         } else {
-          console.log({authenticateBotRes})
           const subscriptionData = authenticateBotRes.user.subscription;
           const authenticateBotResponse = {
             sessionId: authenticateBotRes?.sessionId,
@@ -128,7 +132,7 @@ async function authenticateBotStatus(page, browser) {
         await browser.close();
       }
     } catch (error) {
-      console.log({error})
+      console.log({ error });
       dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
       await page.evaluate(() => {
         window.alert("Gagal menghubungkan shopee power tools");
