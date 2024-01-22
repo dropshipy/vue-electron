@@ -8,6 +8,7 @@ async function messageBlast({
   config,
   categorySetting,
   authBotRes,
+  browser,
 }) {
   const { replyMessage } = config.configMessageBlast;
   const loopCount = config.configMessageBlast.iteration;
@@ -163,7 +164,7 @@ async function messageBlast({
     await page.evaluate(() => {
       window.alert("Program Telah Selesai");
     });
-    await Browser.close();
+    await browser.close();
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }

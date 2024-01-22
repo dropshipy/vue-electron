@@ -173,6 +173,7 @@ async function handleCrawlCreator(config) {
       page,
       loginShopeeBotRes,
       config,
+      browser,
     };
     await crawlCreator(context);
   } catch (error) {
