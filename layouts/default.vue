@@ -32,7 +32,7 @@ export default {
       }
 
       this.fetchUserSubscription()
-    });
+    }, 300);
 
   },
   methods: {

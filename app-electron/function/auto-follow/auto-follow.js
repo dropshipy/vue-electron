@@ -7,6 +7,7 @@ const store = new ElectronStore();
 const { loginShopee } = require("../login");
 const { postGetFollowers } = require("../../api/interface");
 const { postFollowUser } = require("../../api/interface");
+const { showSnackbar } = require("../../helpers/snackbar");
 
 async function runAutoFollow({ chromePath, iteration }) {
   try {
@@ -93,41 +94,7 @@ async function startAutoFollow(context, browser) {
             }
           );
           let username = dataFollowers[indexFollowing].username;
-          await page.evaluate((authorUsernmae) => {
-            // Create a div element for the toast bar
-            const header = document.querySelector(
-              ".shopee-top.container-wrapper"
-            );
-            const toastBar = document.createElement("div");
-            // Set some basic styles
-            toastBar.style.position = "absolute";
-            toastBar.style.top = "100px";
-            toastBar.style.left = "50%";
-            toastBar.style.transform = "translateX(-50%)";
-            toastBar.style.backgroundColor = "#3a373c";
-            toastBar.style.border = "1px solid #3a373c";
-            toastBar.style.color = "#52c81e ";
-            toastBar.style.fontWeight = "600";
-            toastBar.style.minWidth = "500px";
-            toastBar.style.maxWidth = "90%";
-            toastBar.style.fontSize = "40px";
-            toastBar.style.padding = "20px 30px";
-            toastBar.style.borderRadius = "10px";
-            toastBar.style.zIndex = "9999";
-            // Set the text content of the toast bar
-            toastBar.textContent = `Berhasil follow  ${authorUsernmae}`;
-            // Append the toast bar to the body
-            header.appendChild(toastBar);
-            toastBar.style.opacity = "0";
-            setTimeout(() => {
-              toastBar.style.transition = "opacity 1s";
-              toastBar.style.opacity = "1";
-            }, 10);
-            setTimeout(() => {
-              toastBar.style.opacity = "0";
-              toastBar.remove();
-            }, 1000);
-          }, username);
+          await showSnackbar({ page, message: `Berhasil follow ${username}` });
           await page.waitForTimeout(1200);
           followingCount++;
           indexFollowing++;

@@ -16,6 +16,8 @@ const {
   extractIdsFromProductUrl,
 } = require("../../helpers/extract-shopee-ids");
 
+const { showSnackbar } = require("../../helpers/snackbar");
+
 const DEFAULT_LIMIT = 20;
 
 async function runAutoChatByReviews({ chromePath, data }) {
@@ -155,48 +157,7 @@ async function chatByReviews({
         const username = reviewer?.author_username;
 
         if (resChat?.status === 200) {
-          await page.evaluate((_username) => {
-            const showToast = ({ wrapperSelector, textContent }) => {
-              const wrapper = document.querySelector(wrapperSelector);
-              const toastBar = document.createElement("div");
-
-              // Assign styles using an object
-              Object.assign(toastBar.style, {
-                position: "fixed",
-                top: "80px",
-                left: "80px",
-                backgroundColor: "#3a373c",
-                border: "1px solid #3a373c",
-                color: "#52c81e",
-                fontWeight: "600",
-                minWidth: "500px",
-                maxWidth: "90%",
-                fontSize: "36px",
-                padding: "20px 30px",
-                borderRadius: "10px",
-                zIndex: "9999",
-                opacity: "0",
-                transition: "opacity 1s",
-              });
-
-              toastBar.textContent = textContent;
-              wrapper.appendChild(toastBar);
-
-              setTimeout(() => {
-                toastBar.style.opacity = "1";
-              }, 10);
-
-              setTimeout(() => {
-                toastBar.style.opacity = "0";
-                toastBar.remove();
-              }, 1000);
-            };
-
-            showToast({
-              wrapperSelector: "body",
-              textContent: `Berhasil chat ke ${_username}`,
-            });
-          }, username);
+          await showSnackbar({ page, message: `Berhasil chat ke ${username}` });
         }
 
         await waitForTimeout(1000);
