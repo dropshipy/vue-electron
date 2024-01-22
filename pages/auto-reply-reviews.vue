@@ -1,15 +1,14 @@
 <script>
+import { REVIEW_RATING_OPTIONS } from '~/constants/option.constant';
+
 export default {
   data() {
     return {
       selectedIteration: 1,
       replyMessage: '',
       productName: '',
-      selectedRatings: [],
-      ratings: {
-        left: ['Semua', '5 Bintang', '4 Bintang'],
-        right: ['3 Bintang', '2 Bintang', '1 Bintang'],
-      }
+      selectedRatings: null,
+      ratingOptions: REVIEW_RATING_OPTIONS,
     }
   },
   methods: {
@@ -78,23 +77,8 @@ export default {
 
         <Textfield v-model="productName" label="Nama Produk" placeholder="Masukkan nama produk" class="mt-3" />
 
-        <h6 class="text-[#2D2D2D] my-3">Rating Ulasan</h6>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <div class="space-y-3">
-            <div v-for="(rating, i) in ratings.left" :key="i" class="flex items-center gap-2">
-              <input v-model="selectedRatings" type="checkbox" :value="rating" :id="`checkbox-${rating}`"
-                class="accent-primary w-4 h-4" />
-              <label :for="`checkbox-${rating}`">{{ rating }}</label>
-            </div>
-          </div>
-          <div class="space-y-3">
-            <div v-for="(rating, i) in ratings.right" :key="i" class="flex items-center gap-2">
-              <input v-model="selectedRatings" type="checkbox" :value="rating" :id="`checkbox-${rating}`"
-                class="accent-primary w-4 h-4" />
-              <label :for="`checkbox-${rating}`">{{ rating }}</label>
-            </div>
-          </div>
-        </div>
+        <Dropdown v-model="selectedRatings" label="Rating Ulasan" placeholder="Pilih rating ulasan"
+          :options="ratingOptions" class="mt-3" />
 
         <div class="flex items-center justify-end mt-9 gap-2.5">
           <Button class="w-full max-w-[140px]" theme="primary-outline" @click="onSave">Simpan</Button>

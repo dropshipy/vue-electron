@@ -109,3 +109,11 @@ export const DB_CREATOR_TIKTOK_CREATOR_PER_PAGE_OPTIONS = [
   { label: "50 Creator", value: 50 },
   { label: "100 Creator", value: 100 },
 ];
+
+export const REVIEW_RATING_OPTIONS = [
+  { label: "5 Bintang", value: "5 Bintang" },
+  { label: "4 Bintang", value: "4 Bintang" },
+  { label: "3 Bintang", value: "3 Bintang" },
+  { label: "2 Bintang", value: "2 Bintang" },
+  { label: "1 Bintang", value: "1 Bintang" },
+];
