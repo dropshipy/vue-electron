@@ -19,7 +19,7 @@ export default {
         !this.templateChat;
 
       if (hasEmptyField) {
-        this.toastError("Silakan isi semua field terlebih dahulu");
+        this.$snackbar.error("Silakan isi semua field terlebih dahulu");
         return;
       }
 
