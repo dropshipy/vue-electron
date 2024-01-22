@@ -24,7 +24,7 @@ export default {
       const payload = {
         iteration: this.selectedIteration,
         replyMessage: this.replyMessage,
-        ratings: this.selectedRatings,
+        ratingComment: this.selectedRatings,
         productName: this.productName
       }
 
@@ -49,7 +49,7 @@ export default {
     if (dataSelectedReplyReviews) {
       this.selectedIteration = dataSelectedReplyReviews.iteration
       this.replyMessage = dataSelectedReplyReviews.replyMessage
-      this.selectedRatings = dataSelectedReplyReviews.ratings
+      this.selectedRatings = dataSelectedReplyReviews.ratingComment
       this.productName = dataSelectedReplyReviews.productName
     }
   }
