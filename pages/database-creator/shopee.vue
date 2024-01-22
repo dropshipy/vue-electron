@@ -90,7 +90,9 @@ export default {
       return matches ? matches[1] : null;
     },
     convertToCompactFormat,
-    formatCurrency,
+    formatToRupiah(val) {
+      return formatCurrency(val, { notation: 'compact' });
+    },
     formatRangeValue(range, valueType = 'number') {
       if (!Array.isArray(range) || range.length !== 2) {
         return '-';
@@ -99,7 +101,7 @@ export default {
       let formatter = convertToCompactFormat;
 
       if (valueType === 'currency') {
-        formatter = formatCurrency;
+        formatter = this.formatToRupiah;
       }
 
       const [lower, upper] = range;

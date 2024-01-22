@@ -23,18 +23,24 @@ export default {
       this.$snackbar.success(`Welcome, ${userData?.fullName}`)
     }
 
-    const subscriptionStoreData = electronStore.get('account-subscription');
-    if (!subscriptionStoreData?.email || !subscriptionStoreData?.password) {
-      this.$router.replace('/login');
-      return;
-    }
+    setTimeout(() => {
+      const subscriptionStoreData = electronStore.get('account-subscription');
 
-    this.fetchUserSubscription()
+      if (!subscriptionStoreData?.email || !subscriptionStoreData?.password) {
+        this.$router.replace('/login');
+        return;
+      }
+
+      this.fetchUserSubscription()
+    });
+
   },
   methods: {
     async fetchUserSubscription() {
       try {
         const resData = await window.electron.ipcRenderer.invoke("get-subscription-info");
+        console.log('subscriptionInfo: ', resData)
+
         if (resData) {
           this.$store.commit('subscription/setSubscriptionInfo', resData.data);
         }
