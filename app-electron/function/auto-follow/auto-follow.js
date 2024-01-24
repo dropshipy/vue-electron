@@ -23,7 +23,9 @@ async function runAutoFollow({ chromePath, iteration }) {
       if (
         request
           .url()
-          .startsWith("https://shopee.co.id/api/v4/shop/is_show?shopid=")
+          .startsWith(
+            "https://shopee.co.id/api/v4/shop/get_shop_seller_show?shopid="
+          )
       ) {
         const information = {
           url: request.url(),
