@@ -161,6 +161,7 @@ async function requestListAndUnfollow(payload) {
       buttons: ["OK"],
     });
     console.log("Error in requestListAndUnfollow: ", error?.message);
+    return true;
   }
 }
 
