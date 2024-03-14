@@ -163,10 +163,16 @@ async function handleCrawlCreator(config) {
       executablePath: chromePath,
     });
     const page = await browser.newPage();
+
+    const { screenWidth, screenHeight } = await page.evaluate(() => {
+      return {
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height - 200,
+      };
+    });
     await page.setViewport({
-      width: 1350,
-      height: 700,
-      deviceScaleFactor: 1,
+      width: screenWidth,
+      height: screenHeight,
     });
     const loginShopeeBotRes = await loginShopee(page, browser);
     const context = {
