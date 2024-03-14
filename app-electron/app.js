@@ -1,0 +1,359 @@
+require("dotenv").config({ path: __dirname + "/../.env" });
+
+const { app, BrowserWindow, ipcMain } = require("electron");
+const puppeteer = require("puppeteer");
+const path = require("node:path");
+const { loginShopee } = require("./function/login");
+const { autoUnfollow } = require("./function/auto-unfollow");
+const { crawlCreator } = require("./function/invite-creator/crawl-creator");
+const { replyReviews } = require("./function/reply-reviews");
+const { dialog } = require("electron");
+const axios = require("axios");
+const express = require("express");
+const {
+  authenticateUserShopeeTools,
+} = require("./function/browser/authenticate-shopee-tools");
+const ElectronStore = require("electron-store");
+const { runAutoFollow } = require("./function/auto-follow/auto-follow");
+const {
+  runAutoFollowByReviews,
+} = require("./function/auto-follow/auto-follow-by-reviews");
+const {
+  runAutoChatByReviews,
+} = require("./function/auto-chat/auto-chat-by-reviews");
+const { getApiBaseUrl } = require("./helpers/api-url");
+// determine chrome location
+let chromePath = "invalid_os";
+let isDev = process.resourcesPath.includes("node_modules");
+let chromePathBasePath = process.resourcesPath;
+
+if (isDev) {
+  chromePathBasePath = "resources";
+}
+
+let arch = process.arch;
+if (process.platform == "darwin") {
+  if (arch == "arm64") {
+    chromePath = path.join(
+      chromePathBasePath,
+      `chrome/mac_arm-119.0.6045.105/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+    );
+  } else {
+    chromePath = path.join(
+      chromePathBasePath,
+      `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+    );
+  }
+} else if (process.platform == "win32") {
+  chromePath = path.join(
+    chromePathBasePath,
+    `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`
+  );
+}
+
+console.log("Chromium executable path:", chromePath);
+
+let mainWindow;
+// Store the authentication cookie globally
+let authenticationCookie;
+const store = new ElectronStore();
+
+const BASE_URL = getApiBaseUrl();
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: true,
+      enableRemoteModule: true,
+      webSecurity: false,
+      preload: path.join(__dirname, "preload.js"),
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["self"],
+          scriptSrc: ["self"],
+          styleSrc: ["self"],
+        },
+      },
+    },
+  });
+  if (process.env.ENTRY_SOURCE === "dev_server") {
+    mainWindow.loadURL("http://localhost:3000");
+    mainWindow.webContents.openDevTools();
+    mainWindow.setFullScreen(true);
+  } else {
+    const appServer = express();
+
+    // Specify the directory you want to serve files from
+    const directoryPath = path.join(__dirname, "dist");
+
+    // Serve all files in the specified directory
+    appServer.use(express.static(directoryPath));
+
+    // Start the server on a specific port (e.g., 9999)
+    const PORT = process.env.PORT || 9999;
+    appServer.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+    mainWindow.loadURL("http://localhost:9999");
+  }
+}
+
+app.on("ready", () => {
+  createWindow();
+
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+
+  ipcMain.on("post-cookies-shopee-tools", async (event, payload) => {
+    await authenticateUserShopeeTools(payload);
+  });
+
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit();
+    }
+  });
+});
+
+// scrapper
+ipcMain.on("process-auto-unfollow", (event, data) => {
+  handleAutoUnfolow(data);
+});
+async function handleAutoUnfolow(iteration) {
+  try {
+    const browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: null,
+      executablePath: chromePath,
+    });
+    const page = await browser.newPage();
+    await page.setViewport({
+      width: 1300,
+      height: 1080,
+      deviceScaleFactor: 1,
+    });
+    const context = {
+      iteration,
+      page,
+      browser,
+    };
+    await loginShopee(page, browser);
+    await autoUnfollow(context);
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+}
+
+ipcMain.on("crawl-creator", (event, data) => {
+  console.log(data);
+  handleCrawlCreator(data);
+});
+async function handleCrawlCreator(config) {
+  try {
+    const browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: null,
+      executablePath: chromePath,
+    });
+    const page = await browser.newPage();
+    await page.setViewport({
+      width: 1350,
+      height: 700,
+      deviceScaleFactor: 1,
+    });
+    const loginShopeeBotRes = await loginShopee(page, browser);
+    const context = {
+      page,
+      loginShopeeBotRes,
+      config,
+      browser,
+    };
+    await crawlCreator(context);
+  } catch (error) {
+    console.error("Error in the main process:", error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
+}
+ipcMain.on("process-reply-reviews", (event, data) => {
+  runReplyReviews(data);
+});
+async function runReplyReviews(config) {
+  try {
+    const browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: null,
+      executablePath: chromePath,
+    });
+    const page = await browser.newPage();
+    await page.setViewport({
+      width: 1300,
+      height: 800,
+      deviceScaleFactor: 1,
+    });
+    const loginShopeeBotRes = await loginShopee(page, browser);
+    const context = {
+      page,
+      loginShopeeBotRes,
+      config,
+    };
+    await replyReviews(context);
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+}
+// https://shopee.co.id/shop/113475604/following
+ipcMain.on("process-auto-follow", async (event, data) => {
+  try {
+    const context = {
+      chromePath,
+      iteration: data,
+    };
+    await runAutoFollow(context);
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+});
+
+//autofollow by reviews
+ipcMain.on("process-auto-follow-by-reviews", async (event, data) => {
+  try {
+    const context = {
+      chromePath,
+      data,
+    };
+    await runAutoFollowByReviews(context);
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+});
+
+ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
+  try {
+    await runAutoChatByReviews({ chromePath, data });
+  } catch (error) {
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    console.error("Error in the main process:", error);
+  }
+});
+
+ipcMain.handle("get-subscription-info", async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/shopee-subscriptions`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+    });
+    const dataSubscription = store.get("account-subscription") || {};
+    store.set("account-subscription", {
+      ...dataSubscription,
+      subscription: res.data?.data?.code,
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching subscription info:", error);
+    throw error;
+  }
+});
+
+ipcMain.handle("get-database-creator-shopee", async (event, data) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators/app`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: data,
+    });
+    store.set("database-creator-shopee", res.data);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
+});
+
+ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/tikblast-creators/app`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: data,
+    });
+    store.set("database-creator-tiktok", res.data);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});
+
+// function authenticateUser() {
+//   // Simulate an authentication request and return the obtained cookie
+//   return new Promise((resolve, reject) => {
+//     // Your authentication logic here, for example using axios
+//     axios
+//       .post("http://localhost:3000/api/users/authenticate", {
+//         email: "zu@gmail",
+//         password: "qwe",
+//       })
+//       .then((response) => {
+//         // Assuming the authentication endpoint returns a 'Set-Cookie' header
+//         const setCookieHeader = response.headers["set-cookie"];
+//         console.log(setCookieHeader);
+//         if (setCookieHeader) {
+//           // Check if setCookieHeader is an array (multiple cookies) or a string (single cookie)
+//           const cookies = Array.isArray(setCookieHeader)
+//             ? setCookieHeader
+//             : [setCookieHeader];
+
+//           // Extract the first cookie
+//           const cookie = cookies[0].split(";")[0];
+
+//           resolve(cookie);
+//         } else {
+//           reject(new Error("Authentication failed."));
+//         }
+//       })
+//       .catch((error) => {
+//         reject(error);
+//       });
+//   });
+// }
+
+function makeApiRequest() {
+  return new Promise((resolve, reject) => {
+    try {
+      axios
+        .get("http://localhost:3000/api/shopee/message-blast/7", {
+          headers: {
+            Cookie: authenticationCookie,
+          },
+        })
+        .then((response) => {
+          if (response.data) {
+            console.log(response.data);
+            resolve(response.data);
+          } else reject(new Error("api failed."));
+        });
+    } catch (error) {
+      console.log("API eror", error);
+      reject(error);
+    }
+  });
+}
