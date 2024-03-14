@@ -8,6 +8,8 @@ const {
   postShopeeUnfollow,
 } = require("../api/interface");
 
+const { showSnackbar } = require("../helpers/snackbar");
+
 async function autoUnfollow({ page, iteration, browser }) {
   const urlGetProfile = "https://shopee.co.id/api/v4/account/get_profile";
   let profile = null;
@@ -142,48 +144,7 @@ async function requestListAndUnfollow(payload) {
       });
 
       if (responseUnfollow.status === 200) {
-        await page.evaluate((_username) => {
-          const showToast = ({ wrapperSelector, textContent }) => {
-            const wrapper = document.querySelector(wrapperSelector);
-            const toastBar = document.createElement("div");
-
-            // Assign styles using an object
-            Object.assign(toastBar.style, {
-              position: "fixed",
-              top: "80px",
-              left: "80px",
-              backgroundColor: "#3a373c",
-              border: "1px solid #3a373c",
-              color: "#52c81e",
-              fontWeight: "600",
-              minWidth: "500px",
-              maxWidth: "90%",
-              fontSize: "36px",
-              padding: "20px 30px",
-              borderRadius: "10px",
-              zIndex: "9999",
-              opacity: "0",
-              transition: "opacity 1s",
-            });
-
-            toastBar.textContent = textContent;
-            wrapper.appendChild(toastBar);
-
-            setTimeout(() => {
-              toastBar.style.opacity = "1";
-            }, 10);
-
-            setTimeout(() => {
-              toastBar.style.opacity = "0";
-              toastBar.remove();
-            }, 1000);
-          };
-
-          showToast({
-            wrapperSelector: "body",
-            textContent: `Berhasil unfollow ${_username}`,
-          });
-        }, username);
+        await showSnackbar({ page, message: `Berhasil unfollow: ${username}` });
       } else {
         await dialog.showMessageBox({
           message: `Gagal unfollow ${username}`,
@@ -200,6 +161,7 @@ async function requestListAndUnfollow(payload) {
       buttons: ["OK"],
     });
     console.log("Error in requestListAndUnfollow: ", error?.message);
+    return true;
   }
 }
 

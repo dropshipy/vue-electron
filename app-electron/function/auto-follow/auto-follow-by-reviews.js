@@ -6,6 +6,8 @@ const store = new ElectronStore();
 const { loginShopee } = require("../login");
 const { postGetUserReviews } = require("../../api/interface");
 const { postFollowUser } = require("../../api/interface");
+const { showSnackbar } = require("../../helpers/snackbar");
+
 async function runAutoFollowByReviews({ chromePath, data }) {
   const startPoint = data.startPointFollowByReviews;
   const iteration = data.iterationFollowByReviews;
@@ -43,7 +45,7 @@ async function runAutoFollowByReviews({ chromePath, data }) {
     await loginShopee(page, browser);
 
     page.on("response", async (response) => {
-      if (response.url().includes("/get_account_info")) {
+      if (response.url().includes("/get_payment_info")) {
         await page.waitForTimeout(2000);
         await page.waitForSelector(".page-product__shop");
         await page.evaluate(() => {
@@ -113,40 +115,8 @@ async function followByReviews({
         );
         const username =
           getUser.data.data.ratings[currentIndex].author_username;
-        await page.evaluate((authorUsernmae) => {
-          // Create a div element for the toast bar
-          const header = document.querySelector(
-            ".shopee-top.container-wrapper"
-          );
-          const toastBar = document.createElement("div");
-          // Set some basic styles
-          toastBar.style.position = "fixed";
-          toastBar.style.top = "80px";
-          toastBar.style.left = "80px";
-          toastBar.style.backgroundColor = "#3a373c";
-          toastBar.style.border = "1px solid #3a373c";
-          toastBar.style.color = "#52c81e ";
-          toastBar.style.fontWeight = "600";
-          toastBar.style.minWidth = "500px";
-          toastBar.style.maxWidth = "90%";
-          toastBar.style.fontSize = "40px";
-          toastBar.style.padding = "20px 30px";
-          toastBar.style.borderRadius = "10px";
-          toastBar.style.zIndex = "9999";
-          // Set the text content of the toast bar
-          toastBar.textContent = `Berhasil follow  ${authorUsernmae}`;
-          // Append the toast bar to the body
-          header.appendChild(toastBar);
-          toastBar.style.opacity = "0";
-          setTimeout(() => {
-            toastBar.style.transition = "opacity 1s";
-            toastBar.style.opacity = "1";
-          }, 10);
-          setTimeout(() => {
-            toastBar.style.opacity = "0";
-            toastBar.remove();
-          }, 1000);
-        }, username);
+
+        await showSnackbar({ page, message: `Berhasil follow ${username}` });
 
         await page.waitForTimeout(1200);
         currentIndex++;

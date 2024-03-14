@@ -41,7 +41,6 @@ Layouts are a great help when you want to change the look and feel of your Nuxt 
 
 More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
 
-
 ### `pages`
 
 This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
@@ -69,11 +68,18 @@ This directory contains your Vuex store files. Creating a file in this directory
 More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
 
 ## Dev run
+
 ```
 - yarn dev-nuxt
-- di terminal terpisah, ENTRY_SOURCE=dev_server yarn start
+- di terminal terpisah: ENTRY_SOURCE=dev_server yarn start
+  > powershell / windows: $env:ENTRY_SOURCE = "dev_server"; yarn start
 ```
 
 ## Prod run
-- yarn generate
-- yarn start
+
+- yarn generate-nuxt
+- yarn start-nuxt
+
+## Build Electron
+
+- yarn make-desktop-app

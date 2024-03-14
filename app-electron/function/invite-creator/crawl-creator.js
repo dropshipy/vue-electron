@@ -2,7 +2,7 @@ const { filterCreator } = require("../filter/filter-creator");
 const { waitForTimeout } = require("../../helpers/utils");
 const { messageBlast } = require("./message-blast");
 
-async function crawlCreator({ page, loginShopeeBotRes, config }) {
+async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
   const context = {
     page,
     requestData: null,
@@ -15,6 +15,7 @@ async function crawlCreator({ page, loginShopeeBotRes, config }) {
     authBotRes: {
       ...loginShopeeBotRes,
     },
+    browser,
   };
   const reqListData = [];
 

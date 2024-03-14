@@ -2,7 +2,7 @@ node_modules
 out
 resources/*
 !resources/.gitkeep
-store
+# store
 chrome-mac-arm64
 chrome-win
 .DS_Store

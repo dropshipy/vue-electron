@@ -8,6 +8,7 @@ async function messageBlast({
   config,
   categorySetting,
   authBotRes,
+  browser,
 }) {
   const { replyMessage } = config.configMessageBlast;
   const loopCount = config.configMessageBlast.iteration;
@@ -60,6 +61,19 @@ async function messageBlast({
                     orderRange: data.key_metrics.order_range,
                     email: data.profile.contact_info.email,
                     phoneNumber: data.profile.contact_info.phone,
+                    soldProductCount: data.sales_metrics.sold_range,
+                    saleCount: data.sales_metrics.gmv_range.map((el) => {
+                      if (el !== -1) el = el / 100_000;
+                      return el;
+                    }),
+                    maleAudience: getPercentageOfAudienceByGender(
+                      data?.audience_genders,
+                      "male"
+                    ),
+                    femaleAudience: getPercentageOfAudienceByGender(
+                      data?.audience_genders,
+                      "female"
+                    ),
                   };
 
                   const tagNames = categoryAffiliate.map(
@@ -150,9 +164,22 @@ async function messageBlast({
     await page.evaluate(() => {
       window.alert("Program Telah Selesai");
     });
-    await Browser.close();
+    await browser.close();
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }
 }
+
+const getPercentageOfAudienceByGender = (audiences, gender) => {
+  const genderTypeMap = {
+    male: 1,
+    female: 2,
+  };
+
+  const audience = audiences.find(
+    ({ gender_type }) => gender_type === genderTypeMap[gender]
+  );
+  return audience ? audience.gender_ratio * 100 : 0;
+};
+
 module.exports = { messageBlast };

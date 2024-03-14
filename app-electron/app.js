@@ -1,3 +1,5 @@
+require("dotenv").config({ path: __dirname + "/../.env" });
+
 const { app, BrowserWindow, ipcMain } = require("electron");
 const puppeteer = require("puppeteer");
 const path = require("node:path");
@@ -7,11 +9,10 @@ const { crawlCreator } = require("./function/invite-creator/crawl-creator");
 const { replyReviews } = require("./function/reply-reviews");
 const { dialog } = require("electron");
 const axios = require("axios");
-const express = require("express")
+const express = require("express");
 const {
   authenticateUserShopeeTools,
 } = require("./function/browser/authenticate-shopee-tools");
-require("dotenv").config();
 const ElectronStore = require("electron-store");
 const { runAutoFollow } = require("./function/auto-follow/auto-follow");
 const {
@@ -20,6 +21,7 @@ const {
 const {
   runAutoChatByReviews,
 } = require("./function/auto-chat/auto-chat-by-reviews");
+const { getApiBaseUrl } = require("./helpers/api-url");
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -55,7 +57,9 @@ let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
 const store = new ElectronStore();
-const baseUrlProd = "https://supportseller.com/api";
+
+const BASE_URL = getApiBaseUrl();
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -75,14 +79,15 @@ function createWindow() {
       },
     },
   });
-  if (process.env.ENTRY_SOURCE === 'dev_server') {
-    mainWindow.loadURL('http://localhost:3000')
-    mainWindow.webContents.openDevTools()
+  if (process.env.ENTRY_SOURCE === "dev_server") {
+    mainWindow.loadURL("http://localhost:3000");
+    mainWindow.webContents.openDevTools();
+    mainWindow.setFullScreen(true);
   } else {
     const appServer = express();
 
     // Specify the directory you want to serve files from
-    const directoryPath = path.join(__dirname, 'dist');
+    const directoryPath = path.join(__dirname, "dist");
 
     // Serve all files in the specified directory
     appServer.use(express.static(directoryPath));
@@ -92,7 +97,7 @@ function createWindow() {
     appServer.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
-    mainWindow.loadURL('http://localhost:9999')
+    mainWindow.loadURL("http://localhost:9999");
   }
 }
 
@@ -168,6 +173,7 @@ async function handleCrawlCreator(config) {
       page,
       loginShopeeBotRes,
       config,
+      browser,
     };
     await crawlCreator(context);
   } catch (error) {
@@ -240,29 +246,51 @@ ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
   }
 });
 
-ipcMain.on("get-subscription-info", async () => {
-  const res = await axios.get(
-    `https://supportseller.com/api/shopee-subscriptions`,
-    {
+ipcMain.handle("get-subscription-info", async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/shopee-subscriptions`, {
       headers: {
         Cookie: store.get("cookies-spt"),
       },
-    }
-  );
-  store.set("data-subscription", res.data);
+    });
+    const dataSubscription = store.get("account-subscription") || {};
+    store.set("account-subscription", {
+      ...dataSubscription,
+      subscription: res.data?.data?.code,
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching subscription info:", error);
+    throw error;
+  }
 });
-ipcMain.on("get-database-creator", async (event, data) => {
+
+ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   try {
-    const res = await axios.get(
-      `https://supportseller.com/api/shopee/shopee-creators`,
-      {
-        headers: {
-          Cookie: store.get("cookies-spt"),
-        },
-        params: data,
-      }
-    );
-    store.set("database-creator", res.data);
+    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators/app`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: data,
+    });
+    store.set("database-creator-shopee", res.data);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
+});
+
+ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/tikblast-creators/app`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: data,
+    });
+    store.set("database-creator-tiktok", res.data);
+    return res.data;
   } catch (error) {
     console.log(error);
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });

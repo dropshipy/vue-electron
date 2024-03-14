@@ -1,6 +1,6 @@
 {
   "name": "shopee-power-tools",
-  "version": "19.12.23",
+  "version": "16.02.24",
   "description": "",
   "main": "./app-electron/app.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "vue": "^2.7.10",
     "vue-server-renderer": "^2.7.10",
     "vue-template-compiler": "^2.7.10",
-    "vue-toasted": "^1.1.28"
+    "vue2-teleport": "^1.0.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",
@@ -50,7 +50,11 @@
     "@electron-forge/maker-squirrel": "^6.4.2",
     "@electron-forge/maker-zip": "^6.4.2",
     "@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
+    "@nuxtjs/tailwindcss": "^6.10.3",
+    "autoprefixer": "^10.4.16",
     "dotenv-webpack": "^8.0.1",
-    "electron": "^27.0.2"
+    "electron": "^27.0.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
   }
 }
