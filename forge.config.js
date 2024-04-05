@@ -5,7 +5,8 @@ module.exports = {
   packagerConfig: {
     asar: true,
     extraResource: [join(__dirname, "resources", "chrome")],
-    icon: `./app-electron/assets/icons/logo-${process.env.APP_NAME}`,
+    // icon: `./app-electron/assets/icons/logo-${process.env.APP_NAME}`,
+    icon: `./app-electron/assets/icons/logo-tiksender`, // "tiksender" || "supportseller"
   },
   rebuildConfig: {},
   makers: [
