@@ -1,4 +1,5 @@
-const { waitForTimeout } = require("../../helpers/utils");
+const { dialog } = require("electron");
+const { waitForTimeout, clickByText } = require("../../helpers/utils");
 
 // selector in affialter market place page
 const categoryDropdown =
@@ -21,6 +22,29 @@ async function filterCreator({ page, config }) {
     config.configMessageBlast;
   console.log({ config });
   try {
+    if (socialMedias !== "Semua" || !socialMedias) {
+      try {
+        if (socialMedias == "Shopee") {
+          await clickByText(page, "Shopee Live");
+        } else await clickByText(page, socialMedias);
+        // await page.click(mediaSocialDropdown);
+        // await page.waitForTimeout(2000);
+        // await page.evaluate((socialMedias) => {
+        //   const divs = document.querySelectorAll(".eds-react-select-option");
+        //   const targetDiv = Array.from(divs).find((div) =>
+        //     div.innerText.includes(socialMedias)
+        //   );
+
+        //   if (targetDiv) {
+        //     targetDiv.click();
+        //   } else {
+        //     console.error("Div not found with text:", socialMedias);
+        //   }
+        // }, socialMedias);
+      } catch (error) {
+        console.log(error);
+      }
+    }
     if (category.length > 0) {
       try {
         await page.waitForSelector(categoryDropdown);
@@ -43,26 +67,7 @@ async function filterCreator({ page, config }) {
         console.log(error);
       }
     }
-    if (socialMedias !== "Semua" || !socialMedias) {
-      try {
-        await page.click(mediaSocialDropdown);
-        await page.waitForTimeout(2000);
-        await page.evaluate((socialMedias) => {
-          const divs = document.querySelectorAll(".eds-react-select-option");
-          const targetDiv = Array.from(divs).find((div) =>
-            div.innerText.includes(socialMedias)
-          );
 
-          if (targetDiv) {
-            targetDiv.click();
-          } else {
-            console.error("Div not found with text:", socialMedias);
-          }
-        }, socialMedias);
-      } catch (error) {
-        console.log(error);
-      }
-    }
     if (followerCount !== "Semua" || !followerCount) {
       try {
         await page.click(followerCountDropdown);
@@ -115,7 +120,8 @@ async function filterCreator({ page, config }) {
         console.log(error);
       }
     }
-    await page.click(searchButtonFilter);
+    // await page.click(searchButtonFilter);
+    await clickByText(page, "Ajukan");
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.log(error);
