@@ -39,7 +39,8 @@ export const CATEGORY_OPTIONS = [
 ];
 
 export const SOCIAL_MEDIA_OPTIONS = [
-  { label: "Shopee", value: "Shopee" },
+  { label: "Shopee Live", value: "Shopee Live" },
+  { label: "Shopee Video", value: "Shopee Video" },
   { label: "Instagram", value: "Instagram" },
   { label: "Tiktok", value: "Tiktok" },
   { label: "Facebook", value: "Facebook" },

@@ -3,17 +3,17 @@ const { waitForTimeout, clickByText } = require("../../helpers/utils");
 
 // selector in affialter market place page
 const categoryDropdown =
-  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(1) > div.filter-group-content_Xfj27 > div:nth-child(1) > div > div > div > div";
+  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div > div.affiliate-content.filter-wrapper > div > form > div > div > div.kolFilterItems_1b1wf > div.filter-item_CKEyJ.customizeInlineLabel_UD2W9.kolCategory_4q8Bx > div > div > div > div";
 
 const mediaSocialDropdown =
   "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(1) > div.filter-group-content_Xfj27 > div:nth-child(2) > div > div > div > div";
 
 const followerCountDropdown =
-  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(2) > div.filter-group-content_Xfj27 > div:nth-child(1) > div > div > div > div > div.trigger.trigger--normal > div.eds-react-select__suffix > span.eds-react-icon.eds-react-icon-arrow-down-bold.eds-react-select__expend-btn.expend-btn";
+  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div > div.affiliate-content.filter-wrapper > div > form > div > div > div.kolFilterItems_1b1wf > div.filter-item_CKEyJ.inlineLabel_jgJDm.undefined > div > div > div > div";
 const followerAgeDropdown =
-  "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(2) > div.filter-group-content_Xfj27 > div:nth-child(2) > div > div > div > div";
+  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div > div.affiliate-content.filter-wrapper > div > form > div > div > div.kolFilterItems_1b1wf > div.filter-item_CKEyJ.customizeInlineLabel_UD2W9.ageSelect_T7473 > div > div > div > div";
 const followerGenderDropdown =
-  "#root > div.affiliate-layout.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed > div.affiliate-content_va84a > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.kol-filter-items > div:nth-child(2) > div.filter-group-content_Xfj27 > div:nth-child(3) > div > div > div > div";
+  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div > div.affiliate-content.filter-wrapper > div > form > div > div > div.kolFilterItems_1b1wf > div.filter-item_CKEyJ.customizeInlineLabel_UD2W9.genderSelect_Zi-UJ > div > div > div > div";
 const searchButtonFilter =
   "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.filter-actions_dHTx2 > button.eds-react-button.eds-react-button--primary.eds-react-button--normal";
 
@@ -24,9 +24,8 @@ async function filterCreator({ page, config }) {
   try {
     if (socialMedias !== "Semua" || !socialMedias) {
       try {
-        if (socialMedias == "Shopee") {
-          await clickByText(page, "Shopee Live");
-        } else await clickByText(page, socialMedias);
+        await clickByText(page, socialMedias);
+
         // await page.click(mediaSocialDropdown);
         // await page.waitForTimeout(2000);
         // await page.evaluate((socialMedias) => {
