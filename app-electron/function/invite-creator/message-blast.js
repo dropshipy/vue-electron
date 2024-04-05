@@ -158,7 +158,11 @@ async function messageBlast({
           }
         }
       } else {
+        await page.evaluate(() => {
+          window.alert("Creator Tidak Ditemukan");
+        });
         console.log("Creator Tidak Ditemukan");
+        return;
       }
     }
     await page.evaluate(() => {
