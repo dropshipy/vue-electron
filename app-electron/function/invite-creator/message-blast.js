@@ -104,7 +104,7 @@ async function messageBlast({
             await page.click(buttonChat);
 
             const textArea =
-              "#shopee-mini-chat-embedded > div.UvGSSkd1qQ > div.Z8RjJZsXy1 > div.C8Jzw7jkTU > div.Mj9lh6KccD > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
+              "#shopee-mini-chat-embedded > div > div.ZbkI8cjmb1 > div > div.Z8RjJZsXy1 > div.C8Jzw7jkTU > div.Mj9lh6KccD > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
             await page.waitForSelector(textArea);
             let isAlreadySent = false;
             try {
