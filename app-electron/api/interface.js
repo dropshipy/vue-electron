@@ -120,9 +120,6 @@ const getListOfReviews = async (endpoint, headers) => {
 };
 
 const postReplyShop = async (endpoint, payload, { headers }) => {
-  console.log({ endpoint });
-  console.log({ payload });
-
   return await postDataShopee(endpoint, payload, { headers });
 };
 
