@@ -22,6 +22,9 @@ const {
   runAutoChatByReviews,
 } = require("./function/auto-chat/auto-chat-by-reviews");
 const { getApiBaseUrl } = require("./helpers/api-url");
+const {
+  AutoReplyReviewsByApi,
+} = require("./function/reply-reviews-by-api/AutoReplyReviewsByApi");
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -198,10 +201,16 @@ async function runReplyReviews(config) {
       executablePath: chromePath,
     });
     const page = await browser.newPage();
+
+    const { screenWidth, screenHeight } = await page.evaluate(() => {
+      return {
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height - 200,
+      };
+    });
     await page.setViewport({
-      width: 1300,
-      height: 800,
-      deviceScaleFactor: 1,
+      width: screenWidth,
+      height: screenHeight,
     });
     const loginShopeeBotRes = await loginShopee(page, browser);
     const context = {
@@ -209,7 +218,7 @@ async function runReplyReviews(config) {
       loginShopeeBotRes,
       config,
     };
-    await replyReviews(context);
+    await AutoReplyReviewsByApi(context);
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);

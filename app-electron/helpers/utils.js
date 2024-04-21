@@ -76,6 +76,14 @@ async function getLocalStorageData(page, key) {
   }, key);
 }
 
+async function checkSelector(page, selector) {
+  try {
+    await page.waitForSelector(selector, { timeout: 5000 });
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 module.exports = {
   waitForTimeout,
   parseCookieHeader,
@@ -87,4 +95,5 @@ module.exports = {
   clickByText,
   waitForLocalStorageData,
   getLocalStorageData,
+  checkSelector,
 };
