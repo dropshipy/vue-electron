@@ -1,13 +1,18 @@
-const { waitForTimeout } = require("../helpers/utils");
+const {
+  waitForTimeout,
+  generateCustomSelector,
+  clickByText,
+  checkSelector,
+} = require("../helpers/utils");
 const { filterReplyReviews } = require("./filter/reply-reviews");
 const { dialog } = require("electron");
-
 ///selector in rating page
 const textArea = "textarea.shopee-input__inner";
 const pagination =
-  "#app > div.app-container > div.page-container.has-sidebar > div > div > div > div.pagination.shopee-pagination > div > button.shopee-button.shopee-button--small.shopee-button--frameless.shopee-button--block.shopee-pager__button-next > i";
+  "#app > div.app-container > div.page-container.responsive-container > div > div > div > div.eds-react-pagination.my-6.text-center > div > button.eds-react-button.eds-react-pagination-pager__button.eds-react-pagination-pager__button-next.eds-react-button--frameless.eds-react-button--block.eds-react-button--small.eds-react-button--icon-only > span";
 
 async function replyReviews({ page, config }) {
+  console.log("run");
   try {
     const { replyMessage } = config;
     const loopCount = config.iteration;
@@ -16,20 +21,39 @@ async function replyReviews({ page, config }) {
       timeout: 0,
     });
 
+    try {
+      const modalNewTab = generateCustomSelector("h1", "Perubahan di Tab Data");
+
+      if (modalNewTab) {
+        await clickByText(page, "Mengerti");
+      }
+    } catch (error) {
+      console.log("eror ni new tab", error);
+    }
     await filterReplyReviews(page, config);
     let iteration = 1;
     let lastReview = false;
 
     while (loopCount >= iteration && lastReview == false) {
-      const lastPagePagination = await page.$(
-        "#app > div.app-container > div.page-container.has-sidebar > div > div > div > div.pagination.shopee-pagination > div > button.shopee-button.shopee-button--small.shopee-button--frameless.shopee-button--block.disabled.shopee-pager__button-next"
-      );
-      try {
-        await page.waitForSelector(".comment");
+      const lastPagePagination =
+        "#app > div.app-container > div.page-container.responsive-container > div > div > div > div.eds-react-pagination.my-6.text-center > div > button.eds-react-button.eds-react-pagination-pager__button.eds-react-pagination-pager__button-next.eds-react-button--frameless.eds-react-button--block.eds-react-button--small.eds-react-button--icon-only.disabled";
 
-        const cardReviews = await page.$$("div.column.reply.toreply > button ");
+      const isLastPage = await checkSelector(page, lastPagePagination);
+      try {
+        await page.waitForSelector(
+          "#app > div.app-container > div.page-container.responsive-container > div > div > div > div.bg-white.shadow-card.ratingListWrap-0-2-8 > div.rateStar-0-2-3 > div > div.relative.mt-4.flex.flex-col.gap-y-4 > div"
+        );
+        console.log("go 1");
+        const cardReviews = await page.$$(
+          "#app > div.app-container > div.page-container.responsive-container > div > div > div > div.bg-white.shadow-card.ratingListWrap-0-2-8 > div.rateStar-0-2-3 > div > div.relative.mt-4.flex.flex-col.gap-y-4 > div > div.flex.divide-x.divide-[#e8e8e8].divide-solid > div.w-[250px].p-6.flex.justify-center > div > button"
+        );
+        console.log("go 2");
         await page.waitForTimeout(2000);
+        console.log("go 3");
+        console.log("cardReviews", cardReviews);
+        console.log("cardReviews length", cardReviews.length);
         for (let i = 0; i < cardReviews.length; i++) {
+          console.log("go 3");
           console.log("start");
           if (loopCount >= iteration) {
             const buttonReviews = cardReviews[i];
@@ -40,7 +64,6 @@ async function replyReviews({ page, config }) {
             );
 
             if (!isDisabled) {
-              console.log("run....");
               await cardReviews[i].evaluate((element) => {
                 element.scrollIntoView({
                   behavior: "smooth",
@@ -49,10 +72,13 @@ async function replyReviews({ page, config }) {
                 });
               });
               await waitForTimeout(1);
+              console.log("try click");
               await cardReviews[i].click();
+              console.log("run 1");
               await page.waitForTimeout(2000);
               const modalReply = ".shopee-modal__header";
               await page.waitForSelector(modalReply);
+              console.log("run 2");
               await page.waitForTimeout(1000);
               await page.waitForSelector(textArea);
               await page.focus(textArea);
@@ -79,7 +105,7 @@ async function replyReviews({ page, config }) {
         dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
         console.log(error);
       }
-      if (lastPagePagination) {
+      if (isLastPage) {
         lastReview = true;
       }
       await page.click(pagination);

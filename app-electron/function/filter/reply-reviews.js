@@ -2,27 +2,30 @@
 const inputProductName =
   "#app > div.app-container > div.page-container.has-sidebar > div > div > div > div.rating > div.rating-filter-wrapper > form > div.rating-filter > div:nth-child(1) > div > div > div > div > input";
 
-const searchButton =
-  "#app > div.app-container > div.page-container.has-sidebar > div > div > div > div.rating > div.rating-filter-wrapper > form > div.rating-action > div > div > div > button.shopee-button.shopee-button--primary.shopee-button--normal";
+const searchButton = "#searchRequest";
 const tabMenu =
-  "#app > div.app-container > div.page-container.has-sidebar > div > div > div > div.rating > div.content > div.tab-wrapper > div.shopee-tabs.shopee-tabs-line.shopee-tabs-normal.shopee-tabs-top > div.shopee-tabs__nav > div > div.shopee-tabs__nav-tabs > div:nth-child(2)";
+  "#app > div.app-container > div.page-container.responsive-container > div > div > div > div.bg-white.shadow-card.ratingListWrap-0-2-8 > div.flex.items-center.mt-6 > div:nth-child(3)";
 
 async function filterReplyReviews(page, config) {
-  const { productName, ratingComment } = config;
+  try {
+    const { productName, ratingComment } = config;
 
-  if (productName) {
-    await page.focus(inputProductName);
-    await page.type(inputProductName, productName, { delay: 100 });
+    if (productName) {
+      await page.focus(inputProductName);
+      await page.type(inputProductName, productName, { delay: 100 });
+    }
+    const [buttonRating] = await page.$x(
+      `//span[contains(., '${ratingComment}')]`
+    );
+    if (ratingComment !== "semua" && ratingComment) {
+      await buttonRating.click();
+    }
+    await page.waitForSelector(tabMenu);
+    await page.click(tabMenu);
+    await page.click(searchButton);
+  } catch (error) {
+    console.log(error);
   }
-  const [buttonRating] = await page.$x(
-    `//span[contains(., '${ratingComment}')]`
-  );
-  if (ratingComment !== "semua") {
-    await buttonRating.click();
-  }
-  await page.waitForSelector(tabMenu);
-  await page.click(tabMenu);
-  await page.click(searchButton);
 }
 
 module.exports = {

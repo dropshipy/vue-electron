@@ -115,6 +115,17 @@ const postShopeeMessage = async ({ payload, headers }) => {
   return await postDataShopee(endpoint, data, { headers });
 };
 
+const getListOfReviews = async (endpoint, headers) => {
+  return await getDataShopee(endpoint, { headers });
+};
+
+const postReplyShop = async (endpoint, payload, { headers }) => {
+  console.log({ endpoint });
+  console.log({ payload });
+
+  return await postDataShopee(endpoint, payload, { headers });
+};
+
 module.exports = {
   postGetCreatorList,
   postAddCreator,
@@ -130,4 +141,6 @@ module.exports = {
   getShopeeFollowingList,
   postShopeeUnfollow,
   postShopeeMessage,
+  getListOfReviews,
+  postReplyShop,
 };
