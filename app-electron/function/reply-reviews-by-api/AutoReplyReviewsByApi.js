@@ -81,12 +81,12 @@ async function AutoReplyReviewsByApi({ page, config }) {
             payload,
             { headers }
           );
-          await waitForTimeout(2000);
-          loopIndex++;
           await showSnackbar({
             page,
             message: `Berhasil membalas ulasan: ${listReviews[i].user_name}`,
           });
+          await waitForTimeout(2000);
+          loopIndex++;
         } else {
           isLastIndex = true;
           break;
