@@ -99,11 +99,12 @@ function createWindow() {
     appServer.use(express.static(directoryPath));
 
     // Start the server on a specific port (e.g., 9999)
-    const PORT = process.env.PORT || 9999;
+
+    const PORT = process.env.PORT || 9889;
     appServer.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
-    mainWindow.loadURL("http://localhost:9999");
+    mainWindow.loadURL("http://localhost:9889");
   }
 }
 
