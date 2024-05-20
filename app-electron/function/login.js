@@ -19,7 +19,6 @@ async function loadCookiesShopee(page) {
 
 async function authenticateBotStatus(page, browser) {
   const accountSubscription = store.get("account-subscription");
-  console.log({ accountSubscription });
 
   // fetch fingerprint
   const osVersion = os.version();
@@ -63,10 +62,9 @@ async function authenticateBotStatus(page, browser) {
         const authenticateBotCookie = store.get("cookies-spt");
         const authenticateBotRes = await authenticateBot(payloadAuthBot, {
           headers: {
-            Cookie: authenticateBotCookie,
+            Cookie: "",
           },
         });
-
         if (authenticateBotRes?.status == 405) {
           await page.evaluate(() => {
             window.alert("Akun sudah terhubung ke perangkat lain.");

@@ -13,14 +13,13 @@ const followerCountDropdown =
 const followerAgeDropdown =
   "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div > div.affiliate-content.filter-wrapper > div > form > div > div > div.kolFilterItems_1b1wf > div.filter-item_CKEyJ.customizeInlineLabel_UD2W9.ageSelect_T7473 > div > div > div > div";
 const followerGenderDropdown =
-  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div > div.affiliate-content.filter-wrapper > div > form > div > div > div.kolFilterItems_1b1wf > div.filter-item_CKEyJ.customizeInlineLabel_UD2W9.genderSelect_Zi-UJ > div > div > div > div";
+  "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div > div.affiliate-content.filter-wrapper > div > form > div > div > div.kolFilterItems_1b1wf > div.filter-item_CKEyJ.customizeInlineLabel_UD2W9.genderSelect_Zi-UJ > div > div > div > div > div.trigger";
 const searchButtonFilter =
   "#root > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.affiliate-content_va84a.responsive-layout-container > div > div > div.ka-wrapper > div > div:nth-child(1) > div > form > div.filter-actions_dHTx2 > button.eds-react-button.eds-react-button--primary.eds-react-button--normal";
 
 async function filterCreator({ page, config }) {
   const { category, socialMedias, followerCount, followerAge, followerGender } =
     config.configMessageBlast;
-  console.log({ config });
   try {
     if (socialMedias !== "Semua" || !socialMedias) {
       try {

@@ -32,7 +32,6 @@ async function FilterReplyReviewsByApi(page, config) {
       waitUntil: "networkidle2",
       timeout: 0,
     });
-    await clickByText(page, "Lewati");
 
     if (productName) {
       await page.focus(inputProductName);
@@ -44,7 +43,7 @@ async function FilterReplyReviewsByApi(page, config) {
     // if (ratingComment !== "semua" && ratingComment) {
     //   await buttonRating.click();
     // }
-    await clickByText(page, "To Reply");
+    await clickByText(page, "Perlu Dibalas");
     await clickByText(page, "Apply");
     isLoading = true;
     return { headers, isLoading };

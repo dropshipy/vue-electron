@@ -10,17 +10,31 @@ const postGetCreatorList = async (endpoint, data, options) => {
   return await postDataShopee(endpoint, data, options);
 };
 const postGetUserReviews = async (endpoint, options) => {
-  return await getDataShopee(endpoint, options);
+  try {
+    return await getDataShopee(endpoint, options);
+  } catch (error) {
+    console.log("eror ", error);
+  }
 };
-// async function addExposeFunction({ page, config, sessionId }) {
-//   await page.exposeFunction("sendCreatorData", async (creator) => {
-//     await postAddCreator(creator, {
-//       headers: {
-//         Cookie: "connect.sid=" + sessionId,
-//       },
-//     });
-//   });
-// }
+
+const patchUseToken = async (options) => {
+  try {
+    return await patchData(
+      "/users/token",
+      {
+        token: 1,
+      },
+      options
+    );
+  } catch (error) {
+    console.log("eror patch", error);
+  }
+};
+
+const getToken = async (id) => {
+  return await getData(`/users/token/${id}`);
+};
+
 const postGetFollowers = async (endpoint, options) => {
   return await getDataShopee(endpoint, options);
 };
@@ -49,7 +63,6 @@ const authenticateBot = async (data, options) => {
       };
     }
   }
-
   return { ...response.data, sessionId: cookies["connect.sid"] };
 };
 const updateSubscriptionStatus = async (data, options) => {
@@ -140,4 +153,6 @@ module.exports = {
   postShopeeMessage,
   getListOfReviews,
   postReplyShop,
+  patchUseToken,
+  getToken,
 };

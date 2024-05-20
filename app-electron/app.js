@@ -25,6 +25,9 @@ const { getApiBaseUrl } = require("./helpers/api-url");
 const {
   AutoReplyReviewsByApi,
 } = require("./function/reply-reviews-by-api/AutoReplyReviewsByApi");
+const {
+  runAutoChatByReviewsV2,
+} = require("./function/auto-chat/v2/auto-chat-by-reviews-v2");
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -83,7 +86,7 @@ function createWindow() {
     },
   });
   if (process.env.ENTRY_SOURCE === "dev_server") {
-    mainWindow.loadURL("http://localhost:3000");
+    mainWindow.loadURL("http://localhost:3030");
     mainWindow.webContents.openDevTools();
     mainWindow.setFullScreen(true);
   } else {
@@ -155,7 +158,6 @@ async function handleAutoUnfolow(iteration) {
 }
 
 ipcMain.on("crawl-creator", (event, data) => {
-  console.log(data);
   handleCrawlCreator(data);
 });
 async function handleCrawlCreator(config) {
@@ -254,7 +256,8 @@ ipcMain.on("process-auto-follow-by-reviews", async (event, data) => {
 
 ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
   try {
-    await runAutoChatByReviews({ chromePath, data });
+    // await runAutoChatByReviews({ chromePath, data });
+    await runAutoChatByReviewsV2({ chromePath, data });
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
@@ -275,8 +278,8 @@ ipcMain.handle("get-subscription-info", async () => {
     });
     return res.data;
   } catch (error) {
-    console.error("Error fetching subscription info:", error);
-    throw error;
+    console.error("Error fetching subscription info:", error.message);
+    throw error.message;
   }
 });
 
@@ -323,7 +326,7 @@ app.on("window-all-closed", () => {
 //   return new Promise((resolve, reject) => {
 //     // Your authentication logic here, for example using axios
 //     axios
-//       .post("http://localhost:3000/api/users/authenticate", {
+//       .post("http://localhost:3030/api/users/authenticate", {
 //         email: "zu@gmail",
 //         password: "qwe",
 //       })
@@ -355,7 +358,7 @@ function makeApiRequest() {
   return new Promise((resolve, reject) => {
     try {
       axios
-        .get("http://localhost:3000/api/shopee/message-blast/7", {
+        .get("http://localhost:3030/api/shopee/message-blast/7", {
           headers: {
             Cookie: authenticationCookie,
           },
