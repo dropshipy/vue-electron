@@ -108,13 +108,13 @@ async function messageBlast({
             await page.waitForSelector(textArea);
             let isAlreadySent = false;
             try {
-              await page.waitForSelector("div.QwyBL5p0DA", { timeout: 1000 });
+              await page.waitForSelector("div.w2C67vtnXi", { timeout: 1000 });
             } catch (error) {
               isAlreadySent = false;
             }
             await page
               .evaluate(async (text) => {
-                const divs = document.querySelectorAll("div.QwyBL5p0DA");
+                const divs = document.querySelectorAll("div.w2C67vtnXi");
 
                 // const targetDiv = Array.from(divs).find((div) =>
                 //   div.innerText.includes(messageContent)
