@@ -45,7 +45,6 @@ async function sendMessageToReviewer({
     sendMessageIndex < filteredListViewer.length &&
     remainingToken >= 1
   ) {
-    console.log("listReviewer", filteredListViewer[sendMessageIndex]);
     const resChat = await postShopeeMessage({
       payload: {
         to_id: filteredListViewer[sendMessageIndex].userid,
