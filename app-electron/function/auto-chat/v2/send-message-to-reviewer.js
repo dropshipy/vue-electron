@@ -18,6 +18,14 @@ async function sendMessageToReviewer({
   authBotRes,
   remainingToken,
 }) {
+  let filteredListViewer = listReviewer.filter((item, index, array) => {
+    return index === array.findIndex((obj) => obj.userId === item.userId);
+  });
+
+  if (filteredListViewer.length == 0) {
+    return { loopCount: 1000 };
+  }
+
   await waitForLocalStorageData(page, "mini-session");
 
   const miniSessionData = await getLocalStorageData(page, "mini-session");
@@ -34,13 +42,13 @@ async function sendMessageToReviewer({
 
   while (
     iteration >= loopCount &&
-    sendMessageIndex < listReviewer.length &&
+    sendMessageIndex < filteredListViewer.length &&
     remainingToken >= 1
   ) {
-    console.log({ sendMessageIndex });
+    console.log("listReviewer", filteredListViewer[sendMessageIndex]);
     const resChat = await postShopeeMessage({
       payload: {
-        to_id: listReviewer[sendMessageIndex].userid,
+        to_id: filteredListViewer[sendMessageIndex].userid,
         shop_id,
         content: {
           text: template,
@@ -54,6 +62,7 @@ async function sendMessageToReviewer({
           Cookie: "connect.sid=" + authBotRes.sessionId,
         },
       });
+      await waitForTimeout(1000);
       await showSnackbar({
         page,
         message: `Berhasil mengirim pesan ke: ${listReviewer[sendMessageIndex].author_username}`,
@@ -61,7 +70,6 @@ async function sendMessageToReviewer({
       if (resUseToken.status == 201) {
         const { data } = resUseToken.data;
         remainingToken = data.remainingToken;
-        await waitForTimeout(1000);
       }
     }
     loopCount++;
