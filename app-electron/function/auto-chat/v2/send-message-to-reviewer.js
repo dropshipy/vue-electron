@@ -1,6 +1,7 @@
 const {
   waitForLocalStorageData,
   getLocalStorageData,
+  waitForTimeout,
 } = require("../../../helpers/utils");
 
 const { postShopeeMessage, patchUseToken } = require("../../../api/interface");
@@ -36,6 +37,7 @@ async function sendMessageToReviewer({
     sendMessageIndex < listReviewer.length &&
     remainingToken >= 1
   ) {
+    console.log({ sendMessageIndex });
     const resChat = await postShopeeMessage({
       payload: {
         to_id: listReviewer[sendMessageIndex].userid,
@@ -58,8 +60,8 @@ async function sendMessageToReviewer({
       });
       if (resUseToken.status == 201) {
         const { data } = resUseToken.data;
-
         remainingToken = data.remainingToken;
+        await waitForTimeout(1000);
       }
     }
     loopCount++;
