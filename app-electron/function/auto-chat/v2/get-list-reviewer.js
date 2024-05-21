@@ -70,14 +70,14 @@ async function getListReviewer({ browser, startPoint, loopCount }) {
           })
         );
 
-        await page.close();
+        // await page.close();
         return newListReviewer;
       } else await page.reload();
       iteration++;
       await waitForTimeout(500);
     }
     if (listReviewer.length < 1) {
-      await page.close();
+      // await page.close();
       return [];
     }
   } catch (error) {

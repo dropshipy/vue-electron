@@ -82,7 +82,10 @@ async function runAutoChatByReviewsV2({ chromePath, data }) {
 
       const remainingToken = getTokenCustomer.data.userToken.token;
 
-      await page.goto("https://seller.shopee.co.id/webchat/conversations");
+      await page.goto("https://seller.shopee.co.id/webchat/conversations", {
+        waitUntil: "networkidle2",
+        timeout: 10000,
+      });
 
       if (remainingToken && remainingToken >= 1) {
         const sendMessage = await sendMessageToReviewer({

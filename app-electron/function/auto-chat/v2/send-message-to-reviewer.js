@@ -7,6 +7,8 @@ const {
 const { postShopeeMessage, patchUseToken } = require("../../../api/interface");
 const { showSnackbar } = require("../../../helpers/snackbar");
 
+const { interceptSendProduct } = require("./intercept-send-product");
+
 async function sendMessageToReviewer({
   page,
   headers,
@@ -53,16 +55,21 @@ async function sendMessageToReviewer({
       headers,
     });
     if (resChat.status == 200) {
+      await showSnackbar({
+        page,
+        message: `Berhasil mengirim pesan ke: ${filteredListViewer[sendMessageIndex].author_username}`,
+      });
+      await interceptSendProduct({
+        page,
+        author_username: filteredListViewer[sendMessageIndex].author_username,
+      });
       const resUseToken = await patchUseToken({
         headers: {
           Cookie: "connect.sid=" + authBotRes.sessionId,
         },
       });
-      await waitForTimeout(2000);
-      await showSnackbar({
-        page,
-        message: `Berhasil mengirim pesan ke: ${listReviewer[sendMessageIndex].author_username}`,
-      });
+      await waitForTimeout(1000);
+
       if (resUseToken.status == 201) {
         const { data } = resUseToken.data;
         remainingToken = data.remainingToken;
