@@ -7,9 +7,9 @@ const {
 } = require("../../../helpers/extract-shopee-ids");
 const { waitForTimeout } = require("../../../helpers/utils");
 
-// default limit = 20
+// max limit 50
 const reviewUrl = new URL(
-  "https://shopee.co.id/api/v2/item/get_ratings?exclude_filter=1&filter=0&filter_size=0&flag=1&fold_filter=0&itemid=&limit=20&offset=0&relevant_reviews=false&request_source=2&shopid=&tag_filter=&type=0&variation_filters="
+  "https://shopee.co.id/api/v2/item/get_ratings?exclude_filter=1&filter=0&filter_size=0&flag=1&fold_filter=0&itemid=&limit=50&offset=0&relevant_reviews=false&request_source=2&shopid=&tag_filter=&type=0&variation_filters="
 );
 
 async function getListReviewer({ browser, startPoint, loopCount }) {

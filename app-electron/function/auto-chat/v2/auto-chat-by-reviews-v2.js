@@ -97,7 +97,6 @@ async function runAutoChatByReviewsV2({ chromePath, data }) {
           remainingToken,
         });
         loopCount = sendMessage.loopCount;
-        console.log({ loopCount });
       } else break;
     }
 
