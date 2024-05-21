@@ -23,10 +23,6 @@ async function sendMessageToReviewer({
       array.findIndex((obj) => obj.userid === item.userid) === index
   );
 
-  if (filteredListViewer.length == 0) {
-    return { loopCount: 1000 };
-  }
-
   await waitForLocalStorageData(page, "mini-session");
 
   const miniSessionData = await getLocalStorageData(page, "mini-session");
