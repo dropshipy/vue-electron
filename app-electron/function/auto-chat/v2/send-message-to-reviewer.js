@@ -19,6 +19,7 @@ async function sendMessageToReviewer({
   loopCount,
   authBotRes,
   remainingToken,
+  isSendProduct,
 }) {
   let filteredListViewer = listReviewer.filter(
     (item, index, array) =>
@@ -55,19 +56,24 @@ async function sendMessageToReviewer({
       headers,
     });
     if (resChat.status == 200) {
-      await showSnackbar({
-        page,
-        message: `Berhasil mengirim pesan ke: ${filteredListViewer[sendMessageIndex].author_username}`,
-      });
-      await interceptSendProduct({
-        page,
-        author_username: filteredListViewer[sendMessageIndex].author_username,
-      });
       const resUseToken = await patchUseToken({
         headers: {
           Cookie: "connect.sid=" + authBotRes.sessionId,
         },
       });
+
+      await showSnackbar({
+        page,
+        message: `Berhasil mengirim pesan ke: ${filteredListViewer[sendMessageIndex].author_username}`,
+      });
+
+      if (isSendProduct) {
+        await interceptSendProduct({
+          page,
+          author_username: filteredListViewer[sendMessageIndex].author_username,
+        });
+      }
+
       await waitForTimeout(1000);
 
       if (resUseToken.status == 201) {

@@ -17,7 +17,7 @@ const sendMessageToReviewer = require("./send-message-to-reviewer");
 
 async function runAutoChatByReviewsV2({ chromePath, data }) {
   try {
-    const { startPoint, iteration, template } = data;
+    const { startPoint, iteration, template, isSendProduct } = data;
 
     const browser = await puppeteer.launch({
       headless: false,
@@ -98,6 +98,7 @@ async function runAutoChatByReviewsV2({ chromePath, data }) {
           loopCount,
           authBotRes,
           remainingToken,
+          isSendProduct,
         });
         loopCount = sendMessage.loopCount;
       } else break;

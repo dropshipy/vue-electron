@@ -9,6 +9,7 @@ export default {
       startPoint: 1,
       iteration: 1,
       templateChat: "",
+      isSendProduct: false,
     };
   },
   computed: {
@@ -50,6 +51,7 @@ export default {
           startPoint: this.startPoint,
           iteration: +this.iteration,
           template: this.templateChat,
+          isSendProduct: this.isSendProduct,
         };
 
         window.electron.ipcRenderer.send(
@@ -113,8 +115,10 @@ export default {
         placeholder="Masukkan template chat"
         input-class="min-h-28"
         :max-height="200"
-        class="mt-3"
+        class="my-3"
       />
+
+      <Toggle v-model="isSendProduct" label="Kirim Produk" />
       <div class="flex gap-5">
         <Button class="w-full mt-7 !cursor-default"
           >Token : {{ !isLoading ? token.token : "..." }}</Button
