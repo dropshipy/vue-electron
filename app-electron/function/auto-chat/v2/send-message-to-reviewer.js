@@ -58,7 +58,7 @@ async function sendMessageToReviewer({
           Cookie: "connect.sid=" + authBotRes.sessionId,
         },
       });
-      await waitForTimeout(1000);
+      await waitForTimeout(2000);
       await showSnackbar({
         page,
         message: `Berhasil mengirim pesan ke: ${listReviewer[sendMessageIndex].author_username}`,
