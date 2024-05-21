@@ -18,9 +18,10 @@ async function sendMessageToReviewer({
   authBotRes,
   remainingToken,
 }) {
-  let filteredListViewer = listReviewer.filter((item, index, array) => {
-    return index === array.findIndex((obj) => obj.userId === item.userId);
-  });
+  let filteredListViewer = listReviewer.filter(
+    (item, index, array) =>
+      array.findIndex((obj) => obj.userid === item.userid) === index
+  );
 
   if (filteredListViewer.length == 0) {
     return { loopCount: 1000 };
