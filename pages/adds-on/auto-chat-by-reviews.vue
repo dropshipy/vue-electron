@@ -9,6 +9,7 @@ export default {
       startPoint: 1,
       iteration: 1,
       templateChat: "",
+      productName: "",
       isSendProduct: false,
     };
   },
@@ -44,6 +45,10 @@ export default {
           this.$snackbar.error("Silakan isi semua field terlebih dahulu");
           return;
         }
+        if (this.isSendProduct && !this.productName) {
+          this.$snackbar.error("Silakan isi nama produk yang akan dikirim");
+          return;
+        }
 
         electronStore.set(AUTO_CHAT_BY_REVIEWS_LINK_STORE_KEY, this.targetLink);
 
@@ -52,6 +57,7 @@ export default {
           iteration: +this.iteration,
           template: this.templateChat,
           isSendProduct: this.isSendProduct,
+          productName: this.productName,
         };
 
         window.electron.ipcRenderer.send(
@@ -119,6 +125,17 @@ export default {
       />
 
       <Toggle v-model="isSendProduct" label="Kirim Produk" />
+      <div
+        class="overflow-hidden"
+        :class="[isSendProduct ? 'h-max p-2' : 'h-0']"
+      >
+        <Textfield
+          v-model="productName"
+          label="Nama Produk Yang Akan Dikirim"
+          placeholder="Masukkan nama produk"
+          class="mt-5"
+        />
+      </div>
       <div class="flex gap-5">
         <Button class="w-full mt-7 !cursor-default"
           >Token : {{ !isLoading ? token.token : "..." }}</Button
