@@ -20,6 +20,7 @@ async function sendMessageToReviewer({
   authBotRes,
   remainingToken,
   isSendProduct,
+  productName,
 }) {
   let filteredListViewer = listReviewer.filter(
     (item, index, array) =>
@@ -70,6 +71,7 @@ async function sendMessageToReviewer({
       if (isSendProduct) {
         await interceptSendProduct({
           page,
+          productName,
           author_username: filteredListViewer[sendMessageIndex].author_username,
         });
       }

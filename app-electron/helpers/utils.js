@@ -33,6 +33,7 @@ async function loadCookies(path) {
 // example : generateCustomSelector('div','test)
 const generateCustomSelector = (element, text) =>
   `; //${element}[contains(text(),'${text}')]`;
+
 const waitForElementWithText = async (page, element, text) => {
   const selector = generateCustomSelector(element, text);
 
