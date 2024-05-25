@@ -26,11 +26,26 @@ async function getListReviewer(requestDataList, offset) {
       type: 0,
       variation_filters: "",
     };
-    const newHeaders = (requestDataList = {
-      ...requestDataList,
-      cookie: clearCookieValues(requestDataList.cookie),
-    });
-    console.log("newHeaders", newHeaders);
+    const newHeaders = {
+      accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "accept-language": "en-US,en;q=0.9",
+      "cache-control": "no-cache",
+      cookie: getCookieHeader(getRandomCookies()),
+      pragma: "no-cache",
+      priority: "u=0, i",
+      "sec-ch-ua":
+        '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"macOS"',
+      "sec-fetch-dest": "document",
+      "sec-fetch-mode": "navigate",
+      "sec-fetch-site": "none",
+      "sec-fetch-user": "?1",
+      "upgrade-insecure-requests": "1",
+      "user-agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    };
 
     try {
       const getReviewerRes = await axios.get(endpoint, {
@@ -38,7 +53,7 @@ async function getListReviewer(requestDataList, offset) {
         params: params,
       });
       const { data } = getReviewerRes.data;
-      console.log({ data });
+
       const listAccount = data.ratings.map(({ userid, author_username }) => ({
         userid,
         author_username,
@@ -50,27 +65,6 @@ async function getListReviewer(requestDataList, offset) {
     }
   } catch (error) {}
 }
-
-function clearCookieValues(params) {
-  let cookies = params.split(";");
-
-  let result = "";
-
-  cookies.forEach(function (cookie) {
-    let parts = cookie.split("=");
-    let cookieName = parts[0].trim();
-
-    if (parts.length > 1) {
-      result += cookieName + "=; ";
-    } else {
-      result += cookie + "; ";
-    }
-  });
-  console.log("result.trim()", result.trim());
-  // Hapus spasi ekstra di akhir dan kembalikan hasilnya
-  return result.trim();
-}
-
 function getRandomCookies() {
   return {
     SPC_SI: "",
@@ -83,6 +77,7 @@ function getRandomCookies() {
     SPC_T_IV: "",
   };
 }
+
 function getCookieHeader(cookies) {
   return Object.entries(cookies)
     .map(([key, value]) => `${key}=${value}`)
