@@ -74,8 +74,6 @@ async function followByReviews({
     let followingCount = 0;
 
     while (followingCount < iteration) {
-      console.log({ iteration, followingCount });
-
       let offset = +startPoint - 1;
 
       if (followingCount > 0) {
@@ -88,7 +86,6 @@ async function followByReviews({
       );
 
       let currentIndex = 0;
-      console.log({ currentIndex });
 
       while (followingCount < iteration && currentIndex < 20) {
         const follow = await postFollowUser(

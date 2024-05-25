@@ -43,7 +43,7 @@ async function getListReviewer(requestDataList, offset) {
         userid,
         author_username,
       }));
-      console.log({ listAccount });
+
       return { newHeaders, listAccount };
     } catch (error) {
       console.log(error.message);
@@ -52,21 +52,17 @@ async function getListReviewer(requestDataList, offset) {
 }
 
 function clearCookieValues(params) {
-  // Mendapatkan daftar semua cookie
   let cookies = params.split(";");
 
-  // Variabel untuk menyimpan hasil akhir
   let result = "";
 
-  // Loop melalui setiap cookie dan menghapus nilai jika ada
   cookies.forEach(function (cookie) {
     let parts = cookie.split("=");
     let cookieName = parts[0].trim();
-    // Jika cookie memiliki nilai, tambahkan nama cookie dengan nilai kosong
+
     if (parts.length > 1) {
       result += cookieName + "=; ";
     } else {
-      // Jika cookie tidak memiliki nilai, tambahkan langsung cookie tersebut
       result += cookie + "; ";
     }
   });
