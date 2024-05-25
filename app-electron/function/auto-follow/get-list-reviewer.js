@@ -47,15 +47,13 @@ async function getListReviewer(requestDataList, offset) {
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     };
 
-    console.log("newHeaders", newHeaders);
-
     try {
       const getReviewerRes = await axios.get(endpoint, {
         headers: newHeaders,
         params: params,
       });
       const { data } = getReviewerRes.data;
-      console.log({ data });
+
       const listAccount = data.ratings.map(({ userid, author_username }) => ({
         userid,
         author_username,
