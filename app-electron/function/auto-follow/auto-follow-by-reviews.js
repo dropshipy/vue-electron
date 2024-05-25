@@ -1,5 +1,5 @@
 const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+
 const { dialog } = require("electron");
 const ElectronStore = require("electron-store");
 const store = new ElectronStore();
@@ -7,35 +7,38 @@ const { loginShopee } = require("../login");
 const { postGetUserReviews } = require("../../api/interface");
 const { postFollowUser } = require("../../api/interface");
 const { showSnackbar } = require("../../helpers/snackbar");
+const { getListReviewer } = require("./get-list-reviewer");
 
 async function runAutoFollowByReviews({ chromePath, data }) {
   const startPoint = data.startPointFollowByReviews;
   const iteration = data.iterationFollowByReviews;
 
   try {
-    puppeteer.use(StealthPlugin());
     const url = store.get("link-auto-follow-by-reviews");
     const browser = await puppeteer.launch({
       headless: false,
       executablePath: chromePath,
     });
     const page = await browser.newPage();
-    const requestDataList = [];
+    const { width, height } = await page.evaluate(() => {
+      return {
+        width: window.screen.width,
+        height: window.screen.height,
+      };
+    });
+
+    await page.setViewport({ width, height });
+    let requestDataList = null;
     await page.setRequestInterception(true);
     page.on("request", (request) => {
       if (
         request
           .url()
           .startsWith(
-            "https://shopee.co.id/api/v2/item/get_ratings?exclude_filter=1&filter=0&filter_size=0&flag=1&fold_filter=0"
+            "https://seller.shopee.co.id/api/selleraccount/shop_info/"
           )
       ) {
-        const information = {
-          url: request.url(),
-          requestHeaders: request.headers(),
-        };
-        console.log({ request });
-        requestDataList.push(information);
+        requestDataList = request.headers();
         request.continue();
       } else {
         request.continue();
@@ -44,22 +47,8 @@ async function runAutoFollowByReviews({ chromePath, data }) {
 
     await loginShopee(page, browser);
 
-    page.on("response", async (response) => {
-      if (response.url().includes("/get_payment_info")) {
-        await page.waitForTimeout(2000);
-        await page.waitForSelector(".page-product__shop");
-        await page.evaluate(() => {
-          // Note: scroll down to trigger fetch /get_ratings
-          const shopElement = document.querySelector(".page-product__shop");
-          if (shopElement) {
-            shopElement.scrollIntoView({ behavior: "smooth" });
-          }
-        });
-      }
-    });
-
-    await page.goto(url);
-    while (requestDataList.length <= 0) {
+    await page.goto("https://seller.shopee.co.id/");
+    while (requestDataList == null) {
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
     const context = {
@@ -81,9 +70,6 @@ async function followByReviews({
   startPoint,
   page,
 }) {
-  let endpoint = requestDataList[0]?.url;
-  const header = requestDataList[0]?.requestHeaders;
-  endpoint = endpoint.replace(/limit=\d+/, `limit=${20}`);
   try {
     let followingCount = 0;
 
@@ -96,11 +82,10 @@ async function followByReviews({
         offset = +startPoint + followingCount - 1;
       }
 
-      endpoint = endpoint.replace(/offset=\d+/, `offset=${offset}`);
-
-      const getUser = await postGetUserReviews(endpoint, {
-        headers: header,
-      });
+      const { newHeaders, listAccount } = await getListReviewer(
+        requestDataList,
+        offset
+      );
 
       let currentIndex = 0;
       console.log({ currentIndex });
@@ -108,15 +93,15 @@ async function followByReviews({
       while (followingCount < iteration && currentIndex < 20) {
         const follow = await postFollowUser(
           "https://shopee.co.id/api/v4/pages/follow",
-          { userid: getUser.data.data.ratings[currentIndex].userid },
+          { userid: listAccount[currentIndex].userid },
           {
-            headers: header,
+            headers: newHeaders,
           }
         );
-        const username =
-          getUser.data.data.ratings[currentIndex].author_username;
-
-        await showSnackbar({ page, message: `Berhasil follow ${username}` });
+        await showSnackbar({
+          page,
+          message: `Berhasil follow ${listAccount[currentIndex].author_username}`,
+        });
 
         await page.waitForTimeout(1200);
         currentIndex++;
