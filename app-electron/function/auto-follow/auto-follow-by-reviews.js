@@ -95,9 +95,10 @@ async function followByReviews({
             headers: newHeaders,
           }
         );
+        const username = listAccount[currentIndex].author_username;
         await showSnackbar({
           page,
-          message: `Berhasil follow ${listAccount[currentIndex].author_username}`,
+          message: `Berhasil follow ${username}`,
         });
 
         await page.waitForTimeout(1200);
