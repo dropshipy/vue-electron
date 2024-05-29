@@ -45,6 +45,7 @@ async function filterCreator({ page, config }) {
     }
     if (category.length > 0) {
       try {
+        await page.waitForTimeout(500);
         await page.waitForSelector(categoryDropdown);
         await page.click(categoryDropdown);
         await page.waitForTimeout(2000);
@@ -61,6 +62,7 @@ async function filterCreator({ page, config }) {
             }
           });
         }, category);
+        await page.click(categoryDropdown);
       } catch (error) {
         console.log(error);
       }
@@ -68,6 +70,7 @@ async function filterCreator({ page, config }) {
 
     if (followerCount !== "Semua" || !followerCount) {
       try {
+        await page.waitForTimeout(500);
         await page.click(followerCountDropdown);
         await page.waitForTimeout(2000);
         await page.evaluate((followerCount) => {
@@ -88,6 +91,7 @@ async function filterCreator({ page, config }) {
     }
     if (followerAge !== "Semua" || !followerAge) {
       try {
+        await page.waitForTimeout(500);
         await page.click(followerAgeDropdown);
         await page.waitForTimeout(2000);
         await page.evaluate((text) => {
@@ -108,6 +112,7 @@ async function filterCreator({ page, config }) {
     }
     if (followerGender !== "Semua" || !followerGender) {
       try {
+        await page.waitForTimeout(500);
         await page.click(followerGenderDropdown);
         await page.waitForTimeout(2000);
         const [buttonGender] = await page.$x(
@@ -119,6 +124,7 @@ async function filterCreator({ page, config }) {
       }
     }
     // await page.click(searchButtonFilter);
+    await waitForTimeout(2000);
     await clickByText(page, "Ajukan");
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
