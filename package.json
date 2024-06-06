@@ -1,5 +1,5 @@
 {
-  "name": "shopee-power-tools",
+  "name": "shopee-app",
   "version": "16.02.24",
   "description": "",
   "main": "./app-electron/app.js",
