@@ -85,6 +85,11 @@ async function checkSelector(page, selector) {
     return false;
   }
 }
+
+const deleteNewLineAndSpaces = function (teks) {
+  return teks.replace(/[\n\s]/g, "");
+};
+
 module.exports = {
   waitForTimeout,
   parseCookieHeader,
@@ -97,4 +102,5 @@ module.exports = {
   waitForLocalStorageData,
   getLocalStorageData,
   checkSelector,
+  deleteNewLineAndSpaces,
 };

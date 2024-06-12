@@ -1,6 +1,7 @@
 const { postGetCreatorList } = require("../../api/interface");
 const { postAddCreator } = require("../../api/interface");
 const { dialog } = require("electron");
+const { deleteNewLineAndSpaces } = require("../../helpers/utils");
 
 async function messageBlast({
   page,
@@ -107,29 +108,68 @@ async function messageBlast({
               "#shopee-mini-chat-embedded > div > div.ZbkI8cjmb1 > div > div.Z8RjJZsXy1 > div.C8Jzw7jkTU > div.Mj9lh6KccD > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
             await page.waitForSelector(textArea);
             let isAlreadySent = false;
+
+            const chatHistoryBubble = "div.w2C67vtnXi";
             try {
-              await page.waitForSelector("div.w2C67vtnXi", { timeout: 1000 });
+              await page.waitForSelector(chatHistoryBubble, { timeout: 1000 });
             } catch (error) {
               isAlreadySent = false;
             }
-            await page
-              .evaluate(async (text) => {
-                const divs = document.querySelectorAll("div.w2C67vtnXi");
+            // await page
+            //   .evaluate(async (text) => {
+            //     const divs = document.querySelectorAll("div.w2C67vtnXi");
 
-                // const targetDiv = Array.from(divs).find((div) =>
-                //   div.innerText.includes(messageContent)
-                // );
-                const targetDiv = Array.from(divs).some((div) =>
-                  div.textContent.includes(text)
-                );
-                if (targetDiv) {
-                  return true;
+            //     // const targetDiv = Array.from(divs).find((div) =>
+            //     //   div.innerText.includes(messageContent)
+            //     // );
+            //     const targetDiv = Array.from(divs).some((div) =>
+            //       div.textContent.includes(text)
+            //     );
+            //     if (targetDiv) {
+            //       return true;
+            //     }
+            //     return false;
+            //   }, replyMessage)
+            //   .then((result) => {
+            //     isAlreadySent = result;
+            //   });
+
+            let retrieveTextFromPreviousChat;
+
+            const isTextFound = await page.evaluate((searchText) => {
+              const elements = document.querySelectorAll("div.w2C67vtnXi");
+              const result = [];
+              for (let i = 0; i < elements.length; i++) {
+                const element = elements[i];
+
+                if (element.childNodes.length > 0) {
+                  for (let j = 0; j < element.childNodes.length; j++) {
+                    const childNode = element.childNodes[j];
+                    result.push(childNode.textContent);
+                  }
                 }
-                return false;
-              }, replyMessage)
-              .then((result) => {
-                isAlreadySent = result;
-              });
+              }
+              return result;
+            }, replyMessage);
+
+            retrieveTextFromPreviousChat = await isTextFound;
+
+            // handle if the same message has already been sent
+
+            if (retrieveTextFromPreviousChat.length > 0) {
+              retrieveTextFromPreviousChat = retrieveTextFromPreviousChat.map(
+                (teks) => deleteNewLineAndSpaces(teks)
+              );
+              const invitationMessage = deleteNewLineAndSpaces(replyMessage);
+
+              const checkWhetherItHasBeenSent =
+                retrieveTextFromPreviousChat.includes(invitationMessage);
+
+              if (checkWhetherItHasBeenSent) {
+                isAlreadySent = true;
+              }
+            }
+
             if (!isAlreadySent) {
               const messageLines = replyMessage.split("\n");
               // Type each line without pressing Enter

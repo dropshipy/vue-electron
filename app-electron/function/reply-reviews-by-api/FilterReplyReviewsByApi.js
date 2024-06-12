@@ -37,14 +37,8 @@ async function FilterReplyReviewsByApi(page, config) {
       await page.focus(inputProductName);
       await page.type(inputProductName, productName, { delay: 100 });
     }
-    // const [buttonRating] = await page.$x(
-    //   `//span[contains(., '${ratingComment}')]`
-    // );
-    // if (ratingComment !== "semua" && ratingComment) {
-    //   await buttonRating.click();
-    // }
     await clickByText(page, "Perlu Dibalas");
-    await clickByText(page, "Apply");
+    await clickByText(page, "Terapkan");
     isLoading = true;
     return { headers, isLoading };
   } catch (error) {

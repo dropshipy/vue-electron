@@ -76,6 +76,8 @@ async function AutoReplyReviewsByApi({ page, config }) {
             comment_id: listReviews[i].comment_id,
             order_id: listReviews[i].order_id,
           };
+
+          const testCookie = await page.cookies();
           const postReplyReviews = await postReplyShop(
             endpointReplyShop,
             payload,
