@@ -48,12 +48,7 @@ async function getDataShopee(endpoint = "", options = {}, Honeybadger) {
   }
 }
 
-async function postDataShopee(
-  endpoint = "",
-  data = {},
-  options = {},
-  Honeybadger
-) {
+async function postDataShopee(endpoint = "", data = {}, options = {}) {
   try {
     const response = await axios.post(endpoint, data, options);
 

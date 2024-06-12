@@ -133,7 +133,29 @@ const getListOfReviews = async (endpoint, headers) => {
 };
 
 const postReplyShop = async (endpoint, payload, { headers }) => {
-  return await postDataShopee(endpoint, payload, { headers });
+  const updateHeaders = {
+    ...headers,
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"macOS"',
+    origin: "https://seller.shopee.co.id",
+    priority: "u=1, i",
+    "accept-language": "en-US,en;q=0.9",
+    accept: "application/json, text/plain, */*",
+    "content-type": "application/json;charset=UTF-8",
+  };
+
+  fetch(endpoint, {
+    method: "POST",
+    headers: updateHeaders,
+    body: JSON.stringify(payload),
+  })
+    .then((response) => response.json())
+    .then((data) => console.log("Reply by api:", data.message))
+    .catch((error) => console.error("Error:", error));
+  // return await postDataShopee(endpoint, payload, updateHeaders);
 };
 
 module.exports = {
