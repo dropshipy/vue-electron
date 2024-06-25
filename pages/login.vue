@@ -66,12 +66,15 @@ export default {
         password: this.password,
       };
       try {
-        window.electron.ipcRenderer.send("post-cookies-shopee-tools", payload);
         const response = await this.$axios.post(
           `${this.$config.apiBaseUrl}/users/authenticate`,
           payload
         );
         if (response?.status === 200) {
+          window.electron.ipcRenderer.send(
+            "post-cookies-shopee-tools",
+            payload
+          );
           const userData = response.data.user;
 
           localStorage.setItem("user_info", JSON.stringify(userData));
