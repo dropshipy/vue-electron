@@ -27,7 +27,7 @@ async function getListFollower({ requestDataList }, followingCount) {
         params: params,
       });
       const { data } = getReviewerRes.data;
-
+      console.log("data", data);
       const listAccount = data.accounts.map(({ userid, username }) => ({
         userid,
         username,

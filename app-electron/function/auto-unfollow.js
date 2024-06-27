@@ -43,7 +43,7 @@ async function autoUnfollow({ page, iteration, browser }) {
 
   try {
     if (profile?.user_profile) {
-      const shopeeMaxLimit = 50;
+      const shopeeMaxLimit = 20;
       const isLoopRequired =
         iteration === "Semua" || iteration > shopeeMaxLimit;
 
