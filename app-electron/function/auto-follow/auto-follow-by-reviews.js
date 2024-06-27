@@ -92,7 +92,7 @@ async function followByReviews({
           "https://shopee.co.id/api/v4/pages/follow",
           { userid: listAccount[currentIndex].userid },
           {
-            headers: newHeaders,
+            headers: requestDataList,
           }
         );
         const username = listAccount[currentIndex].author_username;

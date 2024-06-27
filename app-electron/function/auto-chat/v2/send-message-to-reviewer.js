@@ -9,6 +9,9 @@ const { showSnackbar } = require("../../../helpers/snackbar");
 
 const { interceptSendProduct } = require("./intercept-send-product");
 
+const ElectronStore = require("electron-store");
+const store = new ElectronStore();
+
 async function sendMessageToReviewer({
   page,
   headers,
@@ -46,42 +49,61 @@ async function sendMessageToReviewer({
     sendMessageIndex < filteredListViewer.length &&
     remainingToken >= 1
   ) {
-    const resChat = await postShopeeMessage({
-      payload: {
-        to_id: filteredListViewer[sendMessageIndex].userid,
-        shop_id,
-        content: {
-          text: template,
-        },
-      },
-      headers,
-    });
-    if (resChat.status == 200) {
-      const resUseToken = await patchUseToken({
-        headers: {
-          Cookie: "connect.sid=" + authBotRes.sessionId,
-        },
-      });
+    // list of reviews that have been sent messages
 
+    const listFromStorage = store.get("listReviewsHaveBeenSentMessages");
+
+    let getlList = listFromStorage ? JSON.parse(listFromStorage) : [];
+
+    const reviewerId = filteredListViewer[sendMessageIndex].userid;
+
+    if (!getlList.includes(reviewerId)) {
+      const resChat = await postShopeeMessage({
+        payload: {
+          to_id: reviewerId,
+          shop_id,
+          content: {
+            text: template,
+          },
+        },
+        headers,
+      });
+      if (resChat.status == 200) {
+        const resUseToken = await patchUseToken({
+          headers: {
+            Cookie: "connect.sid=" + authBotRes.sessionId,
+          },
+        });
+        getlList.push(reviewerId);
+        store.set("listReviewsHaveBeenSentMessages", JSON.stringify(getlList));
+
+        await showSnackbar({
+          page,
+          message: `Berhasil mengirim pesan ke: ${filteredListViewer[sendMessageIndex].author_username}`,
+        });
+
+        if (isSendProduct) {
+          await interceptSendProduct({
+            page,
+            productName,
+            author_username:
+              filteredListViewer[sendMessageIndex].author_username,
+          });
+        }
+
+        await waitForTimeout(1000);
+
+        if (resUseToken.status == 201) {
+          const { data } = resUseToken.data;
+          remainingToken = data.remainingToken;
+        }
+      }
+    } else {
       await showSnackbar({
         page,
-        message: `Berhasil mengirim pesan ke: ${filteredListViewer[sendMessageIndex].author_username}`,
+        message: `Sudah pernah mengirim pesan ke: ${filteredListViewer[sendMessageIndex].author_username}`,
       });
-
-      if (isSendProduct) {
-        await interceptSendProduct({
-          page,
-          productName,
-          author_username: filteredListViewer[sendMessageIndex].author_username,
-        });
-      }
-
-      await waitForTimeout(1000);
-
-      if (resUseToken.status == 201) {
-        const { data } = resUseToken.data;
-        remainingToken = data.remainingToken;
-      }
+      await waitForTimeout(1500);
     }
     loopCount++;
     sendMessageIndex++;

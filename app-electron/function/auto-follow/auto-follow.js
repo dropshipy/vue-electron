@@ -77,11 +77,12 @@ async function startAutoFollow(context, browser) {
       while (followingCount < iteration && indexFollowing < 20) {
         const follow = await postFollowUser(
           "https://shopee.co.id/api/v4/pages/follow",
-          { userid: listAccount[indexFollowing].shopid },
+          { userid: listAccount[indexFollowing].userid },
           {
-            headers: newHeaders,
+            headers: context.requestDataList,
           }
         );
+        console.log("post follow res =", follow?.status);
         let username = listAccount[indexFollowing].username;
         await showSnackbar({ page, message: `Berhasil follow ${username}` });
         await page.waitForTimeout(1200);
