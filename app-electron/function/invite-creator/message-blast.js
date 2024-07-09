@@ -110,7 +110,7 @@ async function messageBlast({
 
             const chatHistoryBubble = "div.w2C67vtnXi";
             try {
-              await page.waitForSelector(chatHistoryBubble, { timeout: 1000 });
+              await page.waitForSelector(chatHistoryBubble, { timeout: 3000 });
             } catch (error) {
               isAlreadySent = false;
             }

@@ -90,6 +90,21 @@ const deleteNewLineAndSpaces = function (teks) {
   return teks.replace(/[\n\s]/g, "");
 };
 
+async function waitForSelectorWithTimeout(page, selector, timeout) {
+  try {
+    await page.waitForSelector(selector, { timeout });
+    console.log(`Selector '${selector}' found within ${timeout}ms.`);
+    return true;
+  } catch (error) {
+    if (error.name === "TimeoutError") {
+      console.error(`Timeout waiting for selector '${selector}'.`);
+    } else {
+      console.error(`Error waiting for selector '${selector}':`, error.message);
+    }
+    return false;
+  }
+}
+
 module.exports = {
   waitForTimeout,
   parseCookieHeader,
@@ -103,4 +118,5 @@ module.exports = {
   getLocalStorageData,
   checkSelector,
   deleteNewLineAndSpaces,
+  waitForSelectorWithTimeout,
 };
