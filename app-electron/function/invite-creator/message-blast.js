@@ -190,11 +190,11 @@ async function messageBlast({
             }
             await page.keyboard.press("Enter");
             await page.waitForTimeout(2000);
-            iteration++;
-            creatorCounter++;
           } catch (error) {
             console.log(error);
           }
+          iteration++;
+          creatorCounter++;
         }
       } else {
         await page.evaluate(() => {
