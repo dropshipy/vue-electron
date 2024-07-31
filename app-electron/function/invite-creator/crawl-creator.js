@@ -1,6 +1,7 @@
 const { filterCreator } = require("../filter/filter-creator");
 const { waitForTimeout } = require("../../helpers/utils");
 const { messageBlast } = require("./message-blast");
+const { DEFAULT_TIMEOUT } = require("../../constants/timeout");
 
 async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
   try {
@@ -21,6 +22,8 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
     const reqListData = [];
 
     await page.setRequestInterception(true);
+
+    page.setDefaultTimeout(DEFAULT_TIMEOUT);
 
     page.on("request", async (request) => {
       if (
