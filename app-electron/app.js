@@ -180,6 +180,11 @@ async function handleCrawlCreator(config) {
       width: screenWidth,
       height: screenHeight,
     });
+
+    // Simulate network conditions
+    // const slow3G = puppeteer.PredefinedNetworkConditions["Fast 3G"];
+    // await page.emulateNetworkConditions(slow3G);
+
     const loginShopeeBotRes = await loginShopee(page, browser);
     const context = {
       page,
