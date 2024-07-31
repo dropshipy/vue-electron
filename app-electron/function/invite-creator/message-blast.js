@@ -30,8 +30,11 @@ async function messageBlast({
       if (creator.length > 0) {
         while (creator.length > creatorCounter && loopCount >= iteration) {
           try {
+            const affiliateId = creator[creatorCounter].affiliate_id;
+            let chatList = null;
+
             await page.goto(
-              `https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace/detail?affiliate_id=${creator[creatorCounter].affiliate_id}&show_back=1`,
+              `https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace/detail?affiliate_id=${affiliateId}&show_back=1`,
               {
                 waitUntil: "networkidle2",
                 timeout: 0,
@@ -99,75 +102,39 @@ async function messageBlast({
                   totalPostCreator++;
                 }
               }
+
+              if (response.url().includes(`/messages?shop_id=`)) {
+                const responseData = (await response.json()) || [];
+                chatList = responseData.map((x) => x.content?.text);
+              }
             });
             const buttonChat =
               "#root > div.affiliate-layout > div.affiliate-layout-content.affiliate-layout-content-full > div > div > div > div.marketplace-detail_U9pYf > div.affiliate-content-1264.affiliate-content-detail.userinfo-card_OvP4e > div.right-wrap_EpKO4 > div > button.eds-react-button.chat-button_7HREW.eds-react-button--normal";
+            await page.waitForSelector(buttonChat);
             await page.click(buttonChat);
+
             const textArea =
               "#shopee-mini-chat-embedded > div > div.ZbkI8cjmb1 > div > div.Z8RjJZsXy1 > div.C8Jzw7jkTU > div.Mj9lh6KccD > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
             await page.waitForSelector(textArea);
+
             let isAlreadySent = false;
 
-            const chatHistoryBubble = "div.w2C67vtnXi";
-            try {
-              await page.waitForSelector(chatHistoryBubble, { timeout: 3000 });
-            } catch (error) {
-              isAlreadySent = false;
+            while (chatList === null) {
+              await new Promise((resolve) => setTimeout(resolve, 1000));
             }
-            // await page
-            //   .evaluate(async (text) => {
-            //     const divs = document.querySelectorAll("div.w2C67vtnXi");
 
-            //     // const targetDiv = Array.from(divs).find((div) =>
-            //     //   div.innerText.includes(messageContent)
-            //     // );
-            //     const targetDiv = Array.from(divs).some((div) =>
-            //       div.textContent.includes(text)
-            //     );
-            //     if (targetDiv) {
-            //       return true;
-            //     }
-            //     return false;
-            //   }, replyMessage)
-            //   .then((result) => {
-            //     isAlreadySent = result;
-            //   });
+            console.group(
+              `\n---  Message Creator: ${creator[creatorCounter].username} ---`
+            );
+            console.log("Chat List: ", chatList);
+            console.log("New Message: ", JSON.stringify(replyMessage));
 
-            let retrieveTextFromPreviousChat;
-
-            const isTextFound = await page.evaluate((searchText) => {
-              const elements = document.querySelectorAll("div.w2C67vtnXi");
-              const result = [];
-              for (let i = 0; i < elements.length; i++) {
-                const element = elements[i];
-
-                if (element.childNodes.length > 0) {
-                  for (let j = 0; j < element.childNodes.length; j++) {
-                    const childNode = element.childNodes[j];
-                    result.push(childNode.textContent);
-                  }
-                }
-              }
-              return result;
-            }, replyMessage);
-
-            retrieveTextFromPreviousChat = await isTextFound;
-
-            // handle if the same message has already been sent
-
-            if (retrieveTextFromPreviousChat.length > 0) {
-              retrieveTextFromPreviousChat = retrieveTextFromPreviousChat.map(
-                (teks) => deleteNewLineAndSpaces(teks)
-              );
-              const invitationMessage = deleteNewLineAndSpaces(replyMessage);
-
-              const checkWhetherItHasBeenSent =
-                retrieveTextFromPreviousChat.includes(invitationMessage);
-
-              if (checkWhetherItHasBeenSent) {
-                isAlreadySent = true;
-              }
+            if (chatList.length > 0) {
+              isAlreadySent = chatList.includes(replyMessage);
             }
+
+            console.log("Is Already Sent: ", isAlreadySent);
+            console.groupEnd("\n");
 
             if (!isAlreadySent) {
               const messageLines = replyMessage.split("\n");

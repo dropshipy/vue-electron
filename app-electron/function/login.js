@@ -1,10 +1,12 @@
-const puppeteer = require("puppeteer");
 const os = require("os");
 const { authenticateBot } = require("../api/interface");
 const ElectronStore = require("electron-store");
 const store = new ElectronStore();
 const { updateSubscriptionStatus } = require("../api/interface");
 const { dialog } = require("electron");
+const { DEFAULT_TIMEOUT, NO_TIMEOUT } = require("../constants/timeout");
+const { URL_SELLER_SHOPEE } = require("../constants/url");
+const { waitForTimeout } = require("../helpers/utils");
 
 async function saveCookies(page, browser) {
   const cookies = await page.cookies();
@@ -150,69 +152,130 @@ async function authenticateBotStatus(page, browser) {
 
 async function loginShopee(page, browser) {
   const resBotStatus = await authenticateBotStatus(page, browser);
+
   try {
     const cookieShopee = store.get("cookies-shopee-account");
+
     if (cookieShopee) {
       try {
         console.log("Cookies found. Logging in...");
         await loadCookiesShopee(page);
-        await Promise.all([
-          page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-          page.goto("https://seller.shopee.co.id", {
-            waitUntil: "networkidle2",
-          }),
-        ]);
+        await navigateToShopee(page);
       } catch (error) {
-        dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+        console.log(
+          "Invalid cookies or error during navigation. Clearing cookies and retrying login..."
+        );
         console.log(error);
+        store.delete("cookies-shopee-account");
+
+        await loginToShopeeSeller(page);
       }
     } else {
-      const account = store.get("shopee-account");
-      const loginMethod = account?.loginMethod || "qr-code";
-
-      console.log(`No cookies found. Logging in with ${loginMethod}...`);
-
-      try {
-        const loginUrl =
-          loginMethod === "qr-code"
-            ? "https://shopee.co.id/seller/login/qr"
-            : "https://shopee.co.id/seller/login";
-
-        await page.goto(loginUrl, {
-          waitUntil: "networkidle2",
-          timeout: 10000,
-        });
-
-        if (loginMethod === "contact") {
-          const contactEl = await page.$('input[name="loginKey"]');
-          await contactEl.click();
-          await page.keyboard.type(account.contact);
-          await page.keyboard.press("Tab");
-          await page.keyboard.type(account.password);
-          await page.keyboard.press("Enter");
-          /**
-           * Wait until user redirect to:
-           * https://shopee.co.id/user/account/profile?is_from_login=true
-           * OR
-           * https://shopee.co.id/?is_from_login=true
-           */
-          await page.waitForFunction(
-            () => document.location.href.includes("?is_from_login=true"),
-            { timeout: 0 }
-          );
-        }
-
-        await page.waitForNavigation();
-        console.log("Login successful. Saving cookies...");
-        await saveCookies(page);
-      } catch (error) {
-        console.error("Error during login:", error);
-      }
+      await loginToShopeeSeller(page);
     }
     return resBotStatus;
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);
+  }
+}
+
+async function navigateToShopee(page) {
+  console.log('navigating to "seller" page...');
+  const MAX_RETRIES = 2;
+  let attempts = 0;
+
+  while (attempts < MAX_RETRIES) {
+    try {
+      await page.goto(URL_SELLER_SHOPEE, {
+        waitUntil: "networkidle2",
+        timeout: DEFAULT_TIMEOUT,
+      });
+
+      if (page.url().includes(URL_SELLER_SHOPEE)) {
+        console.log("Successfully navigated to Shopee seller page.");
+        return;
+      } else {
+        throw new Error("Unable to navigate to the seller page.");
+      }
+    } catch (error) {
+      attempts++;
+      console.log(`Attempt ${attempts} failed. Retrying...`);
+      if (attempts === MAX_RETRIES) {
+        dialog.showMessageBox({
+          message: "Your cookies have expired. Please re-login.",
+          buttons: ["OK"],
+        });
+        console.error(
+          "Navigation failed after multiple attempts:",
+          error?.message || error
+        );
+        throw error;
+      }
+    }
+  }
+}
+
+async function loginToShopeeSeller(page) {
+  const account = store.get("shopee-account");
+  const loginMethod = account?.loginMethod || "qr-code";
+
+  console.log(`No valid cookies found. Logging in with ${loginMethod}...`);
+
+  try {
+    const loginUrl =
+      loginMethod === "qr-code"
+        ? "https://shopee.co.id/seller/login/qr"
+        : "https://shopee.co.id/seller/login";
+
+    await page.goto(loginUrl, {
+      waitUntil: "load",
+      timeout: NO_TIMEOUT,
+    });
+
+    console.log("Navigated to login page. Entering credentials...");
+
+    if (loginMethod === "contact") {
+      const contactEl = await page.$('input[name="loginKey"]');
+      await contactEl.click();
+      await page.keyboard.type(account.contact);
+      await page.keyboard.press("Tab");
+      await page.keyboard.type(account.password);
+      await page.keyboard.press("Enter");
+
+      await page.waitForFunction(
+        () => document.location.href.includes("?is_from_login=true"),
+        { timeout: NO_TIMEOUT }
+      );
+    } else {
+      await waitForTimeout(1000);
+
+      const isQRExist = await page.evaluate(() => {
+        const qrCode = document.querySelector(".CpMrRm.lI6EAf");
+        return !!qrCode;
+      });
+
+      if (isQRExist) {
+        console.log("QR code found. Waiting for user to scan...");
+      } else {
+        console.log("QR code not found...");
+      }
+    }
+
+    await page.waitForNavigation({
+      waitUntil: "networkidle2",
+      timeout: NO_TIMEOUT,
+    });
+
+    console.log("Login successful. Saving cookies...");
+
+    await saveCookies(page);
+
+    if (!page.url().includes(URL_SELLER_SHOPEE)) {
+      await navigateToShopee(page);
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
   }
 }
 
