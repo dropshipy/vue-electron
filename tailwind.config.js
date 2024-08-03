@@ -15,7 +15,7 @@ module.exports = {
         dark2: "#2D2D2D",
         light: "#EEEDFA",
         blue: "#3B9AE1",
-        green: "#0AA723",
+        green: "#60BB55",
         success: "#08A081",
         error: "#EE3331",
       },

@@ -4,28 +4,41 @@ export default {
     return {
       unfollowCount: null,
       isFollowAll: true,
-    }
+    };
+  },
+  computed: {
+    textStyle() {
+      if (this.$config.appName === "tiksender") {
+        return "text-primary";
+      }
+      return "text-[#00AC01]";
+    },
   },
   methods: {
     processUnfollow() {
       if (this.isFollowAll) {
-        window.electron.ipcRenderer.send("process-auto-unfollow", "Semua")
+        window.electron.ipcRenderer.send("process-auto-unfollow", "Semua");
       } else {
         if (!this.unfollowCount) {
-          this.$snackbar.error("Masukkan jumlah yang ingin di unfollow jika tidak ingin semuanya")
+          this.$snackbar.error(
+            "Masukkan jumlah yang ingin di unfollow jika tidak ingin semuanya"
+          );
         } else {
-          window.electron.ipcRenderer.send("process-auto-unfollow", this.unfollowCount)
+          window.electron.ipcRenderer.send(
+            "process-auto-unfollow",
+            this.unfollowCount
+          );
         }
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <template>
   <Card class="w-full max-w-[340px] mx-auto">
     <div class="flex items-center gap-2">
-      <Icon name="sidebar/auto-unfollow" class="text-primary" />
+      <Icon name="sidebar/auto-unfollow" :class="textStyle" />
       <h3 class="text-xl text-dark2 font-bold">Auto Unfollow</h3>
     </div>
 

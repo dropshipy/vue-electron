@@ -17,19 +17,19 @@ export default {
     },
     loadingText: {
       type: String,
-      default: 'Loading...',
+      default: "Loading...",
     },
     noDataText: {
       type: String,
-      default: 'Data tidak ditemukan',
+      default: "Data tidak ditemukan",
     },
     showRowNumber: {
       type: Boolean,
-      default: true
+      default: true,
     },
     showPagination: {
       type: Boolean,
-      default: true
+      default: true,
     },
     pagination: {
       type: Object,
@@ -41,9 +41,23 @@ export default {
       }),
     },
   },
+  computed: {
+    textStyle() {
+      if (this.$config.appName === "tiksender") {
+        return "text-primary";
+      }
+      return "text-[#00AC01]";
+    },
+    backgroundStyle() {
+      if (this.$config.appName === "tiksender") {
+        return "odd:bg-[#EB938F0D] odd:bg-opacity-5";
+      }
+      return "odd:bg-[#F8FAF8]  ";
+    },
+  },
   methods: {
     getColumnWidth(headerWidth) {
-      if (typeof headerWidth === 'number') {
+      if (typeof headerWidth === "number") {
         return {
           maxWidth: `${headerWidth}px`,
           minWidth: `${headerWidth}px`,
@@ -51,13 +65,15 @@ export default {
       }
     },
     onChangePagination(page) {
-      this.$emit('change:page', page)
+      this.$emit("change:page", page);
     },
     getRowNumber(idx) {
-      return (this.pagination.currentPage - 1) * this.pagination.perPage + idx + 1
-    }
-  }
-}
+      return (
+        (this.pagination.currentPage - 1) * this.pagination.perPage + idx + 1
+      );
+    },
+  },
+};
 </script>
 
 <template>
@@ -66,12 +82,20 @@ export default {
       <table class="border-collapse table-fixed bg-white min-w-full">
         <thead>
           <tr class="text-sm text-dark2 font-medium">
-            <th v-if="showRowNumber" class="py-3 px-2 text-left" style="min-width: 50px;">
+            <th
+              v-if="showRowNumber"
+              class="py-3 px-2 text-left"
+              style="min-width: 50px"
+            >
               No
             </th>
 
-            <th v-for="(header, idx) in headers" :key="idx" class="py-3 px-2 select-none text-left"
-              :style="getColumnWidth(header.width)">
+            <th
+              v-for="(header, idx) in headers"
+              :key="idx"
+              class="py-3 px-2 select-none text-left"
+              :style="getColumnWidth(header.width)"
+            >
               {{ header.label }}
             </th>
           </tr>
@@ -80,11 +104,18 @@ export default {
         <tbody class="align-top">
           <tr v-if="!rows.length || loading">
             <td :colspan="headers.length">
-              <div class="flex flex-col items-center justify-center text-neutral-500 text-sm uppercase px-6 py-4">
+              <div
+                class="flex flex-col items-center justify-center text-neutral-500 text-sm uppercase px-6 py-4"
+              >
                 <div v-if="loading" class="flex flex-col">
                   <slot name="loading">
                     <div class="flex items-center justify-center space-x-2">
-                      <Icon name="spinner" :size="24" class="animate-spin text-primary" />
+                      <Icon
+                        name="spinner"
+                        :size="24"
+                        class="animate-spin"
+                        :clas="textStyle"
+                      />
                       <span>{{ loadingText }}</span>
                     </div>
                   </slot>
@@ -100,16 +131,26 @@ export default {
           </tr>
 
           <template v-else>
-            <tr v-for="(row, rowIdx) in rows" :key="rowIdx" class="odd:bg-[#EB938F0D] odd:bg-opacity-5">
-              <td v-if="showRowNumber" class="text-gray-500 text-sm whitespace-nowrap px-2 py-[14px]">
+            <tr
+              v-for="(row, rowIdx) in rows"
+              :key="rowIdx"
+              :class="backgroundStyle"
+            >
+              <td
+                v-if="showRowNumber"
+                class="text-gray-500 text-sm whitespace-nowrap px-2 py-[14px]"
+              >
                 {{ getRowNumber(rowIdx) }}
               </td>
 
-              <td v-for="(col, colIdx) in headers" :key="colIdx"
-                class=" text-gray-500 text-sm px-2 py-[14px] whitespace-nowrap overflow-ellipsis overflow-hidden"
-                :style="getColumnWidth(col.width)">
+              <td
+                v-for="(col, colIdx) in headers"
+                :key="colIdx"
+                class="text-gray-500 text-sm px-2 py-[14px] whitespace-nowrap overflow-ellipsis overflow-hidden"
+                :style="getColumnWidth(col.width)"
+              >
                 <slot :name="`col.${col.key}`" :row="row" :idx="rowIdx">
-                  {{ row[col.key] || '-' }}
+                  {{ row[col.key] || "-" }}
                 </slot>
               </td>
             </tr>
@@ -117,8 +158,15 @@ export default {
         </tbody>
       </table>
     </div>
-    <div v-if="showPagination && pagination.totalResults" class="flex justify-center p-2.5 bg-[#FBFBFD]">
-      <Pagination :pagination="pagination" :max-displayed-pages="5" @change="onChangePagination" />
+    <div
+      v-if="showPagination && pagination.totalResults"
+      class="flex justify-center p-2.5 bg-[#FBFBFD]"
+    >
+      <Pagination
+        :pagination="pagination"
+        :max-displayed-pages="5"
+        @change="onChangePagination"
+      />
     </div>
   </div>
 </template>

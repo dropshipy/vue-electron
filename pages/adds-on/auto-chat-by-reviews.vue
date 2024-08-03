@@ -20,6 +20,12 @@ export default {
     isLoading() {
       return this.$store.getters["user/getLoading"];
     },
+    textStyle() {
+      if (this.$config.appName === "tiksender") {
+        return "text-primary";
+      }
+      return "text-[#00AC01]";
+    },
   },
 
   methods: {
@@ -83,10 +89,7 @@ export default {
   <div>
     <Card class="w-full max-w-[540px] mx-auto mt-10">
       <div class="flex items-center justify-center gap-2">
-        <Icon
-          name="sidebar/adds-on/auto-chat-by-reviews"
-          class="text-primary"
-        />
+        <Icon name="sidebar/adds-on/auto-chat-by-reviews" :class="textStyle" />
         <h3 class="text-xl text-dark2 font-bold">Auto Chat Ulasan</h3>
       </div>
 

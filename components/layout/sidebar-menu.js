@@ -34,11 +34,11 @@ export const SIDEBAR_MENU = [
     path: "/database-creator",
     icon: "sidebar/database-creator",
     children: [
-      {
-        name: "Creator Tiktok",
-        path: "/database-creator/tiktok",
-        icon: "sidebar/database-creator/tiktok",
-      },
+      // {
+      //   name: "Creator Tiktok",
+      //   path: "/database-creator/tiktok",
+      //   icon: "sidebar/database-creator/tiktok",
+      // },
       {
         name: "Creator Shopee",
         path: "/database-creator/shopee",

@@ -9,7 +9,11 @@
         class="w-[120px] h-auto absolute left-10 top-10"
       />
 
-      <h1 class="text-[26px] text-primary font-semibold leading-none">Login</h1>
+      <h1 :style="titleStyle" class="text-[26px] font-semibold leading-none">
+        Login
+      </h1>
+
+      <p>Silakan masuk ke Akun Anda.</p>
 
       <Textfield
         v-model="email"
@@ -38,9 +42,9 @@
 .wrapper-login {
   background-image: linear-gradient(
     to top,
-    #f3e7e9 0%,
-    #e3eeff 99%,
-    #e3eeff 100%
+    #b6eeaf 0%,
+    #f0feee 99%,
+    #f0feee 100%
   );
 }
 </style>
@@ -54,6 +58,18 @@ export default {
       password: "",
       isShowPassword: false,
     };
+  },
+  computed: {
+    titleStyle() {
+      if (this.$config.appName === "tiksender") {
+        return {
+          color: "#EE3A31",
+        };
+      }
+      return {
+        color: "#2D2D2D",
+      };
+    },
   },
   methods: {
     async handleLogin() {

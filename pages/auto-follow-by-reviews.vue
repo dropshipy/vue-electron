@@ -5,45 +5,73 @@ export default {
       productLink: null,
       startPoint: null,
       followCount: null,
-    }
+    };
+  },
+  computed: {
+    textStyle() {
+      if (this.$config.appName === "tiksender") {
+        return "text-primary";
+      }
+      return "text-[#00AC01]";
+    },
   },
   methods: {
     processFollow() {
       if (!this.productLink || !+this.startPoint || !+this.followCount) {
-        this.$snackbar.error("Pastikan data sudah diisi semua")
+        this.$snackbar.error("Pastikan data sudah diisi semua");
       } else {
         electronStore.set("link-auto-follow-by-reviews", this.productLink);
         const payload = {
           startPointFollowByReviews: +this.startPoint,
-          iterationFollowByReviews: +this.followCount
-        }
-        window.electron.ipcRenderer.send("process-auto-follow-by-reviews", payload)
+          iterationFollowByReviews: +this.followCount,
+        };
+        window.electron.ipcRenderer.send(
+          "process-auto-follow-by-reviews",
+          payload
+        );
       }
-    }
+    },
   },
   mounted() {
-    const linkForAutoFollowByReviews = electronStore.get("link-auto-follow-by-reviews");
+    const linkForAutoFollowByReviews = electronStore.get(
+      "link-auto-follow-by-reviews"
+    );
     if (linkForAutoFollowByReviews) {
-      this.productLink = linkForAutoFollowByReviews
+      this.productLink = linkForAutoFollowByReviews;
     }
-  }
-}
+  },
+};
 </script>
 
 <template>
   <Card class="w-full max-w-[540px] mx-auto">
     <div class="flex items-center justify-center gap-2">
-      <Icon name="sidebar/auto-follow-by-reviews" class="text-primary" />
+      <Icon name="sidebar/auto-follow-by-reviews" :class="textStyle" />
       <h3 class="text-xl text-dark2 font-bold">Auto Follow</h3>
     </div>
 
     <p class="text-center text-gray-600 mt-2 font-medium">Dari Ulasan Produk</p>
 
-    <Textfield v-model="productLink" label="Link Produk/Ulasan" placeholder="Masukkan link produk/ulasan" class="mt-5" />
-    <Textfield v-model="startPoint" type="number" label="Mulai Dari Ulasan Ke" placeholder="Masukkan mulai dari ulasan ke"
-      class="mt-3" />
-    <Textfield v-model="followCount" type="number" label="Total Follow" placeholder="Masukkan total follow"
-      class="mt-3" />
+    <Textfield
+      v-model="productLink"
+      label="Link Produk/Ulasan"
+      placeholder="Masukkan link produk/ulasan"
+      class="mt-5"
+    />
+    <Textfield
+      v-model="startPoint"
+      type="number"
+      label="Mulai Dari Ulasan Ke"
+      placeholder="Masukkan mulai dari ulasan ke"
+      class="mt-3"
+    />
+    <Textfield
+      v-model="followCount"
+      type="number"
+      label="Total Follow"
+      placeholder="Masukkan total follow"
+      class="mt-3"
+    />
     <Button class="w-full mt-7" @click="processFollow">Start</Button>
   </Card>
 </template>
