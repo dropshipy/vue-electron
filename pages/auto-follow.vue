@@ -6,6 +6,14 @@ export default {
       followCount: null,
     };
   },
+  computed: {
+    textStyle() {
+      if (this.$config.appName === "tiksender") {
+        return "text-primary";
+      }
+      return "text-[#00AC01]";
+    },
+  },
   methods: {
     processFollow() {
       if (!this.storeLink || !this.followCount) {
@@ -31,7 +39,7 @@ export default {
 <template>
   <Card class="w-full max-w-[540px] mx-auto">
     <div class="flex items-center justify-center gap-2">
-      <Icon name="sidebar/auto-follow" class="text-primary" />
+      <Icon name="sidebar/auto-follow" :class="textStyle" />
       <h3 class="text-xl text-dark2 font-bold">Auto Follow</h3>
     </div>
 

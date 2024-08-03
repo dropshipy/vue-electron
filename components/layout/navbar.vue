@@ -8,7 +8,17 @@ export default {
       isShowDeleteShopeeSessionModal: false,
     };
   },
-
+  computed: {
+    isSupportSeller() {
+      return this.$config.appName === "supportseller";
+    },
+    iconStyle() {
+      if (this.$config.appName === "tiksender") {
+        return "text-primary";
+      }
+      return "text-[#00AC01]";
+    },
+  },
   methods: {
     onClickMenuItem(type) {
       switch (type) {
@@ -36,48 +46,56 @@ export default {
 
 <template>
   <nav
-    class="sticky h-[72px] top-0 bg-white shadow-navbar flex items-center justify-end px-8 py-4 z-10"
+    class="sticky h-[72px] top-0 bg-white shadow-navbar flex items-center justify-between px-8 py-4 z-10"
   >
-    <Button
-      theme="tertiary"
-      class="relative"
-      @click.stop="isOpenSettings = !isOpenSettings"
-    >
-      <Icon name="setting" />
-      <span>Settings</span>
+    <div>
+      <div class="flex items-center gap-1" v-if="isSupportSeller">
+        <img src="/icons/shopee.svg" alt="shopee" class="w-6 h-6" />
+        <p class="font-bold text-[20px]">ShopeBlast</p>
+      </div>
+    </div>
+    <div class="flex">
+      <Button
+        theme="tertiary"
+        class="relative"
+        @click.stop="isOpenSettings = !isOpenSettings"
+      >
+        <Icon name="setting" />
+        <span>Settings</span>
 
-      <Menu v-model="isOpenSettings">
-        <MenuItem
-          v-if="!$config.hideSettingSpt"
-          @click="onClickMenuItem('spt-account')"
-        >
-          <Icon name="profile" class="text-primary" />
-          <p class="text-sm whitespace-nowrap leading-normal">Akun SPT</p>
-        </MenuItem>
+        <Menu v-model="isOpenSettings">
+          <MenuItem
+            v-if="!$config.hideSettingSpt"
+            @click="onClickMenuItem('spt-account')"
+          >
+            <Icon name="profile" :class="iconStyle" />
+            <p class="text-sm whitespace-nowrap leading-normal">Akun SPT</p>
+          </MenuItem>
 
-        <MenuItem @click="onClickMenuItem('shopee-account')">
-          <Icon name="sidebar/database-creator/shopee" class="text-primary" />
-          <p class="text-sm whitespace-nowrap leading-normal">Akun Shopee</p>
-        </MenuItem>
+          <MenuItem @click="onClickMenuItem('shopee-account')">
+            <Icon name="sidebar/database-creator/shopee" :class="iconStyle" />
+            <p class="text-sm whitespace-nowrap leading-normal">Akun Shopee</p>
+          </MenuItem>
 
-        <MenuItem @click="onClickMenuItem('delete-shopee-session')">
-          <Icon name="delete" class="text-primary" />
-          <p class="text-sm whitespace-nowrap leading-normal">
-            Hapus Sesi Login Shopee
-          </p>
-        </MenuItem>
-      </Menu>
-    </Button>
+          <MenuItem @click="onClickMenuItem('delete-shopee-session')">
+            <Icon name="delete" :class="iconStyle" />
+            <p class="text-sm whitespace-nowrap leading-normal">
+              Hapus Sesi Login Shopee
+            </p>
+          </MenuItem>
+        </Menu>
+      </Button>
 
-    <Button class="ml-4" @click="logout">
-      <span>Logout</span>
-      <Icon name="logout" />
-    </Button>
+      <Button class="ml-4" @click="logout">
+        <span>Logout</span>
+        <Icon name="logout" />
+      </Button>
 
-    <AppSettingsSubscriptionModal v-model="isShowSubscriptionModal" />
-    <AppSettingsShopeeAccountModal v-model="isShowShopeeAccountModal" />
-    <AppSettingsDeleteShopeeSessionModal
-      v-model="isShowDeleteShopeeSessionModal"
-    />
+      <AppSettingsSubscriptionModal v-model="isShowSubscriptionModal" />
+      <AppSettingsShopeeAccountModal v-model="isShowShopeeAccountModal" />
+      <AppSettingsDeleteShopeeSessionModal
+        v-model="isShowDeleteShopeeSessionModal"
+      />
+    </div>
   </nav>
 </template>
