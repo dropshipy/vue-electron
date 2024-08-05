@@ -31,20 +31,20 @@ export const SIDEBAR_MENU = [
   },
   {
     name: "Database Creator",
-    path: "/database-creator",
+    path: "/database-creator/shopee",
     icon: "sidebar/database-creator",
-    children: [
-      // {
-      //   name: "Creator Tiktok",
-      //   path: "/database-creator/tiktok",
-      //   icon: "sidebar/database-creator/tiktok",
-      // },
-      {
-        name: "Creator Shopee",
-        path: "/database-creator/shopee",
-        icon: "sidebar/database-creator/shopee",
-      },
-    ],
+    // children: [
+    //   // {
+    //   //   name: "Creator Tiktok",
+    //   //   path: "/database-creator/tiktok",
+    //   //   icon: "sidebar/database-creator/tiktok",
+    //   // },
+    //   {
+    //     name: "Creator Shopee",
+    //     path: "/database-creator/shopee",
+    //     icon: "sidebar/database-creator/shopee",
+    //   },
+    // ],
   },
   {
     name: "divider",
