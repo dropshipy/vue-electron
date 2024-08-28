@@ -25,8 +25,11 @@ export default {
   },
   computed: {
     followerCountOptions() {
-      const differentOptions = ["Youtube", "Shopee"];
-      if (differentOptions.includes(this.selectedSocialMedia)) {
+      const differentOptions = ["Semua", "Youtube", "Shopee"];
+      const hasDifferentOptions = differentOptions.some(
+        (option) => option.includes(this.selectedSocialMedia)
+      )
+      if (hasDifferentOptions) {
         return FOLLOWER_COUNT_OPTIONS[this.selectedSocialMedia];
       }
       return FOLLOWER_COUNT_OPTIONS["Default"];
