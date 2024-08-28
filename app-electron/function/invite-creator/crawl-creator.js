@@ -26,13 +26,7 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
     page.setDefaultTimeout(DEFAULT_TIMEOUT);
 
     page.on("request", async (request) => {
-      if (
-        request
-          .url()
-          .startsWith(
-            "https://seller.shopee.co.id/api/v1/affiliateplatform/creator/list"
-          )
-      ) {
+      if (request.url().includes("/affiliateplatform/creator/list")) {
         const information = {
           url: request.url(),
           requestHeaders: request.headers(),
@@ -59,9 +53,7 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
       if (
         response
           .url()
-          .includes(
-            "https://seller.shopee.co.id/api/v1/affiliateplatform/commissions/category_setting"
-          )
+          .includes("/affiliateplatform/commissions/category_setting")
       ) {
         const responseData = await response.json();
         const data = responseData.data.category_list;
@@ -76,7 +68,7 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
     if (context.config) {
       while (loadingCategories) {
         if (counter <= 5) {
-          await waitForTimeout(500);
+          await waitForTimeout(1000);
           counter++;
         } else {
           await page.reload({ waitUntil: "networkidle0" });

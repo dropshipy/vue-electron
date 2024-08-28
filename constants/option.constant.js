@@ -49,22 +49,32 @@ export const SOCIAL_MEDIA_OPTIONS = [
 ];
 
 export const FOLLOWER_COUNT_OPTIONS = {
+  // Instagram, Tiktok, FB, Twitter
   Default: [
-    { label: "≥ 2RB", value: "2RB" },
-    { label: "≥ 10RB", value: "10RB" },
-    { label: "≥ 100RB", value: "100RB" },
-    { label: "≥ 500RB", value: "500RB" },
-    { label: "≥ 5JT", value: "5JT" },
+    { label: "<2RB", value: "<2RB" },
+    { label: "2RB-10RB", value: "2RB-10RB" },
+    { label: "10RB-100RB", value: "10RB-100RB" },
+    { label: "100RB-500RB", value: "100RB-500RB" },
+    { label: "500RB-5JT", value: "500RB-5JT" },
+    { label: "≥5JT", value: "≥5JT" },
+  ],
+  Semua: [
+    { label: "<1RB", value: "<1RB" },
+    { label: "1RB-10RB", value: "1RB-10RB" },
+    { label: "10RB-50RB", value: "10RB-50RB" },
+    { label: "≥50RB", value: "≥50RB" },
   ],
   Shopee: [
-    { label: "≥ 1RB", value: "1RB" },
-    { label: "≥ 5RB", value: "5RB" },
+    { label: "<1RB", value: "<1RB" },
+    { label: "1RB-5RB", value: "1RB-5RB" },
+    { label: "≥5RB", value: "≥5RB" },
   ],
   Youtube: [
-    { label: "≥ 2RB", value: "2RB" },
-    { label: "≥ 8RB", value: "8RB" },
-    { label: "≥ 500RB", value: "500RB" },
-    { label: "≥ 5JT", value: "5JT" },
+    { label: "<2RB", value: "<2RB" },
+    { label: "2RB-8RB", value: "2RB-8RB" },
+    { label: "8RB-500RB", value: "8RB-500RB" },
+    { label: "500RB-5JT", value: "500RB-5JT" },
+    { label: "≥5JT", value: "≥5JT" },
   ],
 };
 
