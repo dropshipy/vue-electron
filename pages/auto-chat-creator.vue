@@ -11,7 +11,7 @@ export default {
   data() {
     return {
       selectedIteration: 1,
-      selectedCategories: [],
+      selectedCategory: null,
       categoryOptions: CATEGORY_OPTIONS,
       selectedSocialMedia: null,
       socialMediaOptions: SOCIAL_MEDIA_OPTIONS,
@@ -54,7 +54,7 @@ export default {
         followerAge: this.selectedFollowerAge,
         followerGender: this.selectedGender,
         replyMessage: this.message,
-        category: this.selectedCategories,
+        category: this.selectedCategory,
       };
 
       electronStore.set("selected-crawl-creator", payload);
@@ -81,7 +81,12 @@ export default {
       this.selectedFollowerAge = dataSelectedCrawlCreator.followerAge;
       this.selectedGender = dataSelectedCrawlCreator.followerGender;
       this.message = dataSelectedCrawlCreator.replyMessage;
-      this.selectedCategories = dataSelectedCrawlCreator.category;
+      
+      if (Array.isArray(dataSelectedCrawlCreator.category)) {
+        this.selectedCategory = dataSelectedCrawlCreator.category[0];
+      } else {
+        this.selectedCategory = dataSelectedCrawlCreator.category;
+      }
     }
   },
 };
@@ -110,8 +115,7 @@ export default {
         <h6 class="text-gray-500 font-medium mt-6">Kategori Utama</h6>
 
         <Dropdown
-          v-model="selectedCategories"
-          multiple
+          v-model="selectedCategory"
           label="Kategori"
           placeholder="Pilih kategori"
           :options="categoryOptions"
