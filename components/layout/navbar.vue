@@ -51,7 +51,7 @@ export default {
     <div>
       <div class="flex items-center gap-1" v-if="isSupportSeller">
         <img src="/icons/shopee.svg" alt="shopee" class="w-6 h-6" />
-        <p class="font-bold text-[20px]">ShopeBlast</p>
+        <p class="font-bold text-[20px]">ShopeeBlast</p>
       </div>
     </div>
     <div class="flex">
