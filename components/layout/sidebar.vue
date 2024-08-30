@@ -57,11 +57,23 @@ export default {
       }
       return "submenu-item-supportseller";
     },
+    menuItem() {
+      if (this.$config.appName === "tiksender") {
+        return "menu-item--tiksender";
+      }
+      return "menu-item--supportseller";
+    },
+    subText() {
+      if (this.$config.appName === "tiksender") {
+        return "submenu-item__text--tiksender";
+      }
+      return "submenu-item__text--supportseller";
+    },
     activeStyle() {
       if (this.$config.appName === "tiksender") {
-        return "menu-item--active--tiksender";
+        return "menu-item--active--tiksender ";
       }
-      return "menu-item--active--supportseller";
+      return "menu-item--active--supportseller ";
     },
     iconStyle() {
       if (this.$config.appName === "tiksender") {
@@ -127,18 +139,19 @@ export default {
             <component
               :is="Array.isArray(menu.children) ? 'button' : 'NuxtLink'"
               :to="menu.path || ''"
-              class="menu-item flex items-center rounded-lg w-full"
+              class="flex items-center rounded-lg w-full"
               :class="[
                 isDrawerExpanded
                   ? 'p-3 justify-between'
                   : 'px-2 py-3 justify-center',
                 { activeStyle: hasActiveSubmenu(menu) },
+                menuItem,
               ]"
               @click="onClickMenu(menu)"
             >
               <div class="flex items-center space-x-2">
                 <Icon :name="menu.icon" :class="iconStyle" />
-                <span v-if="isDrawerExpanded" class="menu-item__text">
+                <span v-if="isDrawerExpanded" :class="subText">
                   {{ menu.name }}
                 </span>
               </div>
@@ -169,7 +182,7 @@ export default {
                 ]"
               >
                 <Icon :name="submenu.icon" :class="iconStyle" />
-                <span v-if="isDrawerExpanded" class="submenu-item__text">
+                <span v-if="isDrawerExpanded" :class="subText">
                   {{ submenu.name }}
                 </span>
               </NuxtLink>
@@ -184,7 +197,7 @@ export default {
 </template>
 
 <style scoped lang="postcss">
-.menu-item,
+.menu-item--tiksender,
 .submenu-item-tiksender {
   @apply transition-all;
 
@@ -196,7 +209,7 @@ export default {
     @apply text-base text-dark font-normal transition-all;
   }
 }
-.menu-item,
+.menu-item--suportseller,
 .submenu-item-supporlseller {
   @apply transition-all;
 
@@ -211,7 +224,7 @@ export default {
 
 .nuxt-link-active,
 .menu-item--active--tiksender {
-  &.menu-item {
+  &.menu-item--tiksender {
     @apply bg-primary bg-opacity-[8%];
   }
 
@@ -220,13 +233,13 @@ export default {
   }
 
   .menu-item__text,
-  .submenu-item__text {
+  .submenu-item__text--tiksender {
     @apply text-primary font-bold;
   }
 }
 .nuxt-link-active,
 .menu-item--active--supportseller {
-  &.menu-item {
+  &.menu-item--supportseller {
     @apply bg-[#60BB55] bg-opacity-[8%];
   }
 
@@ -235,7 +248,7 @@ export default {
   }
 
   .menu-item__text,
-  .submenu-item__text {
+  .submenu-item__text--supportseller {
     @apply text-[#4F9D4E] font-bold;
   }
 }
