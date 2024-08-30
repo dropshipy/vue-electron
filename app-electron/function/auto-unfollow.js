@@ -1,6 +1,7 @@
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(StealthPlugin());
+const { getFollowingList } = require("./auto-follow/get-list-follower");
 
 const { dialog } = require("electron");
 const {
@@ -11,87 +12,90 @@ const {
 const { showSnackbar } = require("../helpers/snackbar");
 
 async function autoUnfollow({ page, iteration, browser }) {
-  const urlGetProfile = "https://shopee.co.id/api/v4/account/get_profile";
-  let profile = null;
-  let headers = null;
-
-  page.on("response", async (response) => {
-    if (response.url().includes(urlGetProfile)) {
-      const responseData = await response.json();
-      const data = responseData.data;
-      profile = data;
-    }
-  });
-
-  page.on("request", async (request) => {
-    if (request.url().includes(urlGetProfile)) {
-      headers = request.headers();
-
-      const pageCookies = await page.cookies();
-      headers["cookie"] = pageCookies
-        .map(({ name, value }) => `${name}=${value}`)
-        .join(";");
-    }
-  });
-
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-    page.goto("https://shopee.co.id/user/account/profile", {
-      waitUntil: "networkidle2",
-    }),
-  ]);
-
   try {
-    if (profile?.user_profile) {
-      const shopeeMaxLimit = 20;
-      const isLoopRequired =
-        iteration === "Semua" || iteration > shopeeMaxLimit;
+    let requestDataList = null;
+    let shopId = null;
+    await page.setRequestInterception(true);
+    page.on("request", (request) => {
+      if (
+        request
+          .url()
+          .startsWith(
+            "https://seller.shopee.co.id/api/selleraccount/shop_info/"
+          )
+      ) {
+        requestDataList = request.headers();
 
-      const payload = {
-        limit: isLoopRequired ? shopeeMaxLimit : iteration,
-        shopId: profile.user_profile.shopid,
-        headers,
-        page,
-        browser,
+        request.continue();
+      } else {
+        request.continue();
+      }
+    });
+    page.on("response", async (response) => {
+      if (
+        response
+          .url()
+          .startsWith(
+            "https://seller.shopee.co.id/api/selleraccount/shop_info/"
+          )
+      ) {
+        const responseData = await response.json();
+
+        shopId = responseData.data.shop_id;
+      }
+    });
+
+    await page.goto("https://seller.shopee.co.id/");
+    while (requestDataList == null || shopId == null) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    const shopeeMaxLimit = 20;
+    const isLoopRequired = iteration === "Semua" || iteration > shopeeMaxLimit;
+
+    const payload = {
+      limit: isLoopRequired ? shopeeMaxLimit : iteration,
+      shopId,
+      headers: requestDataList,
+      page,
+      browser,
+    };
+
+    let nomore = false;
+    let unfollowCount = 0;
+
+    console.log(`--- START: Unfollow ${iteration} users ---`);
+
+    if (isLoopRequired) {
+      const shouldLooping = () => {
+        let continueLooping = !nomore;
+
+        if (iteration !== "Semua") {
+          continueLooping = !nomore && unfollowCount < iteration;
+        }
+
+        return continueLooping;
       };
 
-      let nomore = false;
-      let unfollowCount = 0;
+      while (shouldLooping()) {
+        const isNomore = await requestListAndUnfollow(payload);
+        nomore = isNomore;
+        unfollowCount += +payload.limit;
 
-      console.log(`--- START: Unfollow ${iteration} users ---`);
-
-      if (isLoopRequired) {
-        const shouldLooping = () => {
-          let continueLooping = !nomore;
-
-          if (iteration !== "Semua") {
-            continueLooping = !nomore && unfollowCount < iteration;
-          }
-
-          return continueLooping;
-        };
-
-        while (shouldLooping()) {
-          const isNomore = await requestListAndUnfollow(payload);
-          nomore = isNomore;
-          unfollowCount += +payload.limit;
-
-          if (iteration !== "Semua") {
-            const remaining = iteration - unfollowCount;
-            payload.limit =
-              remaining > shopeeMaxLimit ? shopeeMaxLimit : remaining;
-          }
+        if (iteration !== "Semua") {
+          const remaining = iteration - unfollowCount;
+          payload.limit =
+            remaining > shopeeMaxLimit ? shopeeMaxLimit : remaining;
         }
-      } else {
-        await requestListAndUnfollow(payload);
       }
+    } else {
+      await requestListAndUnfollow(payload);
     }
 
     await dialog.showMessageBox({
       message: `Program Telah Selesai`,
       buttons: ["OK"],
     });
-
     await browser.close();
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
@@ -102,6 +106,7 @@ async function autoUnfollow({ page, iteration, browser }) {
 async function requestListAndUnfollow(payload) {
   try {
     const { headers, page, browser, limit } = payload;
+    await page.goto("https://seller.shopee.co.id");
 
     const responseGetList = await getShopeeFollowingList(payload);
 
@@ -156,11 +161,11 @@ async function requestListAndUnfollow(payload) {
 
     return resData.nomore;
   } catch (error) {
+    console.log("Error in requestListAndUnfollow: ", error?.message);
     await dialog.showMessageBox({
       message: `Terjadi kesalahan: ${error?.message}`,
       buttons: ["OK"],
     });
-    console.log("Error in requestListAndUnfollow: ", error?.message);
     return true;
   }
 }
