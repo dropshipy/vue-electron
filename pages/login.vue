@@ -1,5 +1,8 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen p-4 wrapper-login">
+  <div
+    class="flex items-center justify-center min-h-screen p-4 wrapper-login"
+    :style="backgroundColor"
+  >
     <div
       class="w-full max-w-[480px] mx-auto h-max bg-white px-5 pb-8 pt-5 rounded-lg space-y-4"
     >
@@ -38,17 +41,6 @@
   </div>
 </template>
 
-<style scoped>
-.wrapper-login {
-  background-image: linear-gradient(
-    to top,
-    #b6eeaf 0%,
-    #f0feee 99%,
-    #f0feee 100%
-  );
-}
-</style>
-
 <script>
 export default {
   layout: "blank",
@@ -69,6 +61,22 @@ export default {
       return {
         color: "#2D2D2D",
       };
+    },
+    backgroundColor() {
+      if (this.$config.appName === "tiksender") {
+        return {
+          backgroundImage:
+            "linear-gradient(to top, #cd603f 0%, #f0feee 99%, #f0feee 100%)",
+        };
+      }
+      return {
+        backgroundImage:
+          "linear-gradient(to top, #b6eeaf 0%, #f0feee 99%, #f0feee 100%)",
+      };
+    },
+    logoUrl() {
+      const appName = this.$config.appName;
+      return require(`~/assets/brand/${appName}.png`);
     },
   },
   methods: {
@@ -113,12 +121,6 @@ export default {
           this.$snackbar.error("Email atau password yang anda masukkan salah");
         }
       }
-    },
-  },
-  computed: {
-    logoUrl() {
-      const appName = this.$config.appName;
-      return require(`~/assets/brand/${appName}.png`);
     },
   },
 };
