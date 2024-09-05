@@ -59,6 +59,7 @@ export default {
         theme="tertiary"
         class="relative"
         @click.stop="isOpenSettings = !isOpenSettings"
+        :class="{'text-[#F1582C]':isSupportSeller}"
       >
         <Icon name="setting" />
         <span>Settings</span>
@@ -86,7 +87,7 @@ export default {
         </Menu>
       </Button>
 
-      <Button class="ml-4" @click="logout">
+      <Button   :theme="isSupportSeller ?'tertiary': 'primary'" @click="logout" :className="{'text-white !bg-[#F1582C]':isSupportSeller}">
         <span>Logout</span>
         <Icon name="logout" />
       </Button>

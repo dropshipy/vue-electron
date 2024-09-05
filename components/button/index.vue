@@ -7,6 +7,10 @@ export default {
       validator: (value) =>
         ["primary", "tertiary", "primary-outline"].includes(value),
     },
+    className:{
+      type: String,
+      default: "",
+    }
   },
   computed: {
     buttonStyle() {
@@ -46,7 +50,7 @@ export default {
     v-bind="$attrs"
     v-on="$listeners"
     class="flex items-center justify-center space-x-2 text-sm py-2 px-4 rounded-lg transition-all"
-    :class="buttonClasses"
+    :class="[buttonClasses,className]"
     :style="buttonStyle"
   >
     <slot />
