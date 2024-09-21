@@ -6,7 +6,7 @@ export default {
         if (this.$config.appName === "tiksender") {
           return "bg-[#FFF8F3] border border-[#F9EDE7]";
         }
-        return "bg-[#60BB55]/10 border border-[#60BB55]/[15%]";
+        return "bg-[#EFF8EE] border !border-[#FFF0E8]";
       }
     },
   },
@@ -21,7 +21,7 @@ export default {
 
 <template>
   <div
-    class="rounded-[10px]"
+    class="rounded-xl"
     :class="[
       cardTheme,
       {
