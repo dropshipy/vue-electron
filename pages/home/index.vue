@@ -53,6 +53,24 @@ export default {
         this.$snackbar.success("Berhasil menyalin kode subscription");
       });
     },
+    labelStyle(status) {
+      const isActive = status == "active";
+      const isRegister = status == "register";
+      const isInactive = status == "inactive";
+      if (isActive) {
+        if (this.$config.appName === "tiksender") {
+          return "!text-white text-green !border-green !bg-green/90";
+        } else {
+          return "!bg-[#BDEAC7] !border-[#A8DDB4] !text-[#0AA723]";
+        }
+      }
+      if (isRegister) {
+        return "!bg-yellow-500 !border-yellow-500 !text-yellow-500";
+      }
+      if (isInactive) {
+        return "!bg-red-500 !border-red-500 !text-red-500";
+      }
+    },
   },
 };
 </script>
@@ -116,13 +134,13 @@ export default {
       >
     </Card>
 
-    <Card v-else :primary="!isSupportSeller" class="mt-3 w-full">
-      <div :class="{ 'border !border-[#60BB55] rounded-xl': isSupportSeller }">
+    <Card v-else :primary="true" class="mt-3 w-fit min-w-[530px]">
+      <div>
         <div
-          class="flex items-center justify-between gap-1 p-3 cursor-pointer rounded-t-[10px]"
+          class="flex items-center justify-center gap-1 p-3 cursor-pointer rounded-t-[10px]"
           :class="[
             isSupportSeller
-              ? 'bg-[#60BB55]/[8%] text-green'
+              ? 'bg-[#60BB55] text-white'
               : 'bg-[#FEB186] text-white',
           ]"
           @click="copySubscriptionCode(subscription.code)"
@@ -131,20 +149,6 @@ export default {
             <Icon name="transaction" />
             <p class="font-bold">{{ subscription.code }}</p>
           </section>
-
-          <div
-            class="px-5 py-1 bg-opacity-10 border border-opacity-20 text-sm font-medium rounded"
-            :class="{
-              'bg-green/10 border-green text-green':
-                subscription.status === 'active',
-              'bg-yellow-500 border-yellow-500 text-yellow-500':
-                subscription.status === 'register',
-              'bg-red-500 border-red-500 text-red-500':
-                subscription.status === 'inactive',
-            }"
-          >
-            {{ getStatusLabel(subscription.status) }}
-          </div>
         </div>
 
         <div class="p-5">
@@ -162,6 +166,12 @@ export default {
                   {{ currencyFormatter(subscription.subscriptionPlan?.price) }}
                 </p>
               </div>
+            </div>
+            <div
+              class="px-5 py-1 text-sm font-medium rounded-[20px]"
+              :class="labelStyle(subscription.status)"
+            >
+              {{ getStatusLabel(subscription.status) }}
             </div>
           </div>
 

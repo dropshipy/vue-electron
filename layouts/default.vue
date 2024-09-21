@@ -17,6 +17,11 @@ export default {
       console.log('Error parsing user info: ', error)
     }
   },
+  computed:{
+    isSupportSeller() {
+      return this.$config.appName === "supportseller";
+    }
+  },
   mounted() {
     const userData = this.$store.getters['user/getUserInfo'];
     if (this.$route.query.from_login) {
@@ -60,7 +65,7 @@ export default {
     <div class="transition-all" :class="isExpanded ? 'ml-[290px]' : 'ml-[84px]'">
       <LayoutNavbar />
 
-      <main class="bg-light min-h-[calc(100vh-72px)] p-8">
+      <main class=" min-h-[calc(100vh-72px)] p-8" :class="[isSupportSeller ? 'bg-[#FEEAE4]':'bg-light']">
         <Nuxt />
       </main>
     </div>

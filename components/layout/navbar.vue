@@ -46,7 +46,8 @@ export default {
 
 <template>
   <nav
-    class="sticky h-[72px] top-0 bg-white shadow-navbar flex items-center justify-between px-8 py-4 z-10"
+    class="sticky h-[72px] top-0 shadow-navbar flex items-center justify-between px-8 py-4 z-10"
+    :class="isSupportSeller ? 'bg-[#FDD1C3]' : 'bg-white'"
   >
     <div>
       <div class="flex items-center gap-1" v-if="isSupportSeller">
@@ -59,10 +60,9 @@ export default {
         theme="tertiary"
         class="relative"
         @click.stop="isOpenSettings = !isOpenSettings"
-        :class="{'text-[#F1582C]':isSupportSeller}"
       >
-        <Icon name="setting" />
-        <span>Settings</span>
+        <Icon :class="{ '!text-[#F1582C]': isSupportSeller }" name="setting" />
+        <span :class="{ '!text-[#F1582C]': isSupportSeller }">Settings</span>
 
         <Menu v-model="isOpenSettings">
           <MenuItem
@@ -87,7 +87,11 @@ export default {
         </Menu>
       </Button>
 
-      <Button   :theme="isSupportSeller ?'tertiary': 'primary'" @click="logout" :className="{'text-white !bg-[#F1582C]':isSupportSeller}">
+      <Button
+        :theme="isSupportSeller ? 'tertiary' : 'primary'"
+        @click="logout"
+        :className="{ 'text-white !bg-[#F1582C]': isSupportSeller }"
+      >
         <span>Logout</span>
         <Icon name="logout" />
       </Button>
