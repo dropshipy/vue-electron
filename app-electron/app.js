@@ -47,7 +47,7 @@ if (process.platform == "darwin") {
   } else {
     chromePath = path.join(
       chromePathBasePath,
-      `chrome/mac-119.0.6045.105/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+      `chrome/mac-129.0.6668.89/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
     );
   }
 } else if (process.platform == "win32") {
