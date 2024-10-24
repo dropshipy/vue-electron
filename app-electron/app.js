@@ -53,7 +53,7 @@ if (process.platform == "darwin") {
 } else if (process.platform == "win32") {
   chromePath = path.join(
     chromePathBasePath,
-    `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`
+    `chrome/win64-121.0.6167.85/chrome-win64/chrome.exe`
   );
 }
 
