@@ -109,7 +109,7 @@ async function messageBlast({
               }
             });
             const buttonChat =
-              "#root > div.affiliate-layout > div.affiliate-layout-content.affiliate-layout-content-full > div > div > div > div.marketplace-detail_U9pYf > div.affiliate-content-1264.affiliate-content-detail.userinfo-card_OvP4e > div.right-wrap_EpKO4 > div > button.eds-react-button.chat-button_7HREW.eds-react-button--normal";
+              "#web-seller-affiliate > div.affiliate-layout > div.affiliate-layout-content.affiliate-layout-content-full > div > div > div > div.src-components-KOLMarketplace-Detail---marketplace-detail--1PcW- > div.affiliate-content-1264.affiliate-content-detail.src-components-KOLMarketplace-UserInfo---userinfo-card--2fPge > div.src-components-KOLMarketplace-UserInfo---right-wrap--3Qm8G > div.src-components-KOLMarketplace-UserInfo---actions--1DKEw > button.eds-react-button.src-components-KOLMarketplace-UserInfo---chat-button--11anr.eds-react-button--normal";
             await page.waitForSelector(buttonChat);
             await page.click(buttonChat);
 
