@@ -1,23 +1,37 @@
-# nuxt
+# Electron, Puppeteer, Nuxt JS for Shopee Automation
+
+## Product
+
+- Shopeeblast = supportseller
+- Shopee Power Tools = tiksender
 
 ## Build Setup
 
 ```bash
 # install dependencies
 $ yarn install
-
-# serve with hot reload at localhost:3000
-$ yarn dev
-
-# build for production and launch server
-$ yarn build
-$ yarn start
-
-# generate static project
-$ yarn generate
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+## Dev run
+
+```
+- yarn dev-nuxt
+- di terminal terpisah: ENTRY_SOURCE=dev_server yarn start
+  > powershell / windows: $env:ENTRY_SOURCE = "dev_server"; yarn start
+```
+
+## Prod run
+```
+yarn generate-nuxt
+```
+```
+yarn start-nuxt
+```
+
+## Build Electron
+```
+yarn make-desktop-app
+```
 
 ## Special Directories
 
@@ -66,20 +80,3 @@ More information about the usage of this directory in [the documentation](https:
 This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
 
 More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
-
-## Dev run
-
-```
-- yarn dev-nuxt
-- di terminal terpisah: ENTRY_SOURCE=dev_server yarn start
-  > powershell / windows: $env:ENTRY_SOURCE = "dev_server"; yarn start
-```
-
-## Prod run
-
-- yarn generate-nuxt
-- yarn start-nuxt
-
-## Build Electron
-
-- yarn make-desktop-app
