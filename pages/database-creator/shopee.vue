@@ -140,6 +140,16 @@ export default {
       this.pagination.currentPage = 1;
       this.getDatabaseCreator();
     },
+    async exportDataToExcel() {
+      const resData = await window.electron.ipcRenderer.invoke(
+        "export-data-to-excel",
+        {
+          category: this.filterCategory === "Semua" ? "" : this.filterCategory,
+          search: this.search,
+        }
+      );
+      console.log("export to excel :", resData);
+    },
   },
   mounted() {
     this.getDatabaseCreator();
@@ -231,5 +241,9 @@ export default {
         </div>
       </template>
     </Table>
+
+    <div class="flex justify-end py-6 px-4">
+      <Button @click="exportDataToExcel()"> Export to Excel </Button>
+    </div>
   </Card>
 </template>

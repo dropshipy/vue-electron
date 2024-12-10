@@ -10,6 +10,8 @@ const { replyReviews } = require("./function/reply-reviews");
 const { dialog } = require("electron");
 const axios = require("axios");
 const express = require("express");
+const XLSX = require("xlsx");
+const fs = require("fs");
 const {
   authenticateUserShopeeTools,
 } = require("./function/browser/authenticate-shopee-tools");
@@ -303,6 +305,82 @@ ipcMain.handle("get-database-creator-shopee", async (event, data) => {
     console.log(error);
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }
+});
+
+ipcMain.handle("export-data-to-excel", async (event, data) => {
+  let page = 1;
+  const limit = 500; // set manual
+  const { category, search } = data;
+  let totalPages;
+  const shopeCreatorData = [];
+
+  do {
+    const dbCreatorPayload = {
+      page,
+      limit,
+      category,
+      search,
+    };
+    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators/app`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: dbCreatorPayload,
+    });
+
+    if (!totalPages) {
+      totalPages = res.data.pagination.totalPages;
+    }
+    shopeCreatorData.push(...res.data.data);
+    page++;
+  } while (page <= totalPages);
+
+  const filePath = path.join(__dirname, "database-creator-data.xlsx");
+
+  let existingData = [];
+  if (fs.existsSync(filePath)) {
+    const workbook = XLSX.readFile(filePath);
+    const worksheet = workbook.Sheets["Sheet1"];
+    existingData = XLSX.utils.sheet_to_json(worksheet);
+  }
+
+  // const contact = shopeCreatorData.map((item) => {
+  //   const socialMedias = item.socialMedias;
+  //   return socialMedias.map((socialMedia) => ({
+  //     id: item.id,
+  //     username: item.username,
+  //     displayName: item.displayName,
+  //     platform: socialMedia.platform,
+  //     website_url: socialMedia.website_url,
+  //     follower_count: socialMedia.follower_count,
+  //     social_media_user_name: socialMedia.social_media_user_name,
+  //   }));
+  // });
+  // console.log("contact :", contact);
+
+  // 3. Gabungkan shopeCreatorData baru dengan shopeCreatorData lama, hindari duplikasi
+  const combinedData = [...existingData];
+  shopeCreatorData.forEach((newItem) => {
+    const isDuplicate = existingData.some((existingItem) =>
+      Object.keys(existingItem).every(
+        (key) => existingItem[key] === newItem[key]
+      )
+    );
+
+    if (!isDuplicate) {
+      combinedData.push(newItem);
+    }
+  });
+
+  // 4. Buat worksheet baru dari data gabungan
+  const ws = XLSX.utils.json_to_sheet(combinedData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+  XLSX.writeFile(wb, filePath);
+
+  console.log("File berhasil diperbarui di:", filePath);
+  return { success: true, filePath };
 });
 
 ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
