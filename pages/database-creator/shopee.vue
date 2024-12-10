@@ -141,6 +141,7 @@ export default {
       this.getDatabaseCreator();
     },
     async exportDataToExcel() {
+      console.log("Export data to excel...");
       const resData = await window.electron.ipcRenderer.invoke(
         "export-data-to-excel",
         {
@@ -148,7 +149,11 @@ export default {
           search: this.search,
         }
       );
-      console.log("export to excel :", resData);
+      window.alert(`Berhasil membuat data excel di: "${resData.filePath}"`);
+      // this.$snackbar.success(
+      //   `Berhasil membuat data excel di "${resData.filePath}"`
+      // );
+      console.log("Export data to excel :", resData);
     },
   },
   mounted() {
