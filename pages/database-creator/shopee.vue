@@ -140,6 +140,21 @@ export default {
       this.pagination.currentPage = 1;
       this.getDatabaseCreator();
     },
+    async exportDataToExcel() {
+      console.log("Export data to excel...");
+      const resData = await window.electron.ipcRenderer.invoke(
+        "export-data-to-excel",
+        {
+          category: this.filterCategory === "Semua" ? "" : this.filterCategory,
+          search: this.search,
+        }
+      );
+      window.alert(`Berhasil membuat data excel di: "${resData.filePath}"`);
+      // this.$snackbar.success(
+      //   `Berhasil membuat data excel di "${resData.filePath}"`
+      // );
+      console.log("Export data to excel :", resData);
+    },
   },
   mounted() {
     this.getDatabaseCreator();
@@ -231,5 +246,9 @@ export default {
         </div>
       </template>
     </Table>
+
+    <div class="flex justify-end py-6 px-4">
+      <Button @click="exportDataToExcel()"> Export to Excel </Button>
+    </div>
   </Card>
 </template>

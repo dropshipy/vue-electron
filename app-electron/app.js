@@ -28,6 +28,7 @@ const {
 const {
   runAutoChatByReviewsV2,
 } = require("./function/auto-chat/v2/auto-chat-by-reviews-v2");
+const { exportDataToSheet } = require("./function/export-data-to-sheet");
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -303,6 +304,11 @@ ipcMain.handle("get-database-creator-shopee", async (event, data) => {
     console.log(error);
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }
+});
+
+ipcMain.handle("export-data-to-excel", async (event, data) => {
+  const resData = await exportDataToSheet({ ...data, BASE_URL, store });
+  return resData;
 });
 
 ipcMain.handle("get-database-creator-tiktok", async (event, data) => {

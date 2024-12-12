@@ -105,6 +105,22 @@ async function waitForSelectorWithTimeout(page, selector, timeout) {
   }
 }
 
+function formatNumberToShortForm(number) {
+  if (number <= 0) {
+    return "0";
+  } else if (number >= 1_000_000_000_000) {
+    return Math.floor(number / 1_000_000_000_000) + "T";
+  } else if (number >= 1_000_000_000) {
+    return Math.floor(number / 1_000_000_000) + "M";
+  } else if (number >= 1_000_000) {
+    return Math.floor(number / 1_000_000) + "Jt";
+  } else if (number >= 1_000) {
+    return Math.floor(number / 1_000) + "Rb";
+  } else {
+    return number.toString();
+  }
+}
+
 module.exports = {
   waitForTimeout,
   parseCookieHeader,
@@ -119,4 +135,5 @@ module.exports = {
   checkSelector,
   deleteNewLineAndSpaces,
   waitForSelectorWithTimeout,
+  formatNumberToShortForm,
 };
