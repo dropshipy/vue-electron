@@ -29,6 +29,9 @@ const {
   runAutoChatByReviewsV2,
 } = require("./function/auto-chat/v2/auto-chat-by-reviews-v2");
 const { exportDataToSheet } = require("./function/export-data-to-sheet");
+
+const store = new ElectronStore();
+
 // determine chrome location
 let chromePath = "invalid_os";
 let isDev = process.resourcesPath.includes("node_modules");
@@ -37,25 +40,30 @@ let chromePathBasePath = process.resourcesPath;
 if (isDev) {
   chromePathBasePath = "resources";
 }
-
 let arch = process.arch;
-if (process.platform == "darwin") {
-  if (arch == "arm64") {
+const selectedBrowser = store.get("browser-choice");
+
+if (selectedBrowser && !selectedBrowser?.isChromium) {
+  chromePath = selectedBrowser.browserPath;
+} else {
+  if (process.platform == "darwin") {
+    if (arch == "arm64") {
+      chromePath = path.join(
+        chromePathBasePath,
+        `chrome/mac_arm-119.0.6045.105/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+      );
+    } else {
+      chromePath = path.join(
+        chromePathBasePath,
+        `chrome/mac-129.0.6668.89/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+      );
+    }
+  } else if (process.platform == "win32") {
     chromePath = path.join(
       chromePathBasePath,
-      `chrome/mac_arm-119.0.6045.105/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
-    );
-  } else {
-    chromePath = path.join(
-      chromePathBasePath,
-      `chrome/mac-129.0.6668.89/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+      `chrome/win64-130.0.6723.116/chrome-win64/chrome.exe`
     );
   }
-} else if (process.platform == "win32") {
-  chromePath = path.join(
-    chromePathBasePath,
-    `chrome/win64-130.0.6723.116/chrome-win64/chrome.exe`
-  );
 }
 
 console.log("Chromium executable path:", chromePath);
@@ -63,7 +71,6 @@ console.log("Chromium executable path:", chromePath);
 let mainWindow;
 // Store the authentication cookie globally
 let authenticationCookie;
-const store = new ElectronStore();
 
 const BASE_URL = getApiBaseUrl();
 
