@@ -6,6 +6,7 @@ export default {
       isShowSubscriptionModal: false,
       isShowShopeeAccountModal: false,
       isShowDeleteShopeeSessionModal: false,
+      isShowBrowserOptionsModal: false,
     };
   },
   computed: {
@@ -30,6 +31,9 @@ export default {
           break;
         case "delete-shopee-session":
           this.isShowDeleteShopeeSessionModal = true;
+          break;
+        case "browser-options":
+          this.isShowBrowserOptionsModal = true;
           break;
       }
     },
@@ -84,6 +88,10 @@ export default {
               Hapus Sesi Login Shopee
             </p>
           </MenuItem>
+          <MenuItem @click="onClickMenuItem('browser-options')">
+            <Icon name="setting" class="text-primary" />
+            <p class="text-sm whitespace-nowrap leading-normal">Opsi Browser</p>
+          </MenuItem>
         </Menu>
       </Button>
 
@@ -101,6 +109,7 @@ export default {
       <AppSettingsDeleteShopeeSessionModal
         v-model="isShowDeleteShopeeSessionModal"
       />
+      <AppSettingsChromeModal v-model="isShowBrowserOptionsModal" />
     </div>
   </nav>
 </template>
