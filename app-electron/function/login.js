@@ -251,7 +251,7 @@ async function loginToShopeeSeller(page) {
       await waitForTimeout(1000);
 
       const isQRExist = await page.evaluate(() => {
-        const qrCode = document.querySelector(".CpMrRm.lI6EAf");
+        const qrCode = document.querySelector(".lI6EAf"); // 4 feb full class: .zFPfur.lI6EAf
         return !!qrCode;
       });
 
