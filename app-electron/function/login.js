@@ -236,7 +236,9 @@ async function loginToShopeeSeller(page) {
     console.log("Navigated to login page. Entering credentials...");
 
     if (loginMethod === "contact") {
-      const contactEl = await page.$('input[name="loginKey"]');
+      const contactEl = await page.waitForSelector('input[name="loginKey"]', {
+        timeout: NO_TIMEOUT,
+      });
       await contactEl.click();
       await page.keyboard.type(account.contact);
       await page.keyboard.press("Tab");
