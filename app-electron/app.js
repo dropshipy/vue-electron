@@ -50,7 +50,7 @@ if (selectedBrowser && !selectedBrowser?.isChromium) {
     if (arch == "arm64") {
       chromePath = path.join(
         chromePathBasePath,
-        `chrome/mac_arm-119.0.6045.105/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
+        `chrome/chrome-mac-arm/Chromium.app/Contents/MacOS/Chromium`
       );
     } else {
       chromePath = path.join(
