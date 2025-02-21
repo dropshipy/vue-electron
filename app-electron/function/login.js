@@ -225,8 +225,8 @@ async function loginToShopeeSeller(page) {
   try {
     const loginUrl =
       loginMethod === "qr-code"
-        ? "https://shopee.co.id/seller/login/qr"
-        : "https://shopee.co.id/seller/login";
+        ? "https://accounts.shopee.co.id/seller/login/qr"
+        : "https://accounts.shopee.co.id/seller/login";
 
     await page.goto(loginUrl, {
       waitUntil: "load",
