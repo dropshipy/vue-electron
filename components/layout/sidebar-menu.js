@@ -30,6 +30,11 @@ export const SIDEBAR_MENU = [
     icon: "sidebar/auto-reply-reviews",
   },
   {
+    name: "Kreator Tersimpan",
+    path: "/saved-creators",
+    icon: "sidebar/saved-creators",
+  },
+  {
     name: "Database Creator",
     path: "/database-creator/shopee",
     icon: "sidebar/database-creator",
