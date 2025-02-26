@@ -93,7 +93,7 @@ async function messageBlast({
                       creatorPayload.relatedCategoris.push(tagName);
                     }
                   });
-                  await postAddCreator(creatorPayload, {
+                  await postAddCreator(subscriptionId, creatorPayload, {
                     headers: {
                       Cookie: "connect.sid=" + authBotRes.sessionId,
                     },

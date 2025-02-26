@@ -313,6 +313,21 @@ ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   }
 });
 
+ipcMain.handle("get-subscription-creator-shopee", async (event, data) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators`, {
+      headers: {
+        Cookie: store.get("cookies-spt"),
+      },
+      params: data,
+    });
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+  }
+});
+
 ipcMain.handle("export-data-to-excel", async (event, data) => {
   const resData = await exportDataToSheet({ ...data, BASE_URL, store });
   return resData;

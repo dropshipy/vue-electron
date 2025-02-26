@@ -68,7 +68,7 @@ export default {
 <template>
   <Card>
     <div class="flex items-center gap-2">
-      <Icon name="sidebar/auto-chat-creator" :class="textStyle" />
+      <Icon name="sidebar/auto-reply-reviews" :class="textStyle" />
       <h3 class="text-xl text-dark2 font-bold">Balas Ulasan Otomatis</h3>
     </div>
 

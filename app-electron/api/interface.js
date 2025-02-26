@@ -39,8 +39,12 @@ const postGetFollowers = async (endpoint, options) => {
   return await getDataShopee(endpoint, options);
 };
 
-const postAddCreator = async (data, options) => {
-  return await postData("/shopee/shopee-creators", data, options);
+const postAddCreator = async (subscriptionId, data, options) => {
+  return await postData(
+    `/shopee/shopee-creators/${subscriptionId}`,
+    data,
+    options
+  );
 };
 const authenticateBot = async (data, options) => {
   const response = await postData(
