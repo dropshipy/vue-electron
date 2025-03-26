@@ -1,7 +1,7 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const { app, BrowserWindow, ipcMain } = require("electron");
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-extra");
 const path = require("node:path");
 const { loginShopee } = require("./function/login");
 const { autoUnfollow } = require("./function/auto-unfollow");
@@ -29,6 +29,9 @@ const {
   runAutoChatByReviewsV2,
 } = require("./function/auto-chat/v2/auto-chat-by-reviews-v2");
 const { exportDataToSheet } = require("./function/export-data-to-sheet");
+
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
 
 const store = new ElectronStore();
 
@@ -61,7 +64,7 @@ if (selectedBrowser && !selectedBrowser?.isChromium) {
   } else if (process.platform == "win32") {
     chromePath = path.join(
       chromePathBasePath,
-      `chrome/win64-130.0.6723.116/chrome-win64/chrome.exe`
+      `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`
     );
   }
 }
