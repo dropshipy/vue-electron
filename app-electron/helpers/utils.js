@@ -4,6 +4,11 @@ const fs = require("fs");
 function waitForTimeout(delay) {
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
+async function waitForRandomDelay(min = 1000, max = 4000) {
+  const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+  return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
 function parseCookieHeader(header) {
   // Split the header into individual name-value pairs
   const pairs = header.split(";");
@@ -123,6 +128,7 @@ function formatNumberToShortForm(number) {
 
 module.exports = {
   waitForTimeout,
+  waitForRandomDelay,
   parseCookieHeader,
   saveCookies,
   loadCookies,

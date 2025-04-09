@@ -64,7 +64,7 @@ if (selectedBrowser && !selectedBrowser?.isChromium) {
   } else if (process.platform == "win32") {
     chromePath = path.join(
       chromePathBasePath,
-      `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`
+      `chrome/win64-121.0.6167.85/chrome-win64/chrome.exe`
     );
   }
 }
@@ -179,7 +179,10 @@ async function handleCrawlCreator(config) {
       defaultViewport: null,
       executablePath: chromePath,
     });
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
+
+    await page.setViewport({ width: 1366, height: 768 });
 
     const { screenWidth, screenHeight } = await page.evaluate(() => {
       return {
@@ -197,6 +200,7 @@ async function handleCrawlCreator(config) {
     // await page.emulateNetworkConditions(slow3G);
 
     const loginShopeeBotRes = await loginShopee(page, browser);
+    console.log("login shopee success");
     const context = {
       page,
       loginShopeeBotRes,

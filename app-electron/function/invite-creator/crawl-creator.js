@@ -1,5 +1,5 @@
 const { filterCreator } = require("../filter/filter-creator");
-const { waitForTimeout } = require("../../helpers/utils");
+const { waitForTimeout, waitForRandomDelay } = require("../../helpers/utils");
 const { messageBlast } = require("./message-blast");
 const { DEFAULT_TIMEOUT } = require("../../constants/timeout");
 
@@ -38,6 +38,8 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
         request.continue();
       }
     });
+
+    await waitForRandomDelay();
     await Promise.all([
       page.goto(
         "https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace",
@@ -47,6 +49,8 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
       ),
       page.waitForNavigation({ waitUntil: "domcontentloaded" }),
     ]);
+    console.log("bot tracking successfully bypassed");
+
     let loadingCategories = true;
     const reqCategories = [];
     page.on("response", async (response) => {
