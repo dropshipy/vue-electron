@@ -118,6 +118,9 @@ export default {
     };
   },
   computed: {
+    subscription() {
+      return this.$store.getters["subscription/getSubscriptionInfo"];
+    },
     textStyle() {
       if (this.$config.appName === "tiksender") {
         return "text-primary";
@@ -133,16 +136,20 @@ export default {
       try {
         this.isLoading = true;
 
-        const payload = {
-          page: this.pagination.currentPage,
-          limit: this.pagination.perPage,
-          category: this.filterCategory === "Semua" ? "" : this.filterCategory,
-          search: this.search,
+        const data = {
+          payload: {
+            page: this.pagination.currentPage,
+            limit: this.pagination.perPage,
+            category:
+              this.filterCategory === "Semua" ? "" : this.filterCategory,
+            search: this.search,
+          },
+          subscriptionId: this.subscription?.id,
         };
 
         const resData = await window.electron.ipcRenderer.invoke(
           "get-subscription-creator-shopee",
-          payload
+          data
         );
         if (resData) {
           this.rows = resData.data;
@@ -152,7 +159,6 @@ export default {
         }
       } catch (error) {
         this.$snackbar.error("Gagal mengambil data creator");
-        console.error("Error getting database creators:", error);
       } finally {
         this.isLoading = false;
       }
@@ -227,9 +233,29 @@ export default {
       this.pagination.currentPage = 1;
       this.getDatabaseCreator();
     },
+    async checkSubscriptionReady() {
+      let attempts = 0;
+      const maxAttempts = 5;
+
+      while (!this.subscription && attempts < maxAttempts) {
+        console.log(`kuuu menungguuu... percobaan ke-${attempts + 1}`);
+
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // Delay 5 detik
+        await this.$nextTick(); // Tunggu render selesai setelah state berubah
+
+        attempts++;
+      }
+
+      if (this.subscription) {
+        this.getDatabaseCreator();
+      } else {
+        console.warn("Subscription tidak tersedia😭.");
+        // Opsional: kamu bisa kasih fallback di sini
+      }
+    },
   },
   mounted() {
-    this.getDatabaseCreator();
+    this.checkSubscriptionReady();
   },
 };
 </script>

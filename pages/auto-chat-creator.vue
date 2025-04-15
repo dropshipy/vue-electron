@@ -24,11 +24,14 @@ export default {
     };
   },
   computed: {
+    subscription() {
+      return this.$store.getters["subscription/getSubscriptionInfo"];
+    },
     followerCountOptions() {
       const differentOptions = ["Semua", "Youtube", "Shopee"];
-      const hasDifferentOptions = differentOptions.some(
-        (option) => option.includes(this.selectedSocialMedia)
-      )
+      const hasDifferentOptions = differentOptions.some((option) =>
+        option.includes(this.selectedSocialMedia)
+      );
       if (hasDifferentOptions) {
         return FOLLOWER_COUNT_OPTIONS[this.selectedSocialMedia];
       }
@@ -65,9 +68,13 @@ export default {
     },
     onStart() {
       const context = electronStore.get("selected-crawl-creator");
+      const subscriptionId = this.subscription?.id || null;
 
       if (context) {
-        window.electron.ipcRenderer.send("crawl-creator", context);
+        window.electron.ipcRenderer.send("crawl-creator", {
+          context,
+          subscriptionId,
+        });
       } else {
         this.$snackbar.error("Belum ada konfigurasi");
       }
@@ -84,7 +91,7 @@ export default {
       this.selectedFollowerAge = dataSelectedCrawlCreator.followerAge;
       this.selectedGender = dataSelectedCrawlCreator.followerGender;
       this.message = dataSelectedCrawlCreator.replyMessage;
-      
+
       if (Array.isArray(dataSelectedCrawlCreator.category)) {
         this.selectedCategory = dataSelectedCrawlCreator.category[0];
       } else {

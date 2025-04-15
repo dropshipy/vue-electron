@@ -3,7 +3,13 @@ const { waitForTimeout, waitForRandomDelay } = require("../../helpers/utils");
 const { messageBlast } = require("./message-blast");
 const { DEFAULT_TIMEOUT } = require("../../constants/timeout");
 
-async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
+async function crawlCreator({
+  page,
+  loginShopeeBotRes,
+  config,
+  browser,
+  subscriptionId,
+}) {
   try {
     const context = {
       page,
@@ -18,6 +24,7 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
         ...loginShopeeBotRes,
       },
       browser,
+      subscriptionId,
     };
     const reqListData = [];
 
@@ -39,7 +46,7 @@ async function crawlCreator({ page, loginShopeeBotRes, config, browser }) {
       }
     });
 
-    await waitForRandomDelay();
+    // await waitForRandomDelay();
     await Promise.all([
       page.goto(
         "https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace",

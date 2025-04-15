@@ -10,6 +10,7 @@ async function messageBlast({
   categorySetting,
   authBotRes,
   browser,
+  subscriptionId,
 }) {
   const { replyMessage } = config.configMessageBlast;
   const loopCount = config.configMessageBlast.iteration;
@@ -33,20 +34,14 @@ async function messageBlast({
             const affiliateId = creator[creatorCounter].affiliate_id;
             let chatList = null;
 
-            await page.goto(
-              `https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace/detail?affiliate_id=${affiliateId}&show_back=1`,
-              {
-                waitUntil: "networkidle2",
-                timeout: 0,
-              }
-            );
             let totalPostCreator = 1;
+
             page.on("response", async (response) => {
               if (
                 response
                   .url()
                   .includes(
-                    "https://seller.shopee.co.id/api/v1/affiliateplatform/creator/detail"
+                    "https://seller.shopee.co.id/api/v3/affiliateplatform/creator/detail"
                   )
               ) {
                 if (totalPostCreator == 1) {
@@ -93,11 +88,16 @@ async function messageBlast({
                       creatorPayload.relatedCategoris.push(tagName);
                     }
                   });
-                  await postAddCreator(subscriptionId, creatorPayload, {
-                    headers: {
-                      Cookie: "connect.sid=" + authBotRes.sessionId,
-                    },
-                  });
+                  const postCreatorSubs = await postAddCreator(
+                    subscriptionId,
+                    creatorPayload,
+                    {
+                      headers: {
+                        Cookie: "connect.sid=" + authBotRes.sessionId,
+                      },
+                    }
+                  );
+                  console.log(postCreatorSubs.data.message);
                   //total post creator for handle bug puppeteer
                   totalPostCreator++;
                 }
@@ -108,6 +108,15 @@ async function messageBlast({
                 chatList = responseData.map((x) => x.content?.text);
               }
             });
+
+            await page.goto(
+              `https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace/detail?affiliate_id=${affiliateId}&show_back=1`,
+              {
+                waitUntil: "networkidle2",
+                timeout: 0,
+              }
+            );
+
             const buttonChat =
               "#web-seller-affiliate > div.affiliate-layout > div.affiliate-layout-content.affiliate-layout-content-full > div > div > div > div.src-components-KOLMarketplace-Detail---marketplace-detail--1PcW- > div.affiliate-content-1264.affiliate-content-detail.src-components-KOLMarketplace-UserInfo---userinfo-card--2fPge > div.src-components-KOLMarketplace-UserInfo---right-wrap--3Qm8G > div.src-components-KOLMarketplace-UserInfo---actions--1DKEw > button.eds-react-button.src-components-KOLMarketplace-UserInfo---chat-button--11anr.eds-react-button--normal";
             await page.waitForSelector(buttonChat);
