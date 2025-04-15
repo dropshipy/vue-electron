@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer-extra");
+const axios = require("axios");
 
 const { dialog } = require("electron");
 const ElectronStore = require("electron-store");
@@ -8,6 +9,7 @@ const { postGetUserReviews } = require("../../api/interface");
 const { postFollowUser } = require("../../api/interface");
 const { showSnackbar } = require("../../helpers/snackbar");
 const { getListReviewer } = require("./get-list-reviewer");
+const { autoScroll, waitForTimeout } = require("../../helpers/utils");
 
 async function runAutoFollowByReviews({ chromePath, data }) {
   const startPoint = data.startPointFollowByReviews;
@@ -19,7 +21,8 @@ async function runAutoFollowByReviews({ chromePath, data }) {
       headless: false,
       executablePath: chromePath,
     });
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
     const { width, height } = await page.evaluate(() => {
       return {
         width: window.screen.width,
@@ -52,6 +55,7 @@ async function runAutoFollowByReviews({ chromePath, data }) {
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
     const context = {
+      browser,
       startPoint,
       iteration,
       requestDataList,
@@ -65,29 +69,89 @@ async function runAutoFollowByReviews({ chromePath, data }) {
 }
 
 async function followByReviews({
+  browser,
   requestDataList,
   iteration,
   startPoint,
   page,
 }) {
   try {
+    const url = store.get("link-auto-follow-by-reviews");
+    let isFirstRun = true;
     let followingCount = 0;
+    let listAccount;
+    let ratingTotal = 0;
+    let paginationTotal = 1;
+    let paginationNow = 1;
+
+    let capturedRequestHeaders = null;
+    let capturedCookies = null;
+    let capturedQueryParams = null;
+
+    // Intercept response
+    page.on("response", async (response) => {
+      const url = response.url();
+      if (url.startsWith("https://shopee.co.id/api/v2/item/get_ratings")) {
+        // const req = response.request();
+        // capturedRequestHeaders = req.headers();
+        // const urlObj = new URL(url);
+        // capturedQueryParams = Object.fromEntries(urlObj.searchParams);
+        // capturedCookies = await page.cookies();
+
+        // Response Data
+        const responseData = await response.json();
+        listAccount = responseData.data.ratings;
+        ratingTotal = responseData.data.item_rating_summary.rating_total;
+        paginationTotal = ratingTotal / 6;
+      }
+    });
 
     while (followingCount < iteration) {
-      let offset = +startPoint - 1;
+      // let offset = +startPoint - 1;
 
-      if (followingCount > 0) {
-        offset = +startPoint + followingCount - 1;
+      // if (followingCount > 0) {
+      //   offset = +startPoint + followingCount - 1;
+      // }
+
+      if (isFirstRun) {
+        await page.goto(url);
+        console.log("Silakan selesaikan captcha secara manual...");
+        await page.waitForSelector('div.container[role="main"]', {
+          timeout: 0,
+        });
+        await autoScroll(page);
+
+        while (+startPoint > 6 && paginationNow < paginationTotal) {
+          await page.click(".shopee-icon-button.shopee-icon-button--right");
+          await waitForTimeout(2500);
+          paginationNow++;
+        }
+        isFirstRun = false;
+      } else {
+        try {
+          await page.click(".shopee-icon-button.shopee-icon-button--right");
+          await waitForTimeout(2500);
+        } catch {
+          dialog.showMessageBox({
+            message: "Komentar sudah tidak tersedia",
+            buttons: ["OK"],
+          });
+          break;
+        }
       }
 
-      const { newHeaders, listAccount } = await getListReviewer(
-        requestDataList,
-        offset
-      );
+      // const { newHeaders, listAccount } = await getListReviewer(
+      //   requestDataList,
+      //   offset
+      // );
 
       let currentIndex = 0;
 
-      while (followingCount < iteration && currentIndex < 20) {
+      while (
+        followingCount < iteration &&
+        currentIndex < 6 &&
+        followingCount < ratingTotal
+      ) {
         const follow = await postFollowUser(
           "https://shopee.co.id/api/v4/pages/follow",
           { userid: listAccount[currentIndex].userid },
@@ -116,6 +180,7 @@ async function followByReviews({
       message: `Program Telah Selesai`,
       buttons: ["OK"],
     });
+    browser.close();
   } catch (error) {
     dialog.showMessageBox({
       message: `87920 = ${error.message}`,

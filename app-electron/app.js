@@ -150,7 +150,8 @@ async function handleAutoUnfolow(iteration) {
       defaultViewport: null,
       executablePath: chromePath,
     });
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
     await page.setViewport({
       width: 1300,
       height: 1080,
@@ -172,7 +173,9 @@ async function handleAutoUnfolow(iteration) {
 ipcMain.on("crawl-creator", (event, data) => {
   handleCrawlCreator(data);
 });
-async function handleCrawlCreator(config) {
+async function handleCrawlCreator(data) {
+  const config = data.context;
+  const subscriptionId = data.subscriptionId;
   try {
     const browser = await puppeteer.launch({
       headless: false,
@@ -206,6 +209,7 @@ async function handleCrawlCreator(config) {
       loginShopeeBotRes,
       config,
       browser,
+      subscriptionId,
     };
     await crawlCreator(context);
   } catch (error) {
@@ -223,7 +227,8 @@ async function runReplyReviews(config) {
       defaultViewport: null,
       executablePath: chromePath,
     });
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
 
     const { screenWidth, screenHeight } = await page.evaluate(() => {
       return {
@@ -262,6 +267,7 @@ ipcMain.on("process-auto-follow", async (event, data) => {
 });
 
 //autofollow by reviews
+//NOTE - have traffic bot in api shopee
 ipcMain.on("process-auto-follow-by-reviews", async (event, data) => {
   try {
     const context = {
@@ -320,20 +326,26 @@ ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   }
 });
 
-ipcMain.handle("get-subscription-creator-shopee", async (event, data) => {
-  try {
-    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators`, {
-      headers: {
-        Cookie: store.get("cookies-spt"),
-      },
-      params: data,
-    });
-    return res.data;
-  } catch (error) {
-    console.log(error);
-    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+ipcMain.handle(
+  "get-subscription-creator-shopee",
+  async (event, { payload, subscriptionId }) => {
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/shopee/shopee-creators/${subscriptionId}`,
+        {
+          headers: {
+            Cookie: store.get("cookies-spt"),
+          },
+          params: payload,
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.log(error.data.error);
+      dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    }
   }
-});
+);
 
 ipcMain.handle("export-data-to-excel", async (event, data) => {
   const resData = await exportDataToSheet({ ...data, BASE_URL, store });

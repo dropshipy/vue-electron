@@ -8,7 +8,10 @@ const {
 async function getListReviewer(requestDataList, offset) {
   try {
     const url = store.get("link-auto-follow-by-reviews");
+    console.log("url", url);
+
     const getIds = extractIdsFromProductUrl(url);
+    console.log("getIds", getIds);
     const endpoint = "https://shopee.co.id/api/v2/item/get_ratings?";
     const params = {
       exclude_filter: 1,
@@ -59,9 +62,10 @@ async function getListReviewer(requestDataList, offset) {
         author_username,
       }));
 
+      console.log("berhasil return newHeaders");
       return { newHeaders, listAccount };
     } catch (error) {
-      console.log(error.message);
+      console.log("error getReviewerRes :", error.message);
     }
   } catch (error) {}
 }

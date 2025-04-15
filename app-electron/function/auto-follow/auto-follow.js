@@ -17,7 +17,8 @@ async function runAutoFollow({ chromePath, iteration }) {
       headless: false,
       executablePath: chromePath,
     });
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
 
     const { width, height } = await page.evaluate(() => {
       return {
