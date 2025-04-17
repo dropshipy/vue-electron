@@ -78,87 +78,102 @@ async function followByReviews({
   try {
     const url = store.get("link-auto-follow-by-reviews");
     let isFirstRun = true;
+    let hasRepeatedPaginationOne = false;
     let followingCount = 0;
     let listAccount;
     let ratingTotal = 0;
+
+    // base from 1
     let paginationTotal = 1;
     let paginationNow = 1;
 
-    let capturedRequestHeaders = null;
-    let capturedCookies = null;
-    let capturedQueryParams = null;
+    // base from 0
+    let paginationStart = Math.floor(+startPoint / 6);
+    let currentIndex = (+startPoint % 6) - 1;
 
-    // Intercept response
+    // Intercept rating response
     page.on("response", async (response) => {
       const url = response.url();
       if (url.startsWith("https://shopee.co.id/api/v2/item/get_ratings")) {
-        // const req = response.request();
-        // capturedRequestHeaders = req.headers();
-        // const urlObj = new URL(url);
-        // capturedQueryParams = Object.fromEntries(urlObj.searchParams);
-        // capturedCookies = await page.cookies();
-
-        // Response Data
         const responseData = await response.json();
         listAccount = responseData.data.ratings;
         ratingTotal = responseData.data.item_rating_summary.rating_total;
-        paginationTotal = ratingTotal / 6;
+        paginationTotal = Math.ceil(ratingTotal / 6);
+
+        console.log("< --------- >");
+        listAccount.forEach((element) => {
+          console.log(element.author_username);
+        });
+        console.log("< --------- >");
       }
     });
 
     while (followingCount < iteration) {
-      // let offset = +startPoint - 1;
-
-      // if (followingCount > 0) {
-      //   offset = +startPoint + followingCount - 1;
-      // }
-
       if (isFirstRun) {
         await page.goto(url);
         console.log("Silakan selesaikan captcha secara manual...");
+
         await page.waitForSelector('div.container[role="main"]', {
           timeout: 0,
         });
+
         await autoScroll(page);
 
-        while (+startPoint > 6 && paginationNow < paginationTotal) {
+        while (paginationStart !== 0 && paginationNow < paginationTotal) {
           await page.click(".shopee-icon-button.shopee-icon-button--right");
           await waitForTimeout(2500);
+          paginationStart--;
           paginationNow++;
         }
-        isFirstRun = false;
+
+        console.log(
+          `pagination now ${paginationNow} and total ${paginationTotal}`
+        );
       } else {
         try {
-          await page.click(".shopee-icon-button.shopee-icon-button--right");
-          await waitForTimeout(2500);
-        } catch {
-          dialog.showMessageBox({
-            message: "Komentar sudah tidak tersedia",
-            buttons: ["OK"],
-          });
-          break;
+          if (paginationNow === paginationTotal) {
+            if (hasRepeatedPaginationOne) {
+              throw new Error("Komentar sudah tidak tersedia, Program Selesai");
+            }
+
+            await page.reload();
+            await page.waitForSelector('div.container[role="main"]', {
+              timeout: 0,
+            });
+            await autoScroll(page);
+            paginationNow = 1;
+            hasRepeatedPaginationOne = true;
+          } else {
+            await page.click(".shopee-icon-button.shopee-icon-button--right");
+            await waitForTimeout(2500);
+            paginationNow++;
+          }
+        } catch (err) {
+          // dialog.showMessageBox({
+          //   message: err.message,
+          //   buttons: ["OK"],
+          // });
+          throw err;
         }
       }
 
-      // const { newHeaders, listAccount } = await getListReviewer(
-      //   requestDataList,
-      //   offset
-      // );
-
-      let currentIndex = 0;
+      if (isFirstRun === false) {
+        currentIndex = 0;
+      }
+      isFirstRun = false;
+      console.log({ currentIndex });
 
       while (
         followingCount < iteration &&
-        currentIndex < 6 &&
-        followingCount < ratingTotal
+        followingCount < ratingTotal &&
+        currentIndex < listAccount.length
       ) {
         const follow = await postFollowUser(
           "https://shopee.co.id/api/v4/pages/follow",
           { userid: listAccount[currentIndex].userid },
-          {
-            headers: requestDataList,
-          }
+          { headers: requestDataList }
         );
+
         const username = listAccount[currentIndex].author_username;
         await showSnackbar({
           page,
@@ -176,6 +191,7 @@ async function followByReviews({
         });
       }
     }
+
     dialog.showMessageBox({
       message: `Program Telah Selesai`,
       buttons: ["OK"],
@@ -183,11 +199,33 @@ async function followByReviews({
     browser.close();
   } catch (error) {
     dialog.showMessageBox({
-      message: `87920 = ${error.message}`,
+      message: `${error.message}`,
       buttons: ["OK"],
     });
-    console.error("87920 Error in the main process:", error);
+    console.error("main process:", error);
   }
 }
+
+// const handlePagination = () => {
+//   let isAfterClick = false;
+//         while (paginationStart !== 0 && paginationNow < paginationTotal) {
+//           await page.click(".shopee-icon-button.shopee-icon-button--right");
+//           await waitForTimeout(2500);
+//           paginationStart--;
+//           paginationNow++;
+//           isAfterClick = true;
+//         }
+//         console.log(
+//           `pagination now ${paginationNow} and total ${paginationTotal}`
+//         );
+//         if (paginationNow === paginationTotal && !isAfterClick) {
+//           // kalau awal jalanin udah limit, reload halaman agar ulang dari pagination pertama saja
+//           await page.reload();
+//           await page.waitForSelector('div.container[role="main"]', {
+//             timeout: 0,
+//           });
+//           await autoScroll(page);
+//         }
+// }
 
 module.exports = { runAutoFollowByReviews };
