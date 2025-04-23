@@ -14,7 +14,8 @@ const reviewUrl = new URL(
 
 async function getListReviewer({ browser, startPoint, loopCount }) {
   try {
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
 
     const url = store.get("link-auto-chat-by-reviews");
 

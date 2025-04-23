@@ -6,7 +6,7 @@ const { updateSubscriptionStatus } = require("../api/interface");
 const { dialog } = require("electron");
 const { DEFAULT_TIMEOUT, NO_TIMEOUT } = require("../constants/timeout");
 const { URL_SELLER_SHOPEE } = require("../constants/url");
-const { waitForTimeout } = require("../helpers/utils");
+const { waitForTimeout, waitForRandomDelay } = require("../helpers/utils");
 
 async function saveCookies(page, browser) {
   const cookies = await page.cookies();
@@ -166,7 +166,7 @@ async function loginShopee(page, browser) {
           "Invalid cookies or error during navigation. Clearing cookies and retrying login..."
         );
         console.log(error);
-        store.delete("cookies-shopee-account");
+        // store.delete("cookies-shopee-account");
 
         await loginToShopeeSeller(page);
       }
@@ -191,6 +191,7 @@ async function navigateToShopee(page) {
         waitUntil: "networkidle2",
         timeout: DEFAULT_TIMEOUT,
       });
+      await waitForRandomDelay(700, 1500);
 
       if (page.url().includes(URL_SELLER_SHOPEE)) {
         console.log("Successfully navigated to Shopee seller page.");
@@ -217,6 +218,9 @@ async function navigateToShopee(page) {
 }
 
 async function loginToShopeeSeller(page) {
+  // await page.goto("https://bot.sannysoft.com");
+  // await page.waitForNavigation();
+
   const account = store.get("shopee-account");
   const loginMethod = account?.loginMethod || "qr-code";
 
@@ -225,13 +229,14 @@ async function loginToShopeeSeller(page) {
   try {
     const loginUrl =
       loginMethod === "qr-code"
-        ? "https://accounts.shopee.co.id/seller/login/qr"
-        : "https://accounts.shopee.co.id/seller/login";
+        ? "https://accounts.shopee.co.id/seller/login/qr/"
+        : "https://accounts.shopee.co.id/seller/login/";
 
     await page.goto(loginUrl, {
       waitUntil: "load",
       timeout: NO_TIMEOUT,
     });
+    await waitForRandomDelay(1743, 2063);
 
     console.log("Navigated to login page. Entering credentials...");
 
@@ -250,11 +255,10 @@ async function loginToShopeeSeller(page) {
         { timeout: NO_TIMEOUT }
       );
     } else {
-      await waitForTimeout(1000);
-
-      const isQRExist = await page.waitForSelector(".v8dFwQ.MitpNa", {
+      const isQRExist = await page.waitForSelector(".v8dFwQ.Qy85a_", {
         timeout: 20000,
       });
+      await waitForRandomDelay(630, 1500);
 
       if (isQRExist) {
         console.log("QR code found. Waiting for user to scan...");

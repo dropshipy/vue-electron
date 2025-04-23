@@ -4,6 +4,11 @@ const fs = require("fs");
 function waitForTimeout(delay) {
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
+async function waitForRandomDelay(min = 1000, max = 4000) {
+  const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+  return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
 function parseCookieHeader(header) {
   // Split the header into individual name-value pairs
   const pairs = header.split(";");
@@ -121,8 +126,28 @@ function formatNumberToShortForm(number) {
   }
 }
 
+async function autoScroll(page) {
+  await page.evaluate(async () => {
+    await new Promise((resolve) => {
+      let totalHeight = 0;
+      const distance = 100;
+      const timer = setInterval(() => {
+        const scrollHeight = document.body.scrollHeight;
+        window.scrollBy(0, distance);
+        totalHeight += distance;
+
+        if (totalHeight >= scrollHeight - window.innerHeight) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 100); // jeda antar scroll
+    });
+  });
+}
+
 module.exports = {
   waitForTimeout,
+  waitForRandomDelay,
   parseCookieHeader,
   saveCookies,
   loadCookies,
@@ -136,4 +161,5 @@ module.exports = {
   deleteNewLineAndSpaces,
   waitForSelectorWithTimeout,
   formatNumberToShortForm,
+  autoScroll,
 };

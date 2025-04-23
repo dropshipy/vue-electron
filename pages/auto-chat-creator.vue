@@ -20,19 +20,13 @@ export default {
       followerAgeOptions: FOLLOWER_AGE_OPTIONS,
       selectedGender: null,
       genderOptions: GENDER_OPTIONS,
+      followerCountOptions: FOLLOWER_COUNT_OPTIONS["Default"],
       message: "",
     };
   },
   computed: {
-    followerCountOptions() {
-      const differentOptions = ["Semua", "Youtube", "Shopee"];
-      const hasDifferentOptions = differentOptions.some(
-        (option) => option.includes(this.selectedSocialMedia)
-      )
-      if (hasDifferentOptions) {
-        return FOLLOWER_COUNT_OPTIONS[this.selectedSocialMedia];
-      }
-      return FOLLOWER_COUNT_OPTIONS["Default"];
+    subscription() {
+      return this.$store.getters["subscription/getSubscriptionInfo"];
     },
     textStyle() {
       if (this.$config.appName === "tiksender") {
@@ -65,12 +59,26 @@ export default {
     },
     onStart() {
       const context = electronStore.get("selected-crawl-creator");
+      const subscriptionId = this.subscription?.id || null;
 
       if (context) {
-        window.electron.ipcRenderer.send("crawl-creator", context);
+        window.electron.ipcRenderer.send("crawl-creator", {
+          context,
+          subscriptionId,
+        });
       } else {
         this.$snackbar.error("Belum ada konfigurasi");
       }
+    },
+    getFollowerOptions() {
+      const differentOptions = ["Semua", "Youtube", "Shopee"];
+      const hasDifferentOptions = differentOptions.some((option) =>
+        option.includes(this.selectedSocialMedia)
+      );
+      if (hasDifferentOptions) {
+        return FOLLOWER_COUNT_OPTIONS[this.selectedSocialMedia];
+      }
+      return FOLLOWER_COUNT_OPTIONS["Default"];
     },
   },
   mounted() {
@@ -83,14 +91,39 @@ export default {
       this.selectedFollowerCount = dataSelectedCrawlCreator.followerCount;
       this.selectedFollowerAge = dataSelectedCrawlCreator.followerAge;
       this.selectedGender = dataSelectedCrawlCreator.followerGender;
+      this.followerCountOptions = this.getFollowerOptions();
       this.message = dataSelectedCrawlCreator.replyMessage;
-      
+
       if (Array.isArray(dataSelectedCrawlCreator.category)) {
         this.selectedCategory = dataSelectedCrawlCreator.category[0];
       } else {
         this.selectedCategory = dataSelectedCrawlCreator.category;
       }
     }
+  },
+  watch: {
+    selectedSocialMedia(newVal) {
+      // console.log(newVal);
+      const differentOptions = ["Semua", "Youtube", "Shopee"];
+      const matchedOption = differentOptions.find((option) =>
+        newVal.toLowerCase().includes(option.toLowerCase())
+      );
+
+      let options;
+      console.log(matchedOption);
+      if (matchedOption) {
+        options = FOLLOWER_COUNT_OPTIONS[matchedOption];
+      } else {
+        options = FOLLOWER_COUNT_OPTIONS["Default"];
+      }
+
+      if (options && options.length > 0) {
+        this.followerCountOptions = options;
+        this.selectedFollowerCount = options[0].value;
+      } else {
+        this.selectedFollowerCount = null; // fallback kalau gak ada
+      }
+    },
   },
 };
 </script>

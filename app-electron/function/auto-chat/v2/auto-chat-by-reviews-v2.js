@@ -24,7 +24,8 @@ async function runAutoChatByReviewsV2({ chromePath, data }) {
       headless: false,
       executablePath: chromePath,
     });
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
     await page.setRequestInterception(true);
 
     let headers = null;
