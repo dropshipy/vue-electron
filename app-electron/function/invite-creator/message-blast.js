@@ -97,7 +97,6 @@ async function messageBlast({
                       },
                     }
                   );
-                  console.log(postCreatorSubs.data.message);
                   //total post creator for handle bug puppeteer
                   totalPostCreator++;
                 }
@@ -110,7 +109,7 @@ async function messageBlast({
             });
 
             await page.goto(
-              `https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace/detail?affiliate_id=${affiliateId}&show_back=1`,
+              `https://seller.shopee.co.id/portal/web-seller-affiliate/kol_marketplace/detail?affiliate_id=${affiliateId}`,
               {
                 waitUntil: "networkidle2",
                 timeout: 0,
@@ -118,7 +117,7 @@ async function messageBlast({
             );
 
             const buttonChat =
-              "#web-seller-affiliate > div.affiliate-layout > div.affiliate-layout-content.affiliate-layout-content-full > div > div > div > div.src-components-KOLMarketplace-Detail---marketplace-detail--1PcW- > div.affiliate-content-1264.affiliate-content-detail.src-components-KOLMarketplace-UserInfo---userinfo-card--2fPge > div.src-components-KOLMarketplace-UserInfo---right-wrap--3Qm8G > div.src-components-KOLMarketplace-UserInfo---actions--1DKEw > button.eds-react-button.src-components-KOLMarketplace-UserInfo---chat-button--11anr.eds-react-button--normal";
+              "button.eds-react-button.src-components-KOLMarketplace-UserInfo---chat-button--7HREW.eds-react-button--normal";
             await page.waitForSelector(buttonChat);
             await page.click(buttonChat);
 

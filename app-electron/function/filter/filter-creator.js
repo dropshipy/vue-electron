@@ -1,13 +1,7 @@
 const { dialog } = require("electron");
 const { waitForTimeout, clickByText } = require("../../helpers/utils");
 
-// selector in affialter market place page
-const followerCountDropdown =
-  "#web-seller-affiliate > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.src-components-Layout-Content---affiliate-content--KabK_.responsive-layout-container > div > div > div.ka-wrapper > div > div.src-components-KOLMarketplace---kolWrapper--1gPmp > div.affiliate-content.filter-wrapper > div > form > div > div > div.src-components-common-KOLFiltersGroup---kolFilterItems--2xgsU > div.undefined.src-components-common-KOLFiltersGroup---follower--1gwlP > div.src-components-common-KOLFiltersGroup---filter-group-content--2MODZ > div.src-components-common-KOLFiltersGroup---filter-item--LYwhQ.src-components-common-KOLFiltersGroup---inlineLabel--1VSdK.undefined > div > div > div";
-const followerAgeDropdown =
-  "#web-seller-affiliate > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.src-components-Layout-Content---affiliate-content--KabK_.responsive-layout-container > div > div > div.ka-wrapper > div > div.src-components-KOLMarketplace---kolWrapper--1gPmp > div.affiliate-content.filter-wrapper > div > form > div > div > div.src-components-common-KOLFiltersGroup---kolFilterItems--2xgsU > div.undefined.src-components-common-KOLFiltersGroup---follower--1gwlP > div.src-components-common-KOLFiltersGroup---filter-group-content--2MODZ > div.src-components-common-KOLFiltersGroup---filter-item--LYwhQ.src-components-common-KOLFiltersGroup---customizeInlineLabel--19Qy4.src-components-common-KOLFiltersGroup---ageSelect--1PZWZ > div > div > div > div > div.trigger.trigger--normal";
-const followerGenderDropdown =
-  "#web-seller-affiliate > div.affiliate-layout.affiliate-responsive-layout-wrapper.show-header-cnsc > div.affiliate-layout-content.affiliate-layout-content-not-collapsed.affiliate-responsive-layout-content > div.src-components-Layout-Content---affiliate-content--KabK_.responsive-layout-container > div > div > div.ka-wrapper > div > div.src-components-KOLMarketplace---kolWrapper--1gPmp > div.affiliate-content.filter-wrapper > div > form > div > div > div.src-components-common-KOLFiltersGroup---kolFilterItems--2xgsU > div.undefined.src-components-common-KOLFiltersGroup---follower--1gwlP > div.src-components-common-KOLFiltersGroup---filter-group-content--2MODZ > div.src-components-common-KOLFiltersGroup---filter-item--LYwhQ.src-components-common-KOLFiltersGroup---customizeInlineLabel--19Qy4.src-components-common-KOLFiltersGroup---genderSelect--1P-dr > div";
+const filterDropdownSelector = "div.eds-react-select__suffix"; // got 5 element
 
 async function filterCreator({ page, config }) {
   const { category, socialMedias, followerCount, followerAge, followerGender } =
@@ -36,10 +30,12 @@ async function filterCreator({ page, config }) {
     await clickByText(page, "Tampilkan Semua Filter");
     await page.waitForTimeout(1000);
 
+    const filterDropdown = await page.$$(filterDropdownSelector);
+
     if (followerCount !== "Semua" || !followerCount) {
       try {
         await page.waitForTimeout(500);
-        await page.click(followerCountDropdown);
+        await filterDropdown[0].click();
         await page.waitForTimeout(2000);
         await page.evaluate((followerCount) => {
           const divs = document.querySelectorAll(".eds-react-select-option");
@@ -60,7 +56,7 @@ async function filterCreator({ page, config }) {
     if (followerAge !== "Semua" || !followerAge) {
       try {
         await page.waitForTimeout(500);
-        await page.click(followerAgeDropdown);
+        await filterDropdown[1].click();
         await page.waitForTimeout(2000);
         await page.evaluate((text) => {
           const divs = document.querySelectorAll(".eds-react-select-option");
@@ -81,7 +77,7 @@ async function filterCreator({ page, config }) {
     if (followerGender !== "Semua" || !followerGender) {
       try {
         await page.waitForTimeout(500);
-        await page.click(followerGenderDropdown);
+        await filterDropdown[2].click();
         await page.waitForTimeout(2000);
 
         let buttonGenderSelector = ".select-gender-button-any";
