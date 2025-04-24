@@ -21,6 +21,7 @@ export default {
       selectedGender: null,
       genderOptions: GENDER_OPTIONS,
       followerCountOptions: FOLLOWER_COUNT_OPTIONS["Default"],
+      isMounted: false,
       message: "",
     };
   },
@@ -100,10 +101,12 @@ export default {
         this.selectedCategory = dataSelectedCrawlCreator.category;
       }
     }
+    this.isMounted = true;
   },
   watch: {
     selectedSocialMedia(newVal) {
-      // console.log(newVal);
+      console.log("isMounted :", this.isMounted);
+
       const differentOptions = ["Semua", "Youtube", "Shopee"];
       const matchedOption = differentOptions.find((option) =>
         newVal.toLowerCase().includes(option.toLowerCase())
@@ -119,7 +122,9 @@ export default {
 
       if (options && options.length > 0) {
         this.followerCountOptions = options;
-        this.selectedFollowerCount = options[0].value;
+        !this.isMounted
+          ? (this.selectedFollowerCount = options[0].value)
+          : (this.isMounted = false);
       } else {
         this.selectedFollowerCount = null; // fallback kalau gak ada
       }
