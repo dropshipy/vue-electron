@@ -1,4 +1,6 @@
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   data() {
     return {
@@ -13,9 +15,15 @@ export default {
       }
       return "text-[#00AC01]";
     },
+    isRun() {
+      return this.$store.getters["loading/getUnfollow"];
+    }
   },
   methods: {
-    processUnfollow() {
+    ...mapMutations({
+      setUnfollow: "loading/setUnfollow"
+    }),
+    async processUnfollow() {
       if (this.isFollowAll) {
         window.electron.ipcRenderer.send("process-auto-unfollow", "Semua");
       } else {
@@ -24,10 +32,12 @@ export default {
             "Masukkan jumlah yang ingin di unfollow jika tidak ingin semuanya"
           );
         } else {
-          window.electron.ipcRenderer.send(
+          this.setUnfollow(true)
+          await window.electron.ipcRenderer.invoke(
             "process-auto-unfollow",
             this.unfollowCount
           );
+          this.setUnfollow(false)
         }
       }
     },
@@ -52,6 +62,9 @@ export default {
       </div>
     </div>
 
-    <Button class="mt-5 w-full" @click="processUnfollow">Start</Button>
+    <Button class="mt-5 w-full" @click="processUnfollow">
+      <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
+      <span v-else>Start</span>
+    </Button>
   </Card>
 </template>

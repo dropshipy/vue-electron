@@ -96,6 +96,8 @@ async function startAutoFollow(context, browser) {
       message: `Program Telah Selesai`,
       buttons: ["OK"],
     });
+
+    browser.close()
   } catch (error) {
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
     console.error("Error in the main process:", error);

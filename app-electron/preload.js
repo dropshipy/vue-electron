@@ -3,6 +3,14 @@ const ElectronStore = require("electron-store");
 const store = new ElectronStore();
 contextBridge.exposeInMainWorld("electron", {
   ipcRenderer: ipcRenderer,
+  onUpdateAvailable: (callback) =>
+    ipcRenderer.on("update_available", (_, data) => callback(data)),
+  onUpdateNotAvailable: (callback) =>
+    ipcRenderer.on("update_not_available", (_, data) => callback(data)),
+  onDownloadProgress: (callback) =>
+    ipcRenderer.on("download_progress", (_, data) => callback(data)),
+  onUpdateDownloaded: (callback) =>
+    ipcRenderer.on("update_downloaded", () => callback()),
 });
 
 contextBridge.exposeInMainWorld("ipcRenderer", {

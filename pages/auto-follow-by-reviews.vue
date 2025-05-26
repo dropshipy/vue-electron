@@ -1,4 +1,6 @@
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   data() {
     return {
@@ -14,9 +16,15 @@ export default {
       }
       return "text-[#00AC01]";
     },
+    isRun() {
+      return this.$store.getters["loading/getFollowByReviews"];
+    }
   },
   methods: {
-    processFollow() {
+    ...mapMutations({
+      setFollowByReviews: "loading/setFollowByReviews"
+    }),
+    async processFollow() {
       if (!this.productLink || !+this.startPoint || !+this.followCount) {
         this.$snackbar.error("Pastikan data sudah diisi semua");
       } else {
@@ -25,10 +33,12 @@ export default {
           startPointFollowByReviews: +this.startPoint,
           iterationFollowByReviews: +this.followCount,
         };
-        window.electron.ipcRenderer.send(
+        this.setFollowByReviews(true)
+        await window.electron.ipcRenderer.invoke(
           "process-auto-follow-by-reviews",
           payload
         );
+        this.setFollowByReviews(false)
       }
     },
   },
@@ -52,26 +62,15 @@ export default {
 
     <p class="text-center text-gray-600 mt-2 font-medium">Dari Ulasan Produk</p>
 
-    <Textfield
-      v-model="productLink"
-      label="Link Produk/Ulasan"
-      placeholder="Masukkan link produk/ulasan"
-      class="mt-5"
-    />
-    <Textfield
-      v-model="startPoint"
-      type="number"
-      label="Mulai Dari Ulasan Ke"
-      placeholder="Masukkan mulai dari ulasan ke"
-      class="mt-3"
-    />
-    <Textfield
-      v-model="followCount"
-      type="number"
-      label="Total Follow"
-      placeholder="Masukkan total follow"
-      class="mt-3"
-    />
-    <Button class="w-full mt-7" @click="processFollow">Start</Button>
+    <Textfield v-model="productLink" label="Link Produk/Ulasan" placeholder="Masukkan link produk/ulasan"
+      class="mt-5" />
+    <Textfield v-model="startPoint" type="number" label="Mulai Dari Ulasan Ke"
+      placeholder="Masukkan mulai dari ulasan ke" class="mt-3" />
+    <Textfield v-model="followCount" type="number" label="Total Follow" placeholder="Masukkan total follow"
+      class="mt-3" />
+    <Button class="w-full mt-7" @click="processFollow">
+      <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
+      <span v-else>Start</span>
+    </Button>
   </Card>
 </template>

@@ -242,7 +242,7 @@ async function loginToShopeeSeller(page) {
 
     if (loginMethod === "contact") {
       const contactEl = await page.waitForSelector('input[name="loginKey"]', {
-        timeout: NO_TIMEOUT,
+        timeout: 200,
       });
       await contactEl.click();
       await page.keyboard.type(account.contact);
@@ -281,6 +281,8 @@ async function loginToShopeeSeller(page) {
     }
   } catch (error) {
     console.error("Error during login:", error);
+    if (error?.name?.includes('TimeoutError'))
+      showSnackbar({ page, message: "Looks like it’s taking longer than expected. You can try again or chat admin" })
   }
 }
 

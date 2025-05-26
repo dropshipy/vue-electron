@@ -1,6 +1,6 @@
 {
   "name": "shopee-app",
-  "version": "16.02.24",
+  "version": "16.2.27",
   "description": "",
   "main": "./app-electron/app.js",
   "scripts": {
@@ -12,8 +12,13 @@
     "dev-nuxt": "nuxt",
     "build-nuxt": "nuxt build",
     "start-nuxt": "nuxt start",
-    "generate-nuxt": "nuxt generate"
+    "generate-nuxt": "nuxt generate",
+    "build:tiksender:win": "cross-env APP_NAME=tiksender REPO=vue-electron electron-builder --win --config=electron-builder.config.js --publish always",
+    "build:supportseller:win": "cross-env APP_NAME=supportseller REPO=shopee-app-supsel electron-builder --win --config=electron-builder.config.js --publish always",
+    "build:tiksender:mac": "cross-env APP_NAME=tiksender REPO=shopee-app-mac electron-builder --mac --config=electron-builder.config.js --publish always",
+    "build:supportseller:mac": "cross-env APP_NAME=supportseller REPO=shopee-app-supsel-mac electron-builder --mac --config=electron-builder.config.js --publish always"
   },
+  "build": "./electron-builder.config.js",
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -24,7 +29,6 @@
     "cookie": "^0.5.0",
     "core-js": "^3.25.3",
     "dotenv": "^16.3.1",
-    "electron-builder": "^24.6.4",
     "electron-cookies": "^1.1.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
@@ -42,7 +46,8 @@
     "vue-server-renderer": "^2.7.10",
     "vue-template-compiler": "^2.7.10",
     "vue2-teleport": "^1.0.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "electron-updater": "^6.6.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",
@@ -56,6 +61,7 @@
     "dotenv-webpack": "^8.0.1",
     "electron": "^27.0.2",
     "postcss": "^8.4.32",
-    "tailwindcss": "^3.4.0"
+    "tailwindcss": "^3.4.0",
+    "electron-builder": "^26.0.12"
   }
 }

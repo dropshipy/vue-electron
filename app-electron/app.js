@@ -1,6 +1,15 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const { app, BrowserWindow, ipcMain } = require("electron");
+const { autoUpdater } = require("electron-updater");
+
+autoUpdater.setFeedURL({
+  provider: "github",
+  owner: "dropshipy",
+  repo: process.env.REPO,
+  token: process.env.GITHUB_TOKEN,
+});
+
 const puppeteer = require("puppeteer-extra");
 const path = require("node:path");
 const { loginShopee } = require("./function/login");
@@ -64,7 +73,7 @@ if (selectedBrowser && !selectedBrowser?.isChromium) {
   } else if (process.platform == "win32") {
     chromePath = path.join(
       chromePathBasePath,
-      `chrome/win64-121.0.6167.85/chrome-win64/chrome.exe`
+      `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`
     );
   }
 }
@@ -121,6 +130,28 @@ function createWindow() {
 
 app.on("ready", () => {
   createWindow();
+  // mainWindow.webContents.send("update_not_available", false);
+  // dialog.showMessageBox({
+  //   type: "info",
+  //   title: "Update Available",
+  //   message: "New version available. New application will automatically update.",
+  // });
+  // setTimeout(() => {
+  //   let percent = 0;
+  //   mainWindow.webContents.send("update_available", true);
+  //   const progressInterval = setInterval(() => {
+  //     percent += 10;
+  //     mainWindow.webContents.send("download_progress", { percent });
+  //     if (percent >= 100) {
+  //       clearInterval(progressInterval);
+  //       mainWindow.webContents.send("update_downloaded");
+  //     }
+  //   }, 500);
+  // }, 2000);
+
+  app.whenReady().then(() => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -139,9 +170,41 @@ app.on("ready", () => {
   });
 });
 
+autoUpdater.on("update-available", () => {
+  mainWindow.webContents.send("update_available", true);
+});
+autoUpdater.on("update-not-available", () => {
+  mainWindow.webContents.send("update_not_available", false);
+});
+
+autoUpdater.on("update-downloaded", () => {
+  dialog
+    .showMessageBox({
+      type: "info",
+      title: "Update Ready",
+      message:
+        "Update has been downloaded, the application will restart to apply the update.",
+    })
+    .then(() => {
+      autoUpdater.quitAndInstall();
+    });
+  // autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on("download-progress", (progressObj) => {
+  console.log(
+    `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`
+  );
+  mainWindow.webContents.send("download_progress", progressObj);
+});
+
+autoUpdater.on("error", (error) => {
+  dialog.showErrorBox("Update Error", error?.stack || error.toString());
+});
+
 // scrapper
-ipcMain.on("process-auto-unfollow", (event, data) => {
-  handleAutoUnfolow(data);
+ipcMain.handle("process-auto-unfollow", async (event, data) => {
+  await handleAutoUnfolow(data);
 });
 async function handleAutoUnfolow(iteration) {
   try {
@@ -170,10 +233,7 @@ async function handleAutoUnfolow(iteration) {
   }
 }
 
-ipcMain.on("crawl-creator", (event, data) => {
-  handleCrawlCreator(data);
-});
-async function handleCrawlCreator(data) {
+ipcMain.handle("crawl-creator", async (event, data) => {
   const config = data.context;
   const subscriptionId = data.subscriptionId;
   try {
@@ -216,9 +276,10 @@ async function handleCrawlCreator(data) {
     console.error("Error in the main process:", error);
     dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
   }
-}
-ipcMain.on("process-reply-reviews", (event, data) => {
-  runReplyReviews(data);
+});
+
+ipcMain.handle("process-reply-reviews", async (event, data) => {
+  await runReplyReviews(data);
 });
 async function runReplyReviews(config) {
   try {
@@ -253,7 +314,7 @@ async function runReplyReviews(config) {
   }
 }
 // https://shopee.co.id/shop/113475604/following
-ipcMain.on("process-auto-follow", async (event, data) => {
+ipcMain.handle("process-auto-follow", async (event, data) => {
   try {
     const context = {
       chromePath,
@@ -268,7 +329,7 @@ ipcMain.on("process-auto-follow", async (event, data) => {
 
 //autofollow by reviews
 //NOTE - have traffic bot in api shopee
-ipcMain.on("process-auto-follow-by-reviews", async (event, data) => {
+ipcMain.handle("process-auto-follow-by-reviews", async (event, data) => {
   try {
     const context = {
       chromePath,
@@ -293,6 +354,7 @@ ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
 
 ipcMain.handle("get-subscription-info", async () => {
   try {
+    console.log(BASE_URL)
     const res = await axios.get(`${BASE_URL}/shopee-subscriptions`, {
       headers: {
         Cookie: store.get("cookies-spt"),
@@ -360,6 +422,7 @@ ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
       },
       params: data,
     });
+    console.log(res)
     store.set("database-creator-tiktok", res.data);
     return res.data;
   } catch (error) {

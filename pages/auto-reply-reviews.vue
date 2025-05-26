@@ -1,5 +1,6 @@
 <script>
 import { REVIEW_RATING_OPTIONS } from "~/constants/option.constant";
+import { mapMutations } from 'vuex'
 
 export default {
   data() {
@@ -18,8 +19,14 @@ export default {
       }
       return "text-[#00AC01]";
     },
+    isRun() {
+      return this.$store.getters["loading/getReplyReviews"];
+    }
   },
   methods: {
+    ...mapMutations({
+      setReplyReviews: "loading/setReplyReviews"
+    }),
     onSave() {
       this.replyMessage = this.replyMessage.trim();
 
@@ -41,11 +48,13 @@ export default {
       this.$snackbar.success("Berhasil menyimpan konfigurasi");
     },
 
-    onStart() {
+    async onStart() {
       const context = electronStore.get("selected-reply-reviews");
 
       if (context) {
-        window.electron.ipcRenderer.send("process-reply-reviews", context);
+        this.setReplyReviews(true);
+        await window.electron.ipcRenderer.invoke("process-reply-reviews", context);
+        this.setReplyReviews(false);
       } else {
         this.$snackbar.error("Belum ada konfigurasi");
       }
@@ -75,51 +84,27 @@ export default {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-3">
       <div>
         <h6 class="text-gray-500 font-medium">Konfigurasi Bot Automasi</h6>
-        <Textfield
-          v-model="selectedIteration"
-          label="Jumlah Balas Ulasan"
-          type="number"
-          placeholder="Masukkan jumlah balas ulasan"
-          class="mt-3"
-        />
+        <Textfield v-model="selectedIteration" label="Jumlah Balas Ulasan" type="number"
+          placeholder="Masukkan jumlah balas ulasan" class="mt-3" />
 
-        <Textfield
-          v-model="replyMessage"
-          label="Pesan Ulasan"
-          placeholder="Masukkan pesan ulasan"
-          type="textarea"
-          input-class="min-h-24"
-          :max-height="200"
-          class="mt-3"
-        />
+        <Textfield v-model="replyMessage" label="Pesan Ulasan" placeholder="Masukkan pesan ulasan" type="textarea"
+          input-class="min-h-24" :max-height="200" class="mt-3" />
       </div>
 
       <div>
         <h6 class="text-gray-500 font-medium">Filter Ulasan (Opsional)</h6>
 
-        <Textfield
-          v-model="productName"
-          label="Nama Produk"
-          placeholder="Masukkan nama produk"
-          class="mt-3"
-        />
+        <Textfield v-model="productName" label="Nama Produk" placeholder="Masukkan nama produk" class="mt-3" />
 
-        <Dropdown
-          v-model="selectedRatings"
-          label="Rating Ulasan"
-          placeholder="Pilih rating ulasan"
-          :options="ratingOptions"
-          class="mt-3"
-        />
+        <Dropdown v-model="selectedRatings" label="Rating Ulasan" placeholder="Pilih rating ulasan"
+          :options="ratingOptions" class="mt-3" />
 
         <div class="flex items-center justify-end mt-9 gap-2.5">
-          <Button
-            class="w-full max-w-[140px]"
-            theme="primary-outline"
-            @click="onSave"
-            >Simpan</Button
-          >
-          <Button class="w-full max-w-[140px]" @click="onStart">Start</Button>
+          <Button class="w-full max-w-[140px]" theme="primary-outline" @click="onSave">Simpan</Button>
+          <Button class="w-full max-w-[140px]" @click="onStart">
+            <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
+            <span v-else>Start</span>
+          </Button>
         </div>
       </div>
     </div>
