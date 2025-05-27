@@ -1,6 +1,6 @@
 {
   "name": "shopee-app",
-  "version": "16.2.27",
+  "version": "16.2.32",
   "description": "",
   "main": "./app-electron/app.js",
   "scripts": {

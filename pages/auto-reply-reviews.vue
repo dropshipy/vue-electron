@@ -101,7 +101,7 @@ export default {
 
         <div class="flex items-center justify-end mt-9 gap-2.5">
           <Button class="w-full max-w-[140px]" theme="primary-outline" @click="onSave">Simpan</Button>
-          <Button class="w-full max-w-[140px]" @click="onStart">
+          <Button class="w-full max-w-[140px]" @click="onStart" :is-disabled="isRun">
             <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
             <span v-else>Start</span>
           </Button>

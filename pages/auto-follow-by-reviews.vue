@@ -68,7 +68,7 @@ export default {
       placeholder="Masukkan mulai dari ulasan ke" class="mt-3" />
     <Textfield v-model="followCount" type="number" label="Total Follow" placeholder="Masukkan total follow"
       class="mt-3" />
-    <Button class="w-full mt-7" @click="processFollow">
+    <Button class="w-full mt-7" @click="processFollow" :is-disabled="isRun">
       <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
       <span v-else>Start</span>
     </Button>

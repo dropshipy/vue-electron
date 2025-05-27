@@ -7,10 +7,14 @@ export default {
       validator: (value) =>
         ["primary", "tertiary", "primary-outline"].includes(value),
     },
-    className:{
+    className: {
       type: String,
       default: "",
-    }
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     buttonStyle() {
@@ -46,13 +50,10 @@ export default {
 </script>
 
 <template>
-  <button
-    v-bind="$attrs"
-    v-on="$listeners"
+  <button v-bind="$attrs" v-on="$listeners"
     class="flex items-center justify-center space-x-2 text-sm py-2 px-4 rounded-lg transition-all"
-    :class="[buttonClasses,className]"
-    :style="buttonStyle"
-  >
+    :class="[buttonClasses, className, isDisabled ? 'opacity-65' : 'opacity-100']" :style="buttonStyle"
+    :disabled="isDisabled">
     <slot />
   </button>
 </template>

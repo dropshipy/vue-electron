@@ -62,7 +62,7 @@ export default {
       </div>
     </div>
 
-    <Button class="mt-5 w-full" @click="processUnfollow">
+    <Button class="mt-5 w-full" @click="processUnfollow" :is-disabled="isRun">
       <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
       <span v-else>Start</span>
     </Button>

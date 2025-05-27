@@ -60,7 +60,7 @@ export default {
     <Textfield v-model="storeLink" label="Link Produk" placeholder="Masukkan link produk" class="mt-5" />
     <Textfield v-model="followCount" type="number" label="Jumlah" placeholder="Masukkan jumlah yang ingin difollow"
       class="mt-3" />
-    <Button class="w-full mt-7" @click="processFollow">
+    <Button class="w-full mt-7" @click="processFollow" :is-disabled="isRun">
       <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
       <span v-else>Start</span>
     </Button>
