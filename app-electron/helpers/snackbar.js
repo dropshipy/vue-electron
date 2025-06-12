@@ -50,15 +50,33 @@ const showSnackbar = async ({ page, message, type = 'success', autoHide = true }
 
         snackbarContent.append(snackbarTitle, snackbarMessage);
 
-        const successIcon = document.createElement("div");
-        successIcon.innerHTML = `
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="40" height="40" rx="20" fill="${theme}"/>
-        <path d="M20 32C13.3831 32 8 26.6169 8 20C8 13.3831 13.3831 8 20 8C26.6169 8 32 13.3831 32 20C32 26.6169 26.6169 32 20 32Z" fill="${theme}"/>
-        <path d="M26.4739 14.6475L15.623 25.4983L21.9637 31.8389C27.5946 30.9082 31.9155 26.0435 31.9986 20.1722L26.4739 14.6475Z" fill="${theme}"/>
-        <path d="M26.7156 14.8798C26.0224 14.1282 25.3939 13.621 24.6423 14.313L16.9599 21.3955L15.0205 19.1774C14.3474 18.4087 13.6683 18.8455 12.8983 19.5184C12.1284 20.1913 11.5592 20.8457 12.2328 21.6157L14.236 23.9067L15.8709 25.7767C16.3113 26.2803 17.0803 26.3218 17.5722 25.8683L19.3985 24.1846L27.1523 17.0364C27.9045 16.3432 27.4088 15.6315 26.7156 14.8798Z" fill="white"/>
-      </svg>
-    `;
+        const iconContainer = document.createElement("div");
+
+        if (_type === 'warning') {
+          iconContainer.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="${theme}" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="8" fill="${theme}" />
+      <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.553.553 0 0 1-1.1 0z" fill="white"/>
+    </svg>
+  `;
+        } else if (_type === 'error') {
+          iconContainer.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="${theme}" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="8" fill="${theme}" />
+      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" fill="white"/>
+    </svg>
+  `;
+        } else {
+          // default to success
+          iconContainer.innerHTML = `
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="20" fill="${theme}"/>
+      <path d="M20 32C13.3831 32 8 26.6169 8 20C8 13.3831 13.3831 8 20 8C26.6169 8 32 13.3831 32 20C32 26.6169 26.6169 32 20 32Z" fill="${theme}"/>
+      <path d="M26.4739 14.6475L15.623 25.4983L21.9637 31.8389C27.5946 30.9082 31.9155 26.0435 31.9986 20.1722L26.4739 14.6475Z" fill="${theme}"/>
+      <path d="M26.7156 14.8798C26.0224 14.1282 25.3939 13.621 24.6423 14.313L16.9599 21.3955L15.0205 19.1774C14.3474 18.4087 13.6683 18.8455 12.8983 19.5184C12.1284 20.1913 11.5592 20.8457 12.2328 21.6157L14.236 23.9067L15.8709 25.7767C16.3113 26.2803 17.0803 26.3218 17.5722 25.8683L19.3985 24.1846L27.1523 17.0364C27.9045 16.3432 27.4088 15.6315 26.7156 14.8798Z" fill="white"/>
+    </svg>
+  `;
+        }
 
         const closeIcon = document.createElement("div");
         closeIcon.innerHTML = `
@@ -68,7 +86,7 @@ const showSnackbar = async ({ page, message, type = 'success', autoHide = true }
       </svg>
     `;
 
-        snackbar.append(successIcon, snackbarContent, closeIcon);
+        snackbar.append(iconContainer, snackbarContent, closeIcon);
 
         document.body.appendChild(snackbar);
 
