@@ -6,6 +6,7 @@ import {
   FOLLOWER_AGE_OPTIONS,
   GENDER_OPTIONS,
 } from "~/constants/option.constant";
+import { mapMutations } from 'vuex'
 
 export default {
   data() {
@@ -35,8 +36,14 @@ export default {
       }
       return "text-[#00AC01]";
     },
+    isRun() {
+      return this.$store.getters["loading/getChat"];
+    }
   },
   methods: {
+    ...mapMutations({
+      setChat: "loading/setChat"
+    }),
     onSave() {
       this.message = this.message.trim();
 
@@ -58,15 +65,17 @@ export default {
       electronStore.set("selected-crawl-creator", payload);
       this.$snackbar.success("Berhasil menyimpan konfigurasi");
     },
-    onStart() {
+    async onStart() {
       const context = electronStore.get("selected-crawl-creator");
       const subscriptionId = this.subscription?.id || null;
 
       if (context) {
-        window.electron.ipcRenderer.send("crawl-creator", {
+        this.setChat(true);
+        await window.electron.ipcRenderer.invoke("crawl-creator", {
           context,
           subscriptionId,
         });
+        this.setChat(false);
       } else {
         this.$snackbar.error("Belum ada konfigurasi");
       }
@@ -105,15 +114,12 @@ export default {
   },
   watch: {
     selectedSocialMedia(newVal) {
-      console.log("isMounted :", this.isMounted);
-
       const differentOptions = ["Semua", "Youtube", "Shopee"];
       const matchedOption = differentOptions.find((option) =>
         newVal.toLowerCase().includes(option.toLowerCase())
       );
 
       let options;
-      console.log(matchedOption);
       if (matchedOption) {
         options = FOLLOWER_COUNT_OPTIONS[matchedOption];
       } else {
@@ -145,76 +151,38 @@ export default {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-3">
       <div>
         <h6 class="text-gray-500 font-medium">Konfigurasi Bot Automasi</h6>
-        <Textfield
-          v-model="selectedIteration"
-          label="Jumlah Pengulangan Automasi"
-          type="number"
-          placeholder="Masukkan jumlah pengulangan"
-          class="mt-3"
-        />
+        <Textfield v-model="selectedIteration" label="Jumlah Pengulangan Automasi" type="number"
+          placeholder="Masukkan jumlah pengulangan" class="mt-3" />
 
         <h6 class="text-gray-500 font-medium mt-6">Kategori Utama</h6>
 
-        <Dropdown
-          v-model="selectedCategory"
-          label="Kategori"
-          placeholder="Pilih kategori"
-          :options="categoryOptions"
-          class="mt-3"
-        />
+        <Dropdown v-model="selectedCategory" label="Kategori" placeholder="Pilih kategori" :options="categoryOptions"
+          class="mt-3" />
 
         <h6 class="text-gray-500 font-medium mt-6">Atribut Kreator</h6>
 
-        <Dropdown
-          v-model="selectedSocialMedia"
-          label="Media Sosial"
-          placeholder="Pilih sosial media kreator"
-          :options="socialMediaOptions"
-          :max-height="150"
-          class="mt-3"
-        />
+        <Dropdown v-model="selectedSocialMedia" label="Media Sosial" placeholder="Pilih sosial media kreator"
+          :options="socialMediaOptions" :max-height="150" class="mt-3" />
       </div>
 
       <div>
         <h6 class="text-gray-500 font-medium">Filter Jumlah Pengikut</h6>
 
-        <Dropdown
-          v-model="selectedFollowerCount"
-          label="Pengikut"
-          placeholder="Pilih jumlah pengikut"
-          :options="followerCountOptions"
-          class="mt-3"
-        />
+        <Dropdown v-model="selectedFollowerCount" label="Pengikut" placeholder="Pilih jumlah pengikut"
+          :options="followerCountOptions" class="mt-3" />
 
-        <Dropdown
-          v-model="selectedFollowerAge"
-          label="Usia Pengikut"
-          placeholder="Pilih usia pengikut"
-          :options="followerAgeOptions"
-          class="mt-3"
-        />
+        <Dropdown v-model="selectedFollowerAge" label="Usia Pengikut" placeholder="Pilih usia pengikut"
+          :options="followerAgeOptions" class="mt-3" />
 
-        <Dropdown
-          v-model="selectedGender"
-          label="Jenis Kelamin"
-          placeholder="Pilih gender pengikut"
-          :options="genderOptions"
-          class="mt-3"
-        />
+        <Dropdown v-model="selectedGender" label="Jenis Kelamin" placeholder="Pilih gender pengikut"
+          :options="genderOptions" class="mt-3" />
 
         <h6 class="text-gray-500 font-medium mt-6">
           Pesan Undangan Untuk Kreator
         </h6>
 
-        <Textfield
-          v-model="message"
-          label="Pesan Undangan Ke Affiliator"
-          placeholder="Masukkan pesan undangan"
-          type="textarea"
-          input-class="min-h-24"
-          :max-height="200"
-          class="mt-3"
-        >
+        <Textfield v-model="message" label="Pesan Undangan Ke Affiliator" placeholder="Masukkan pesan undangan"
+          type="textarea" input-class="min-h-24" :max-height="200" class="mt-3">
           <template #label>
             <div class="flex items-center space-x-1 text-error">
               <Icon name="warning" :size="14" />
@@ -224,13 +192,11 @@ export default {
         </Textfield>
 
         <div class="flex items-center justify-end mt-9 gap-2.5">
-          <Button
-            class="w-full max-w-[140px]"
-            theme="primary-outline"
-            @click="onSave"
-            >Simpan</Button
-          >
-          <Button class="w-full max-w-[140px]" @click="onStart">Start</Button>
+          <Button class="w-full max-w-[140px]" theme="primary-outline" @click="onSave">Simpan</Button>
+          <Button class="w-full max-w-[140px]" @click="onStart" :is-disabled="isRun">
+            <Icon v-if="isRun" name="spinner" :size="24" class="animate-spin" :clas="textStyle" />
+            <span v-else>Start</span>
+          </Button>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ const { dialog } = require("electron");
 const { DEFAULT_TIMEOUT, NO_TIMEOUT } = require("../constants/timeout");
 const { URL_SELLER_SHOPEE } = require("../constants/url");
 const { waitForTimeout, waitForRandomDelay } = require("../helpers/utils");
+const { showSnackbar } = require('../helpers/snackbar')
 
 async function saveCookies(page, browser) {
   const cookies = await page.cookies();
@@ -242,7 +243,7 @@ async function loginToShopeeSeller(page) {
 
     if (loginMethod === "contact") {
       const contactEl = await page.waitForSelector('input[name="loginKey"]', {
-        timeout: NO_TIMEOUT,
+        timeout: 200,
       });
       await contactEl.click();
       await page.keyboard.type(account.contact);
@@ -281,6 +282,8 @@ async function loginToShopeeSeller(page) {
     }
   } catch (error) {
     console.error("Error during login:", error);
+    if (error?.name?.includes('TimeoutError'))
+      await showSnackbar({ page, message: "Looks like it’s taking longer than expected. Please try again", type: 'warning' })
   }
 }
 
