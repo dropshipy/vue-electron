@@ -24,8 +24,10 @@ export default {
       setUnfollow: "loading/setUnfollow"
     }),
     async processUnfollow() {
+      this.setUnfollow(true)
       if (this.isFollowAll) {
         window.electron.ipcRenderer.send("process-auto-unfollow", "Semua");
+        await window.electron.ipcRenderer.invoke("process-auto-unfollow", "Semua");
       } else {
         if (!this.unfollowCount) {
           this.$snackbar.error(
@@ -40,6 +42,7 @@ export default {
           this.setUnfollow(false)
         }
       }
+      this.setUnfollow(false)
     },
   },
 };
