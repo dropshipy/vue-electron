@@ -24,22 +24,22 @@ export default {
       setUnfollow: "loading/setUnfollow"
     }),
     async processUnfollow() {
+      this.setUnfollow(true)
       if (this.isFollowAll) {
-        window.electron.ipcRenderer.send("process-auto-unfollow", "Semua");
+        await window.electron.ipcRenderer.invoke("process-auto-unfollow", "Semua");
       } else {
         if (!this.unfollowCount) {
           this.$snackbar.error(
             "Masukkan jumlah yang ingin di unfollow jika tidak ingin semuanya"
           );
         } else {
-          this.setUnfollow(true)
           await window.electron.ipcRenderer.invoke(
             "process-auto-unfollow",
             this.unfollowCount
           );
-          this.setUnfollow(false)
         }
       }
+      this.setUnfollow(false)
     },
   },
 };

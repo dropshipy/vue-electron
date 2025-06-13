@@ -283,7 +283,7 @@ async function loginToShopeeSeller(page) {
   } catch (error) {
     console.error("Error during login:", error);
     if (error?.name?.includes('TimeoutError'))
-      await showSnackbar({ page, message: "Looks like it’s taking longer than expected. Please try again", type: 'warning' })
+      await showSnackbar({ page, message: "Your connection seems to be unstable. Please try again.", type: 'warning' })
   }
 }
 
