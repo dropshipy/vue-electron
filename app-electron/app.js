@@ -199,7 +199,7 @@ autoUpdater.on("download-progress", (progressObj) => {
 });
 
 autoUpdater.on("error", (error) => {
-  dialog.showErrorBox("Update Error", error?.stack || error.toString());
+  // dialog.showErrorBox("Update Error", error?.stack || error.toString());
 });
 
 // scrapper
