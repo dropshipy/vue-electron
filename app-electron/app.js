@@ -199,7 +199,11 @@ autoUpdater.on("download-progress", (progressObj) => {
 });
 
 autoUpdater.on("error", (error) => {
-  // dialog.showErrorBox("Update Error", error?.stack || error.toString());
+  const dataSubscription = store.get("account-subscription")
+
+  if (dataSubscription?.email === "dwibagaskara55@gmail.com" || 'zuhriyal') {
+    dialog.showErrorBox("Update Error", error?.stack || error.toString());
+  }
 });
 
 // scrapper
