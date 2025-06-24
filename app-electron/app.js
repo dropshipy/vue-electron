@@ -388,7 +388,9 @@ ipcMain.handle("get-database-creator-shopee", async (event, data) => {
     return res.data;
   } catch (error) {
     console.log(error);
-    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    if (!error.data.message.includes('unauthorized')) {
+      dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
+    }
   }
 });
 
