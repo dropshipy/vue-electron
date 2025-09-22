@@ -46,6 +46,13 @@ const postAddCreator = async (subscriptionId, data, options) => {
     options
   );
 };
+const checkSubscriptionCreator = async (subscriptionId, options) => {
+  return await getData(
+    `/shopee/shopee-creators/check/${subscriptionId}`,
+    options
+  );
+};
+
 const authenticateBot = async (data, options) => {
   const response = await postData(
     "/users/authenticate-bot-shopee",
@@ -165,6 +172,7 @@ const postReplyShop = async (endpoint, payload, { headers }) => {
 module.exports = {
   postGetCreatorList,
   postAddCreator,
+  checkSubscriptionCreator,
   authenticateBot,
   getUserConfigByUserId,
   getUserConfigBySubscriptionId,

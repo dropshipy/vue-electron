@@ -1,7 +1,7 @@
-const { postGetCreatorList } = require("../../api/interface");
-const { postAddCreator } = require("../../api/interface");
+const { postAddCreator, postGetCreatorList, checkSubscriptionCreator } = require("../../api/interface");
 const { dialog } = require("electron");
-const { deleteNewLineAndSpaces, clickByText } = require("../../helpers/utils");
+const { deleteNewLineAndSpaces, clickByText, waitForTimeout } = require("../../helpers/utils");
+const {searchCreatorSnackbar} = require('../../helpers/snackbar')
 
 async function messageBlast({
   page,
@@ -22,18 +22,47 @@ async function messageBlast({
 
   try {
     while (loopCount >= iteration) {
+      console.log('hit get creator')
       let setPayload = { ...payload, offset: 1, limit: 20 };
       const getCreatorList = await postGetCreatorList(endpoint, setPayload, {
         headers: header,
       });
+      console.log("get creator list :", getCreatorList)
+
       let creatorCounter = 0;
       let creator = getCreatorList.data.data.list;
       if (creator.length > 0) {
         while (creator.length > creatorCounter && loopCount >= iteration) {
+          console.log("creator counter :",creatorCounter)
           try {
             const affiliateId = creator[creatorCounter].affiliate_id;
-            let chatList = null;
+            const username = creator[creatorCounter].username;
 
+            searchCreatorSnackbar({ page, username });
+            await waitForTimeout(2000
+              
+            )
+            const res = await checkSubscriptionCreator(
+                subscriptionId,
+                {
+                  headers: {
+                        Cookie: "connect.sid=" + authBotRes.sessionId,
+                      },
+                  params: {
+                    affiliateId,
+                    username,
+                  },
+                }
+              );
+            const isInSubs = res.data.message
+
+            if(isInSubs){
+              console.log(`skip creator ${username}, ${affiliateId}`)
+              creatorCounter++
+              continue
+            }              
+
+            let chatList = null;
             let totalPostCreator = 1;
 
             page.on("response", async (response) => {

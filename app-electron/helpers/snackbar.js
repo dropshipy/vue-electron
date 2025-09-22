@@ -117,4 +117,97 @@ const showSnackbar = async ({ page, message, type = 'success', autoHide = true }
   } catch { }
 };
 
-module.exports = { showSnackbar };
+const searchCreatorSnackbar = async ({ page, username }) => {
+  try {
+    await page.evaluate((username) => {
+      const theme = "#08A081"; // default to success color
+
+      if (!window.__searchCreatorSnackbar) {
+        const snackbar = document.createElement("div");
+        Object.assign(snackbar.style, {
+          display: "flex",
+          alignItems: "center",
+          position: "fixed",
+          right: "-1000px",
+          top: "30px",
+          padding: "12px 16px",
+          background: "#FFF",
+          zIndex: "9999",
+          borderLeft: `4px solid ${theme}`,
+          borderRadius: "4px",
+          boxShadow: "0px 2px 12px 0px rgba(102, 115, 143, 0.10)",
+          transition: "0.5s",
+          fontFamily: "sans-serif",
+        });
+
+        // Spinner
+        const spinner = document.createElement("div");
+        Object.assign(spinner.style, {
+          border: "4px solid #f3f3f3",
+          borderTop: `4px solid ${theme}`,
+          borderRadius: "50%",
+          width: "24px",
+          height: "24px",
+          animation: "spin 1s linear infinite",
+          marginRight: "12px",
+        });
+
+        // Inject @keyframes spin (only once)
+        if (!document.getElementById("__snackbar_style")) {
+          const style = document.createElement("style");
+          style.id = "__snackbar_style";
+          style.innerHTML = `
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        // Text container
+        const snackbarText = document.createElement("div");
+
+        const title = document.createElement("h6");
+        title.textContent = `Looking for creators: ${username}`;
+        Object.assign(title.style, {
+          margin: 0,
+          color: "#2D2D2D",
+          fontWeight: "500",
+          fontSize: "16px",
+        });
+
+        snackbarText.appendChild(title);
+        snackbar.appendChild(spinner);
+        snackbar.appendChild(snackbarText);
+        document.body.appendChild(snackbar);
+
+        setTimeout(() => {
+          snackbar.style.right = "30px";
+        }, 10);
+
+        // Save references for later updates
+        window.__searchCreatorSnackbar = snackbar;
+        window.__searchCreatorSnackbarTitle = title;
+
+        // Optional close function
+        window.__closeSearchCreatorSnackbar = () => {
+          snackbar.style.right = "-1000px";
+          setTimeout(() => {
+            snackbar.remove();
+            delete window.__searchCreatorSnackbar;
+            delete window.__searchCreatorSnackbarTitle;
+            delete window.__closeSearchCreatorSnackbar;
+          }, 300);
+        };
+      } else {
+        // Just update the title text
+        window.__searchCreatorSnackbarTitle.textContent = `Looking for creators: ${username}`;
+      }
+    }, username);
+  } catch (e) {
+    console.error("Failed to show searchCreatorSnackbar:", e);
+  }
+};
+
+module.exports = { showSnackbar, searchCreatorSnackbar };
