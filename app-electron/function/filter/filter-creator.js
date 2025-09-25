@@ -1,5 +1,5 @@
 const { dialog } = require("electron");
-const { waitForTimeout, clickByText } = require("../../helpers/utils");
+const { clickByText } = require("../../helpers/utils");
 
 const filterDropdownSelector = "div.eds-react-select__suffix"; // got 5 element
 
