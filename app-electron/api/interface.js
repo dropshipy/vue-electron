@@ -1,140 +1,105 @@
-// const ENDPOINT = require("./endpoint.js").ENDPOINT;
-const postData = require("./request-manager.js").postData;
-const postDataShopee = require("./request-manager.js").postDataShopee;
-const getData = require("./request-manager.js").getData;
-const getDataShopee = require("./request-manager.js").getDataShopee;
-const patchData = require("./request-manager.js").patchData;
+const {
+  postDataJWT,
+  getDataJWT,
+  patchDataJWT,
+} = require("./jwt-request"); // gunakan jwt-request yg sudah kamu bikin
+const {
+  postDataShopee,
+  getDataShopee,
+} = require("./request-manager.js"); // untuk API Shopee tanpa JWT
 const { parseCookieHeader } = require("../helpers/utils.js");
 
-const postGetCreatorList = async (endpoint, data, options) => {
-  return await postDataShopee(endpoint, data, options);
-};
-const postGetUserReviews = async (endpoint, options) => {
-  try {
-    return await getDataShopee(endpoint, options);
-  } catch (error) {
-    console.log("eror ", error);
-  }
-};
+// ---------- USER & AUTH ----------
+async function authenticateBot(data, options) {
+  const response = await postDataJWT("/users/authenticate-bot-shopee", data, options);
 
-const patchUseToken = async (options) => {
-  try {
-    return await patchData(
-      "/users/token",
-      {
-        token: 1,
-      },
-      options
-    );
-  } catch (error) {
-    console.log("eror patch", error);
-  }
-};
-
-const getToken = async (id) => {
-  return await getData(`/users/token/${id}`);
-};
-
-const postGetFollowers = async (endpoint, options) => {
-  return await getDataShopee(endpoint, options);
-};
-
-const postAddCreator = async (subscriptionId, data, options) => {
-  return await postData(
-    `/shopee/shopee-creators/${subscriptionId}`,
-    data,
-    options
-  );
-};
-const authenticateBot = async (data, options) => {
-  const response = await postData(
-    "/users/authenticate-bot-shopee",
-    data,
-    options
-  );
-  if (response?.status == 405 || response?.status == 403) {
+  if (response?.status === 405 || response?.status === 403) {
     return response;
   }
 
   let cookies = {};
-
-  if (response.headers["set-cookie"]) {
+  if (response.headers?.["set-cookie"]) {
     for (let cookieStr of response.headers["set-cookie"]) {
-      const cookie = parseCookieHeader(cookieStr);
-      cookies = {
-        ...cookies,
-        ...cookie,
-      };
+      cookies = { ...cookies, ...parseCookieHeader(cookieStr) };
     }
   }
+
   return { ...response.data, sessionId: cookies["connect.sid"] };
-};
-const updateSubscriptionStatus = async (data, options) => {
-  const { params } = options;
-  return await patchData(
-    `/shopee-subscriptions/${params.id}/status`,
-    data,
-    options
+}
+
+const patchUseToken = (options) =>
+  patchDataJWT("/users/token", { token: 1 }, options);
+
+const getToken = (id) => getDataJWT(`/users/token/${id}`);
+
+// ---------- CONFIG ----------
+const getUserConfigByUserId = (options) => getDataJWT("/user-config", options);
+
+const getUserConfigBySubscriptionId = ({ params, ...options }) =>
+  getDataJWT(`/shopee/reply-reviews/${params.subscriptionId}`, options);
+
+const getDatabaseCreators = (options) =>
+  getDataJWT(`/shopee/shopee-creators/app`, options);
+
+const getSavedCreators = ({ params, options }) =>
+  getDataJWT(`/shopee/shopee-creators/${params.subscriptionId}`, options);
+
+const getUserMessageBlastConfigBySubscriptionId = ({ params, ...options }) =>
+  getDataJWT(`/shopee/message-blast/${params.subscriptionId}`, options);
+
+const getUserSubscriptionByCode = ({ params, ...options }) =>
+  getDataJWT(`/shopee-subscriptions/code/${params.code}`, options);
+
+const updateSubscriptionStatus = ({ params, ...options }, data) =>
+  patchDataJWT(`/shopee-subscriptions/${params.id}/status`, data, options);
+
+// ---------- SHOPEE API ----------
+const getTikblastSubscriptions = (options) => 
+  getDataJWT("/shopee-subscriptions", options);
+
+const postGetCreatorList = (endpoint, data, options) =>
+  postDataShopee(endpoint, data, options);
+
+const postGetUserReviews = (endpoint, options) =>
+  getDataShopee(endpoint, options);
+
+const postGetFollowers = (endpoint, options) =>
+  getDataShopee(endpoint, options);
+
+const postAddCreator = (subscriptionId, data, options) =>
+  postDataJWT(`/shopee/shopee-creators/${subscriptionId}`, data, options);
+
+const postFollowUser = (endpoint, data, options) =>
+  postDataShopee(endpoint, data, options);
+
+const getShopeeFollowingList = ({ limit, shopId, headers }) =>
+  getDataShopee(
+    `https://shopee.co.id/api/v4/pages/get_followee_list?limit=${limit}&offset=0&shopid=${shopId}`,
+    { headers }
   );
-};
-const getUserConfigByUserId = async (options) => {
-  return await getData("/user-config", options);
-};
 
-const getUserConfigBySubscriptionId = async (options) => {
-  const { params } = options;
-  return await getData(
-    `/shopee/reply-reviews/${params.subscriptionId}`,
-    options
-  );
-};
-const getUserMessageBlastConfigBySubscriptionId = async (options) => {
-  const { params } = options;
-  return await getData(
-    `/shopee/message-blast/${params.subscriptionId}`,
-    options
-  );
-};
+const postShopeeUnfollow = ({ userId, headers }) =>
+  postDataShopee("https://shopee.co.id/api/v4/pages/unfollow", { userid: userId }, { headers });
 
-const getUserSubscriptionByCode = async (options) => {
-  const { params } = options;
-  return await getData(`/shopee-subscriptions/code/${params.code}`, options);
-};
-const postFollowUser = async (endpoint, data, options) => {
-  return await postDataShopee(endpoint, data, options);
-};
-
-const getShopeeFollowingList = async ({ limit, shopId, headers }) => {
-  const endpoint = `https://shopee.co.id/api/v4/pages/get_followee_list?limit=${limit}&offset=0&shopid=${shopId}`;
-  return await getDataShopee(endpoint, { headers });
-};
-
-const postShopeeUnfollow = async ({ userId, headers }) => {
-  const endpoint = "https://shopee.co.id/api/v4/pages/unfollow";
-  return await postDataShopee(endpoint, { userid: userId }, { headers });
-};
-
-const postShopeeMessage = async ({ payload, headers }) => {
-  const endpoint = "https://seller.shopee.co.id/webchat/api/v1.2/mini/messages";
-
-  const data = {
-    request_id: `request_id_${Date.now()}`,
-    entry_point: "direct_chat_entry_point",
-    source: "minichat",
-    type: "text",
-    chat_send_option: {
-      force_send_cancel_order_warning: false,
-      comply_cancel_order_warning: false,
+const postShopeeMessage = ({ payload, headers }) =>
+  postDataShopee(
+    "https://seller.shopee.co.id/webchat/api/v1.2/mini/messages",
+    {
+      request_id: `request_id_${Date.now()}`,
+      entry_point: "direct_chat_entry_point",
+      source: "minichat",
+      type: "text",
+      chat_send_option: {
+        force_send_cancel_order_warning: false,
+        comply_cancel_order_warning: false,
+      },
+      ...payload,
     },
-    ...payload,
-  };
+    { headers }
+  );
 
-  return await postDataShopee(endpoint, data, { headers });
-};
-
-const getListOfReviews = async (endpoint, headers) => {
-  return await getDataShopee(endpoint, { headers });
-};
+const getListOfReviews = (endpoint, headers) =>
+  getDataShopee(endpoint, { headers });
 
 const postReplyShop = async (endpoint, payload, { headers }) => {
   const updateHeaders = {
@@ -151,34 +116,40 @@ const postReplyShop = async (endpoint, payload, { headers }) => {
     "content-type": "application/json;charset=UTF-8",
   };
 
-  fetch(endpoint, {
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: updateHeaders,
     body: JSON.stringify(payload),
-  })
-    .then((response) => response.json())
-    .then((data) => console.log("Reply by api:", data.message))
-    .catch((error) => console.error("Error:", error));
-  // return await postDataShopee(endpoint, payload, updateHeaders);
+  });
+  return res.json();
 };
 
+// ---------- EXPORT ----------
 module.exports = {
-  postGetCreatorList,
-  postAddCreator,
+  // User & Auth
   authenticateBot,
+  patchUseToken,
+  getToken,
+
+  // Config
+  getTikblastSubscriptions,
+  getDatabaseCreators,
+  getSavedCreators,
   getUserConfigByUserId,
   getUserConfigBySubscriptionId,
-  getUserSubscriptionByCode,
   getUserMessageBlastConfigBySubscriptionId,
+  getUserSubscriptionByCode,
   updateSubscriptionStatus,
+
+  // Shopee API
+  postGetCreatorList,
   postGetUserReviews,
-  postFollowUser,
   postGetFollowers,
+  postAddCreator,
+  postFollowUser,
   getShopeeFollowingList,
   postShopeeUnfollow,
   postShopeeMessage,
   getListOfReviews,
   postReplyShop,
-  patchUseToken,
-  getToken,
 };
