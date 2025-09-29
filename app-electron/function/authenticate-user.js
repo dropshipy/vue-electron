@@ -1,43 +1,44 @@
 require("dotenv").config({ path: __dirname + "/../.env" });
 
-const fs = require("fs");
-const path = require("node:path");
 const axios = require("axios");
 const { getApiBaseUrl } = require("../helpers/api-url");
-const COOKIES_SHOPEE_TOOLS = path.join(
-  __dirname,
-  "../store/cookies-shopee-tools.json"
-);
+const store = require("../store/electron-store");
 
 const BASE_URL = getApiBaseUrl();
 
-async function saveCookies(cookies) {
-  fs.writeFileSync(COOKIES_SHOPEE_TOOLS, JSON.stringify(cookies));
+async function saveTokens(tokens) {
+  store.set("jwt-auth-tokens", tokens);
+}
+
+function getStoredTokens() {
+  return store.get("jwt-auth-tokens") || null;
+}
+
+function clearStoredTokens() {
+  store.delete("jwt-auth-tokens");
 }
 
 function authenticateUser(payload) {
-  // Simulate an authentication request and return the obtained cookie
+  // Authenticate user and return JWT tokens
   return new Promise((resolve, reject) => {
-    // Your authentication logic here, for example using axios
     axios
       .post(`${BASE_URL}/users/authenticate`, payload)
       .then((response) => {
-        console.log(response);
-        // Assuming the authentication endpoint returns a 'Set-Cookie' header
-        const setCookieHeader = response.headers["set-cookie"];
-        console.log(setCookieHeader);
-        if (setCookieHeader) {
-          // Check if setCookieHeader is an array (multiple cookies) or a string (single cookie)
-          const cookies = Array.isArray(setCookieHeader)
-            ? setCookieHeader
-            : [setCookieHeader];
+        // JWT response should contain token and refreshToken
+        const { token, refreshToken, user } = response.data;
 
-          // Extract the first cookie
-          const cookie = cookies[0].split(";")[0];
-          saveCookies(cookie);
-          resolve(cookie);
+        if (token) {
+          const tokens = {
+            token,
+            refreshToken,
+            user,
+            timestamp: new Date().toISOString(),
+          };
+
+          saveTokens(tokens);
+          resolve(tokens);
         } else {
-          reject(new Error("Authentication failed."));
+          reject(new Error("Authentication failed - no token received."));
         }
       })
       .catch((error) => {
@@ -45,4 +46,10 @@ function authenticateUser(payload) {
       });
   });
 }
-module.exports = { authenticateUser };
+module.exports = {
+  authenticateUser,
+  getStoredTokens,
+  saveTokens,
+  clearStoredTokens,
+};
+

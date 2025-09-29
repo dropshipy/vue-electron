@@ -40,6 +40,8 @@ const {
 const { exportDataToSheet } = require("./function/export-data-to-sheet");
 
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const { getTikblastSubscriptions, getDatabaseCreators, getSavedCreators } = require("./api/interface");
+const { saveTokens } = require("./function/authenticate-user");
 puppeteer.use(StealthPlugin());
 
 const store = new ElectronStore();
@@ -161,6 +163,11 @@ app.on("ready", () => {
 
   ipcMain.on("post-cookies-shopee-tools", async (event, payload) => {
     await authenticateUserShopeeTools(payload);
+  });
+
+   // Handle JWT token saving
+  ipcMain.on("save-jwt-tokens", async (event, tokens) => {
+    await saveTokens(tokens);
   });
 
   app.on("window-all-closed", () => {
@@ -358,12 +365,7 @@ ipcMain.on("process-auto-chat-by-reviews", async (_, data) => {
 
 ipcMain.handle("get-subscription-info", async () => {
   try {
-    console.log(BASE_URL)
-    const res = await axios.get(`${BASE_URL}/shopee-subscriptions`, {
-      headers: {
-        Cookie: store.get("cookies-spt"),
-      },
-    });
+    const res = await getTikblastSubscriptions()
     const dataSubscription = store.get("account-subscription") || {};
     store.set("account-subscription", {
       ...dataSubscription,
@@ -378,12 +380,8 @@ ipcMain.handle("get-subscription-info", async () => {
 
 ipcMain.handle("get-database-creator-shopee", async (event, data) => {
   try {
-    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators/app`, {
-      headers: {
-        Cookie: store.get("cookies-spt"),
-      },
-      params: data,
-    });
+    const res = await getDatabaseCreators({ params: data })
+    console.log('database:', res.data)
     store.set("database-creator-shopee", res.data);
     return res.data;
   } catch (error) {
@@ -398,15 +396,11 @@ ipcMain.handle(
   "get-subscription-creator-shopee",
   async (event, { payload, subscriptionId }) => {
     try {
-      const res = await axios.get(
-        `${BASE_URL}/shopee/shopee-creators/${subscriptionId}`,
-        {
-          headers: {
-            Cookie: store.get("cookies-spt"),
-          },
-          params: payload,
-        }
-      );
+      const res = await getSavedCreators({ params: {
+        subscriptionId
+      }, options: {
+        params: payload
+      } })
       return res.data;
     } catch (error) {
       console.log(error.data.error);
@@ -418,23 +412,6 @@ ipcMain.handle(
 ipcMain.handle("export-data-to-excel", async (event, data) => {
   const resData = await exportDataToSheet({ ...data, BASE_URL, store });
   return resData;
-});
-
-ipcMain.handle("get-database-creator-tiktok", async (event, data) => {
-  try {
-    const res = await axios.get(`${BASE_URL}/tikblast-creators/app`, {
-      headers: {
-        Cookie: store.get("cookies-spt"),
-      },
-      params: data,
-    });
-    console.log(res)
-    store.set("database-creator-tiktok", res.data);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-    dialog.showMessageBox({ message: error.message, buttons: ["OK"] });
-  }
 });
 
 app.on("window-all-closed", () => {

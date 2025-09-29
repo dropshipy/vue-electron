@@ -94,12 +94,24 @@ export default {
           `${this.$config.apiBaseUrl}/users/authenticate`,
           payload
         );
+        console.log(response);
+        console.log(response.status);
         if (response?.status === 200) {
-          window.electron.ipcRenderer.send(
-            "post-cookies-shopee-tools",
-            payload
-          );
-          const userData = response.data.user;
+          // window.electron.ipcRenderer.send(
+          //   "post-cookies-shopee-tools",
+          //   payload
+          // );
+
+          // Save JWT tokens instead of cookies
+          const { token, refreshToken, user: userData } = response.data;
+
+          // Send tokens to Electron main process for storage
+          window.electron.ipcRenderer.send("save-jwt-tokens", {
+            token,
+            refreshToken,
+            user: userData,
+            timestamp: new Date().toISOString(),
+          });
 
           localStorage.setItem("user_info", JSON.stringify(userData));
 

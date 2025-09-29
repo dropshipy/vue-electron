@@ -1,8 +1,8 @@
 const XLSX = require("xlsx");
-const axios = require("axios");
 const fs = require("fs");
 const path = require("node:path");
 const { formatNumberToShortForm } = require("../helpers/utils");
+const { getDatabaseCreators } = require("../api/interface");
 
 async function exportDataToSheet(data) {
   let page = 1;
@@ -18,12 +18,7 @@ async function exportDataToSheet(data) {
       category,
       search,
     };
-    const res = await axios.get(`${BASE_URL}/shopee/shopee-creators/app`, {
-      headers: {
-        Cookie: store.get("cookies-spt"),
-      },
-      params: dbCreatorPayload,
-    });
+    const res = await getDatabaseCreators({ params: dbCreatorPayload })
 
     const processedData = res.data.data.map((item) => {
       const relatedCategoris = item.relatedCategoris

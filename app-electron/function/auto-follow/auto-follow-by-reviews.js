@@ -1,5 +1,4 @@
 const puppeteer = require("puppeteer-extra");
-const axios = require("axios");
 
 const { dialog } = require("electron");
 const ElectronStore = require("electron-store");

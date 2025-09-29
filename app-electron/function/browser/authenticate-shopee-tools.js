@@ -1,3 +1,4 @@
+// NOT USED ANYMORE
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const axios = require("axios");

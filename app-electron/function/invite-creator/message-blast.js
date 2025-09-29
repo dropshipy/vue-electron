@@ -1,7 +1,5 @@
 const { postAddCreator, postGetCreatorList, checkSubscriptionCreator } = require("../../api/interface");
 const { dialog } = require("electron");
-const { deleteNewLineAndSpaces, clickByText, waitForTimeout } = require("../../helpers/utils");
-const {searchCreatorSnackbar} = require('../../helpers/snackbar')
 
 async function messageBlast({
   page,
@@ -184,14 +182,9 @@ async function messageBlast({
                       creatorPayload.relatedCategoris.push(tagName);
                     }
                   });
-                  const postCreatorSubs = await postAddCreator(
+                  postAddCreator(
                     subscriptionId,
-                    creatorPayload,
-                    {
-                      headers: {
-                        Cookie: "connect.sid=" + authBotRes.sessionId,
-                      },
-                    }
+                    creatorPayload                  
                   );
                   //total post creator for handle bug puppeteer
                   totalPostCreator++;
