@@ -23,18 +23,23 @@
         label="Email"
         type="email"
         placeholder="Masukkan email kamu disini"
+        @enter="onEnterEmail"
       />
-
       <Textfield
+        ref="password"
         v-model="password"
         label="Password"
         placeholder="Masukkan password kamu disini"
         :type="isShowPassword ? 'text' : 'password'"
         @click:icon="isShowPassword = !isShowPassword"
+        @enter="handleLogin"
         :icon="isShowPassword ? 'eye-show' : 'eye-hide'"
       />
 
-      <Button @click="handleLogin" class="!mt-10 w-full hover:opacity-60"
+      <Button
+        @click="handleLogin"
+        :is-disabled="isHandleLogin"
+        class="!mt-10 w-full hover:opacity-60"
         >Login</Button
       >
     </div>
@@ -49,6 +54,7 @@ export default {
       email: "",
       password: "",
       isShowPassword: false,
+      isHandleLogin: false,
     };
   },
   computed: {
@@ -81,21 +87,21 @@ export default {
   },
   methods: {
     async handleLogin() {
+      this.isHandleLogin = true;
       if (!this.email || !this.password) {
         this.$snackbar.error("Harap isi semua field");
         return;
       }
-      const payload = {
-        email: this.email,
-        password: this.password,
-      };
+
       try {
+        const payload = {
+          email: this.email,
+          password: this.password,
+        };
         const response = await this.$axios.post(
           `${this.$config.apiBaseUrl}/users/authenticate`,
           payload
         );
-        console.log(response);
-        console.log(response.status);
         if (response?.status === 200) {
           // window.electron.ipcRenderer.send(
           //   "post-cookies-shopee-tools",
@@ -133,6 +139,11 @@ export default {
           this.$snackbar.error("Email atau password yang anda masukkan salah");
         }
       }
+
+      this.isHandleLogin = false;
+    },
+    onEnterEmail() {
+      this.$refs.password.focus();
     },
   },
 };
