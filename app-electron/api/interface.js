@@ -49,9 +49,17 @@ const getUserMessageBlastConfigBySubscriptionId = ({ params, ...options }) =>
 
 const getUserSubscriptionByCode = ({ params, ...options }) =>
   getDataJWT(`/shopee-subscriptions/code/${params.code}`, options);
+const checkSubscriptionCreator = async (subscriptionId, options) => {
+  return await getDataJWT(
+    `/shopee/shopee-creators/check/${subscriptionId}`,
+    options
+  );
+};
+
 
 const updateSubscriptionStatus = ({ params, ...options }, data) =>
   patchDataJWT(`/shopee-subscriptions/${params.id}/status`, data, options);
+
 
 // ---------- SHOPEE API ----------
 const getTikblastSubscriptions = (options) => 
@@ -139,6 +147,7 @@ module.exports = {
   getUserConfigBySubscriptionId,
   getUserMessageBlastConfigBySubscriptionId,
   getUserSubscriptionByCode,
+  checkSubscriptionCreator,
   updateSubscriptionStatus,
 
   // Shopee API

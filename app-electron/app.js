@@ -425,7 +425,7 @@ app.on("window-all-closed", () => {
 //   return new Promise((resolve, reject) => {
 //     // Your authentication logic here, for example using axios
 //     axios
-//       .post("http://localhost:3030/api/users/authenticate", {
+//       .post("http://localhost:3000/api/users/authenticate", {
 //         email: "zu@gmail",
 //         password: "qwe",
 //       })
@@ -457,7 +457,7 @@ function makeApiRequest() {
   return new Promise((resolve, reject) => {
     try {
       axios
-        .get("http://localhost:3030/api/shopee/message-blast/7", {
+        .get("http://localhost:3000/api/shopee/message-blast/7", {
           headers: {
             Cookie: authenticationCookie,
           },

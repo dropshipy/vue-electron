@@ -50,6 +50,11 @@ export default {
       return "focus:!ring-[#00AC01]";
     },
   },
+  methods: {
+    focus() {
+      this.$refs.input.focus();
+    },
+  },
 };
 </script>
 
@@ -81,11 +86,13 @@ export default {
 
       <input
         v-else
+        ref="input"
         :value="value"
         :type="type"
         :placeholder="placeholder"
         @input="$emit('input', $event.target.value)"
         @change="$emit('change', $event.target.value)"
+        @keyup.enter="$emit('enter', $event)"
         :id="id"
         class="input-field"
         :class="[inputClass, { '!pr-9': icon }, ringStyle]"

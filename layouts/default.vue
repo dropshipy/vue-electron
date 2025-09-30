@@ -10,7 +10,6 @@ export default {
   created() {
     try {
       const userInfo = JSON.parse(localStorage.getItem("user_info"));
-      console.log("user info: ", userInfo);
       if (userInfo) {
         this.$store.commit("user/setUserInfo", userInfo);
       } else {

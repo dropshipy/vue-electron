@@ -1,6 +1,7 @@
-const { postGetCreatorList } = require("../../api/interface");
-const { postAddCreator } = require("../../api/interface");
+const { searchCreatorSnackbar } = require("../../helpers/snackbar");
+const { postAddCreator, postGetCreatorList, checkSubscriptionCreator } = require("../../api/interface");
 const { dialog } = require("electron");
+const { waitForTimeout } = require("../../helpers/utils");
 
 async function messageBlast({
   page,
@@ -21,18 +22,109 @@ async function messageBlast({
 
   try {
     while (loopCount >= iteration) {
+      console.log('hit get creator')
       let setPayload = { ...payload, offset: 1, limit: 20 };
       const getCreatorList = await postGetCreatorList(endpoint, setPayload, {
         headers: header,
       });
+
       let creatorCounter = 0;
       let creator = getCreatorList.data.data.list;
       if (creator.length > 0) {
         while (creator.length > creatorCounter && loopCount >= iteration) {
           try {
             const affiliateId = creator[creatorCounter].affiliate_id;
-            let chatList = null;
+            const username = creator[creatorCounter].username;
 
+            searchCreatorSnackbar({ page, username });
+            await waitForTimeout(2000)
+            const res = await checkSubscriptionCreator(
+                subscriptionId,
+                {
+                  params: {
+                    affiliateId,
+                    username,
+                  },
+                }
+              );
+            const isInSubs = res.data.message
+
+            if (isInSubs) {
+              console.log(`skip creator ${username}, ${affiliateId}`);
+
+              const response = await page.evaluate(async ({ affiliateId }) => {
+                const res = await fetch(
+                  "https://seller.shopee.co.id/api/v3/affiliateplatform/creator/detail",
+                  {
+                    method: "POST",
+                    credentials: "include", // biar session Shopee kepake
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      affiliate_id: Number(affiliateId),
+                      category_sort_type: 1,
+                      data_period: 30,
+                      show_meta_link: 0,
+                    }),
+                  }
+                );
+
+                return res.json();
+              }, { affiliateId });
+
+              const data = response.data;
+              const categoryAffiliate = data.profile.promote_category_ids;
+
+              const creatorPayload = {
+                username: data.profile.username,
+                displayName: data.profile.display_name,
+                affiliateId: data.profile.affiliate_id,
+                totalFollower: data.key_metrics.total_follower_count,
+                socialMedias: JSON.stringify(data.profile.social_media_details),
+                relatedCategoris: [],
+                orderRange: data.key_metrics.order_range,
+                email: data.profile.contact_info.email,
+                phoneNumber: data.profile.contact_info.phone,
+                soldProductCount: data.sales_metrics.sold_range,
+                saleCount: data.sales_metrics.gmv_range.map((el) => {
+                  if (el !== -1) el = el / 100_000;
+                  return el;
+                }),
+                maleAudience: getPercentageOfAudienceByGender(
+                  data?.audience_genders,
+                  "male"
+                ),
+                femaleAudience: getPercentageOfAudienceByGender(
+                  data?.audience_genders,
+                  "female"
+                ),
+              };
+
+              const tagNames = categoryAffiliate.map((categoryAffiliate) => {
+                const foundCategory = categoryShopee.find(
+                  (category) => category.category_id === categoryAffiliate
+                );
+                return foundCategory ? foundCategory.tag_name : null;
+              });
+              tagNames.forEach((tagName) => {
+                if (tagName !== null) {
+                  creatorPayload.relatedCategoris.push(tagName);
+                }
+              });
+
+              await postAddCreator(subscriptionId, creatorPayload, {
+                headers: {
+                  Cookie: "connect.sid=" + authBotRes.sessionId,
+                },
+              });
+
+              creatorCounter++;
+              continue;
+            }
+         
+
+            let chatList = null;
             let totalPostCreator = 1;
 
             page.on("response", async (response) => {
@@ -158,7 +250,7 @@ async function messageBlast({
               );
             }
             await page.keyboard.press("Enter");
-            await page.waitForTimeout(2000);
+            await waitForTimeout(2000);
           } catch (error) {
             console.log(error);
           }
