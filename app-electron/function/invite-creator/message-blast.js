@@ -1,5 +1,7 @@
+const { searchCreatorSnackbar } = require("../../helpers/snackbar");
 const { postAddCreator, postGetCreatorList, checkSubscriptionCreator } = require("../../api/interface");
 const { dialog } = require("electron");
+const { waitForTimeout } = require("../../helpers/utils");
 
 async function messageBlast({
   page,
@@ -35,15 +37,10 @@ async function messageBlast({
             const username = creator[creatorCounter].username;
 
             searchCreatorSnackbar({ page, username });
-            await waitForTimeout(2000
-              
-            )
+            await waitForTimeout(2000)
             const res = await checkSubscriptionCreator(
                 subscriptionId,
                 {
-                  headers: {
-                        Cookie: "connect.sid=" + authBotRes.sessionId,
-                      },
                   params: {
                     affiliateId,
                     username,
@@ -253,7 +250,7 @@ async function messageBlast({
               );
             }
             await page.keyboard.press("Enter");
-            await page.waitForTimeout(2000);
+            await waitForTimeout(2000);
           } catch (error) {
             console.log(error);
           }
