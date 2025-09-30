@@ -44,6 +44,10 @@ export default {
         this.$router.replace("/login");
       }, 500);
     },
+    async onCheckUpdate() {
+      console.log("check udpate");
+      window.ipcRenderer.send("check-for-update");
+    },
   },
 };
 </script>
@@ -91,6 +95,12 @@ export default {
           <MenuItem @click="onClickMenuItem('browser-options')">
             <Icon name="setting" class="text-primary" />
             <p class="text-sm whitespace-nowrap leading-normal">Opsi Browser</p>
+          </MenuItem>
+          <MenuItem @click="onCheckUpdate">
+            <Icon name="box-arrow-up-right" class="text-primary" />
+            <p class="text-sm capitalize whitespace-nowrap leading-normal">
+              Check Update
+            </p>
           </MenuItem>
         </Menu>
       </Button>

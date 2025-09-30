@@ -177,6 +177,10 @@ app.on("ready", () => {
   });
 });
 
+ipcMain.on("check-for-update", () => {
+  autoUpdater.checkForUpdates();
+});
+
 autoUpdater.on("update-available", () => {
   mainWindow.webContents.send("update_available", true);
 });
