@@ -145,6 +145,15 @@ async function autoScroll(page) {
   });
 }
 
+function withTimeout(promise, ms = 10000) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) =>
+      setTimeout(() => resolve(false), ms)
+    )
+  ])
+}
+
 module.exports = {
   waitForTimeout,
   waitForRandomDelay,
@@ -162,4 +171,5 @@ module.exports = {
   waitForSelectorWithTimeout,
   formatNumberToShortForm,
   autoScroll,
+  withTimeout
 };

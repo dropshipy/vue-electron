@@ -1,7 +1,7 @@
 const { searchCreatorSnackbar } = require("../../helpers/snackbar");
 const { postAddCreator, postGetCreatorList, checkSubscriptionCreator } = require("../../api/interface");
 const { dialog } = require("electron");
-const { waitForTimeout } = require("../../helpers/utils");
+const { waitForTimeout, withTimeout } = require("../../helpers/utils");
 
 async function messageBlast({
   page,
@@ -37,8 +37,9 @@ async function messageBlast({
             const username = creator[creatorCounter].username;
 
             searchCreatorSnackbar({ page, username });
-            await waitForTimeout(2000)
-            const res = await checkSubscriptionCreator(
+
+            const res = await withTimeout(
+              checkSubscriptionCreator(
                 subscriptionId,
                 {
                   params: {
@@ -46,7 +47,13 @@ async function messageBlast({
                     username,
                   },
                 }
-              );
+              ), 6000
+            )
+            if(res === false) {
+              creatorCounter++;
+              continue;
+            }
+            
             const isInSubs = res.data.message
 
             if (isInSubs) {
@@ -207,10 +214,17 @@ async function messageBlast({
             await page.waitForSelector(buttonChat);
             await page.click(buttonChat);
 
-            const textArea =
-              "#sidebar-minichat-list > div.WGDkm_RPQw > div.Mj9lh6KccD.yLzxr6DkWa > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
-            await page.waitForSelector(textArea);
-
+            let textArea = null
+            try{
+              textArea =
+                "#sidebar-minichat-list > div.WGDkm_RPQw > div.Mj9lh6KccD.yLzxr6DkWa > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
+              await page.waitForSelector(textArea, { timeout: 8000 });
+            } catch (error) {
+              console.log(error)
+              creatorCounter++;
+              continue;
+            }
+            
             let isAlreadySent = false;
 
             while (chatList === null) {

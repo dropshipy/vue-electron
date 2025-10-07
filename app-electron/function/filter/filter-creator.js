@@ -15,7 +15,7 @@ async function filterCreator({ page, config }) {
         console.log(error);
       }
     }
-    if (category.length > 0) {
+    if (category?.length > 0) {
       try {
         if (category[0] !== "Semua") {
           await clickByText(page, "Lebih Banyak");
