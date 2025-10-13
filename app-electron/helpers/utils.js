@@ -8,6 +8,25 @@ async function waitForRandomDelay(min = 1000, max = 4000) {
   const delay = Math.floor(Math.random() * (max - min + 1)) + min;
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
+async function promiseWithTimeout(promise, ms = 10000) {
+  let timeoutId;
+
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`Timeout after ${ms}ms`));
+    }, ms);
+  });
+
+  try {
+    const result = await Promise.race([promise, timeoutPromise]);
+    return result;
+  } catch (err) {
+    console.warn(`[promiseWithTimeout] ${err.message}`);
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 function parseCookieHeader(header) {
   // Split the header into individual name-value pairs
@@ -145,18 +164,11 @@ async function autoScroll(page) {
   });
 }
 
-function withTimeout(promise, ms = 10000) {
-  return Promise.race([
-    promise,
-    new Promise((resolve) =>
-      setTimeout(() => resolve(false), ms)
-    )
-  ])
-}
 
 module.exports = {
   waitForTimeout,
   waitForRandomDelay,
+  promiseWithTimeout,
   parseCookieHeader,
   saveCookies,
   loadCookies,
@@ -171,5 +183,4 @@ module.exports = {
   waitForSelectorWithTimeout,
   formatNumberToShortForm,
   autoScroll,
-  withTimeout
 };

@@ -1,7 +1,7 @@
 const { searchCreatorSnackbar } = require("../../helpers/snackbar");
 const { postAddCreator, postGetCreatorList, checkSubscriptionCreator } = require("../../api/interface");
 const { dialog } = require("electron");
-const { waitForTimeout, withTimeout } = require("../../helpers/utils");
+const { waitForTimeout, promiseWithTimeout } = require("../../helpers/utils");
 
 async function messageBlast({
   page,
@@ -38,7 +38,7 @@ async function messageBlast({
 
             searchCreatorSnackbar({ page, username });
 
-            const res = await withTimeout(
+            const res = await promiseWithTimeout(
               checkSubscriptionCreator(
                 subscriptionId,
                 {
@@ -218,11 +218,21 @@ async function messageBlast({
             try{
               textArea =
                 "#sidebar-minichat-list > div.WGDkm_RPQw > div.Mj9lh6KccD.yLzxr6DkWa > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
-              await page.waitForSelector(textArea, { timeout: 8000 });
-            } catch (error) {
-              console.log(error)
-              creatorCounter++;
-              continue;
+              await page.waitForSelector(textArea, { timeout: 4837 });
+            } catch {
+              try{
+                const chatAgainButtonSelector = "#sidebar-minichat-list > div.WGDkm_RPQw > div.Mj9lh6KccD.yLzxr6DkWa > div.QDLp_uN4bC > div > div.g00e_kvU_x > div > div"
+                const chatAgainButton = await page.waitForSelector(chatAgainButtonSelector, { timeout: 3631 });
+                await chatAgainButton.click()
+                await waitForTimeout(794)
+
+                textArea =
+                "#sidebar-minichat-list > div.WGDkm_RPQw > div.Mj9lh6KccD.yLzxr6DkWa > div.QDLp_uN4bC > div > div > div > div.X6NljyWyEg > div > textarea";
+                await page.waitForSelector(textArea, { timeout: 50000 });
+              } catch {
+                creatorCounter++;
+                continue;
+              }
             }
             
             let isAlreadySent = false;
