@@ -125,7 +125,7 @@ export default {
 
     <!-- NOTE change and up version every update build (same as package json) -->
     <span class="fixed bottom-0 right-0 text-xs m-[6px] text-dark3">
-      v16.2.37
+      v16.2.38
     </span>
   </div>
 </template>
