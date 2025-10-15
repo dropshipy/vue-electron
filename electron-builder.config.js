@@ -3,6 +3,7 @@ require("dotenv").config({ override: false });
 const brand = process.env.APP_NAME || "tiksender"
 
 const config = {
+  appId: brand === "tiksender" ? "com.shopeepowertools.app" : "com.shopeeblast.app",
   productName: brand === 'tiksender' ? 'Shopee Power Tools App' : 'Shopeeblast App',
   directories: {
     buildResources: "./app-electron/assets/icons"

@@ -169,12 +169,6 @@ app.on("ready", () => {
   ipcMain.on("save-jwt-tokens", async (event, tokens) => {
     await saveTokens(tokens);
   });
-
-  app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-      app.quit();
-    }
-  });
 });
 
 ipcMain.on("check-for-update", () => {
@@ -212,7 +206,7 @@ autoUpdater.on("download-progress", (progressObj) => {
 autoUpdater.on("error", (error) => {
   const dataSubscription = store.get("account-subscription")
 
-  if (dataSubscription?.email === "dwibagaskara55@gmail.com" || 'zuhriyal') {
+  if (dataSubscription?.email === "dwibagaskara55@gmail.com" || dataSubscription?.email === 'zuhriyal') {
     dialog.showErrorBox("Update Error", error?.stack || error.toString());
   }
 });
@@ -419,9 +413,9 @@ ipcMain.handle("export-data-to-excel", async (event, data) => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  // if (process.platform !== "darwin") {
     app.quit();
-  }
+  // }
 });
 
 // function authenticateUser() {
