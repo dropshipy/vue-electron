@@ -407,10 +407,10 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle("export-data-to-excel", async (event, data) => {
-  const resData = await exportDataToSheet({ ...data, BASE_URL, store });
-  return resData;
-});
+// ipcMain.handle("export-data-to-excel", async (event, data) => {
+//   const resData = await exportDataToSheet({ ...data, BASE_URL, store });
+//   return resData;
+// });
 
 app.on("window-all-closed", () => {
   // if (process.platform !== "darwin") {
