@@ -79,9 +79,9 @@ if (selectedBrowser && !selectedBrowser?.isChromium) {
     );
   } else if (process.platform === "linux") {
     if (arch === "arm64") {
-      chromePath = path.join(chromePathBasePath, "chrome/linux-arm64/chrome");
+      chromePath = path.join(chromePathBasePath, "chrome/linux-119.0.6045.105/chrome-linux64/chrome");
     } else {
-      chromePath = path.join(chromePathBasePath, "chrome/linux-x64/chrome");
+      chromePath = path.join(chromePathBasePath, "chrome/linux-119.0.6045.105/chrome-linux64/chrome");
     }
   }
 }
