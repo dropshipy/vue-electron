@@ -32,11 +32,15 @@ async function authenticateBotStatus(page, browser) {
   const osHostName = os.hostname();
   const osHomeDir = os.homedir();
   const osCpus = JSON.stringify(
-    os.cpus().map((o) => ({ model: o.model, speed: o.speed }))
+    os.cpus().map((o) => ({
+      model: o.model,
+      speed: osPlatform === "linux" ? 9999 : o.speed,
+    })) //dummy speed for linux
   );
   const osTotalMem = os.totalmem();
   const osUserInfo = JSON.stringify(os.userInfo());
   const osEndianess = os.endianness();
+  
   if (accountSubscription) {
     const payloadAuthBot = {
       email: accountSubscription.email,
