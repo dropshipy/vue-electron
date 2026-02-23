@@ -77,6 +77,12 @@ if (selectedBrowser && !selectedBrowser?.isChromium) {
       chromePathBasePath,
       `chrome/win64-119.0.6045.105/chrome-win64/chrome.exe`
     );
+  } else if (process.platform === "linux") {
+    if (arch === "arm64") {
+      chromePath = path.join(chromePathBasePath, "chrome/linux-arm64/chrome");
+    } else {
+      chromePath = path.join(chromePathBasePath, "chrome/linux-x64/chrome");
+    }
   }
 }
 
